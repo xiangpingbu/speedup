@@ -1,0 +1,4 @@
+Jetty_Home=/homes/maas/jetty-distribution-9.4.1.v20170120
+RESOURCE_PATH=./maas-web/target/maas-web.war
+Maas_Home=/homes/maas
+SERVER_IP=101.71.245.166
