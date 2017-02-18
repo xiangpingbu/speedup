@@ -1,8 +1,6 @@
 #!/bin/bash
 
-Jetty_Home=/homes/maas/jetty-distribution-9.4.1.v20170120
-RESOURCE_PATH=./maas-web/target/maas-web.war
-SERVER_IP=101.71.245.166
+. ./config
 
 
 

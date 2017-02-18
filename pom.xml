@@ -12,6 +12,7 @@
         <module>maas-model</module>
         <module>maas-web</module>
         <module>maas-service</module>
+        <module>maas-common</module>
     </modules>
 
     <properties>
