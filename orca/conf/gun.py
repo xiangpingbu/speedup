@@ -7,9 +7,9 @@ import multiprocessing
 
 debug = True
 loglevel = 'info'
-bind = '0.0.0.0:5000'
-pidfile = 'log/gunicorn.pid'
-logfile = 'log/debug.log'
+bind = '0.0.0.0:8091'
+pidfile = 'log/maas.pid'
+logfile = 'log/maas.log'
 
 #启动的进程数
 workers = multiprocessing.cpu_count() * 2 + 1
