@@ -51,14 +51,16 @@ public class IPBasedRateLimiter {
         if (rateLimiter == null) {
             synchronized (ipAddress.intern()) {
                 if ((rateLimiter = cache.getIfPresent(ipAddress)) !=null) {
+                    log.info("直接访问本地log");
                    return rateLimiter.tryAcquire(200,TimeUnit.MILLISECONDS);
                 }
-                    rateLimiter = RateLimiter.create(500);
+                    rateLimiter = RateLimiter.create(100);
                     cache.put(ipAddress, rateLimiter);
                     log.info("create a new ratelimiter for ip: {}", ipAddress);
                 return defaultRateLimiter.tryAcquire();
             }
         } else {
+            log.info("访问本地log");
             return rateLimiter.tryAcquire();
         }
     }

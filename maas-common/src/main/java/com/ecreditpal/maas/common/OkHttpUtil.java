@@ -168,18 +168,38 @@ public class OkHttpUtil {
 //        ThreadTest b = new ThreadTest();
 //         b.start();
 //          Thread.sleep(1000);
-        for (int i = 0; i < 25; i++) {
+//        for (int i = 0; i < 25; i++) {
+//            ThreadTest a = new ThreadTest();
+//            a.start();
+////        a = new ThreadTest();
+////        a.start();
+//        }
+////        Thread.sleep(500);
+//        for (int i = 0; i < 25; i++) {
+//            ThreadTest a = new ThreadTest();
+//            a.start();
+////        a = new ThreadTest();
+////        a.start();
+//        }
+
+        while(true) {
+            Thread.sleep(20);
             ThreadTest a = new ThreadTest();
             a.start();
-        a = new ThreadTest();
-        a.start();
         }
-        for (int i = 0; i < 25; i++) {
-            ThreadTest2 b = new ThreadTest2();
-            b.start();
-        b = new ThreadTest2();
-        b.start();
-        }
+//        Thread.sleep(500);
+//        for (int i = 0; i < 2; i++) {
+//            ThreadTest a = new ThreadTest();
+//            a.start();
+////        a = new ThreadTest();
+////        a.start();
+//        }
+//        for (int i = 0; i < 25; i++) {
+//            ThreadTest2 b = new ThreadTest2();
+//            b.start();
+//        b = new ThreadTest2();
+//        b.start();
+//        }
     }
 
     public static class ThreadTest extends Thread {
@@ -196,7 +216,6 @@ public class OkHttpUtil {
 
     public static class ThreadTest2 extends Thread {
         public void run() {
-            while (true) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -209,7 +228,6 @@ public class OkHttpUtil {
                     e.printStackTrace();
                 }
                 System.out.print(" " + (System.currentTimeMillis() - time));
-            }
         }
     }
 
