@@ -26,7 +26,7 @@ credit_query_times_three = '{"columnType": "N",' \
                            '"columnFlag": null, ' \
                            '"finalSelect": true, ' \
                            '"columnNum": "1", ' \
-                           '"columnName": "credit_query_times_three", ' \
+                           '"columnName": "CreditQueryTimes", ' \
                            '"columnBinning": {"binCategory":null,"binCountWoe": [0,0.3289,0.0939,-0.1082,-0.3609,-0.7697,-0.1245],' \
                            '"binBoundary": ["-Infinity",-999998,1,5,6,9]}, ' \
                            '"version": "", ' \
@@ -40,7 +40,7 @@ credit_c_credit_amount_sum = '{"columnType": "N",' \
                              '"columnFlag": null, ' \
                              '"finalSelect": true, ' \
                              '"columnNum": "2", ' \
-                             '"columnName": "credit_c_credit_amount_sum", ' \
+                             '"columnName": "CreditAmountSumVariable", ' \
                              '"columnBinning": {"binCategory":null,"binCountWoe": [0,-0.5007,-0.1528,0.0161,0.2159,0.4574,-0.1309],' \
                              '"binBoundary": ["-Infinity",-999998,6100,48598,156500,232000]}, ' \
                              '"version": "", ' \
@@ -54,10 +54,10 @@ credit_utilization = '{"columnType": "N",' \
                      '"columnFlag": null, ' \
                      '"finalSelect": true, ' \
                      '"columnNum": "3", ' \
-                     '"columnName": "credit_utilization", ' \
+                     '"columnName": "CreditUtilizationVariable", ' \
                      '"columnBinning": {' \
                      '"binCategory":null,' \
-                     '"binCountWoe": [0,0.1421,0.0329,-0.1524,-0.3616,-0.1496],' \
+                     '"binCountWoe": [0,0.2881,0.1421,0.0329,-0.1524,-0.3616,-0.1496],' \
                      '"binBoundary": ["-Infinity",-999998,0.249813,0.6888235,0.8948689,0.9859697]}, ' \
                      '"version": "", ' \
                      '"columnStats":{"max":3.0,"min":1.0,"mean":2.1363636363636362,"median":2.0,' \
@@ -71,9 +71,9 @@ personal_education = '{"columnType": "C",' \
                      '"columnFlag": null, ' \
                      '"finalSelect": true, ' \
                      '"columnNum": "4", ' \
-                     '"columnName": "personal_education", ' \
+                     '"columnName": "PersonalEducation", ' \
                      '"columnBinning": {' \
-                     '"binCategory":["硕士及以上","本科","专科","其他","missing","invalid"],' \
+                     '"binCategory":["masterOrAbove","undergraduate","junior","others","missing","invalid"],' \
                      '"binCountWoe": [0.5664,0.2364,-0.0886,-0.3337,0,0],' \
                      '"binBoundary": null}, ' \
                      '"version": "", ' \
@@ -87,9 +87,9 @@ personal_live_case = '{"columnType": "C",' \
                      '"columnFlag": null, ' \
                      '"finalSelect": true, ' \
                      '"columnNum": "5", ' \
-                     '"columnName": "personal_live_case", ' \
+                     '"columnName": "PersonalLiveCase", ' \
                      '"columnBinning": {' \
-                     '"binCategory":["自有商业按揭房","自有无按揭购房","自有公积金按揭购房","自建房","房","亲戚住房","宿舍","其他","missing","invalid"],' \
+                     '"binCategory":["commercialMortgageRoom","noMortgageRoom","fundMortgageRoom","selfBuildingRoom","rentalRoom","Relatives","dormitory","others","missing","invalid"],' \
                      '"binCountWoe": [0.0297,0.1522,0.3626,-0.2545,-0.0559,-0.0559,-0.1686,-0.1686,0,0],' \
                      '"binBoundary": null}, ' \
                      '"version": "", ' \
@@ -103,9 +103,9 @@ client_gender = '{"columnType": "C",' \
                 '"columnFlag": null, ' \
                 '"finalSelect": true, ' \
                 '"columnNum": "6", ' \
-                '"columnName": "client_gender", ' \
+                '"columnName": "ClientGender", ' \
                 '"columnBinning": {' \
-                '"binCategory":["男","女","missing","invalid"],' \
+                '"binCategory":["male","female","missing","invalid"],' \
                 '"binCountWoe": [-0.1056,0.276,-0.0439,0],' \
                 '"binBoundary": null}, ' \
                 '"version": "", ' \
@@ -119,9 +119,9 @@ personal_live_join = '{"columnType": "C",' \
                      '"columnFlag": null, ' \
                      '"finalSelect": true, ' \
                      '"columnNum": "7", ' \
-                     '"columnName": "personal_live_join", ' \
+                     '"columnName": "PersonalLiveJoin", ' \
                      '"columnBinning": {' \
-                     '"binCategory":["父母","配偶及子女","父母&配偶及子女","其他","朋友","配偶及子女&其他","父母,其他","父母&配偶及子女&其他","missing","invalid"],' \
+                     '"binCategory":["parents","spouse&child","parents&spouse&child","others","friend","spouse&child&others","parents&others","parents&spouse&child&others","missing","invalid"],' \
                      '"binCountWoe": [0.0313,0.0313,0.0313,-0.2019,-0.1069,-0.1069,-0.1069,-0.1069,0,0],' \
                      '"binBoundary": null}, ' \
                      '"version": "", ' \
@@ -135,7 +135,7 @@ personal_year_income = '{"columnType": "N",' \
                        '"columnFlag": null, ' \
                        '"finalSelect": true, ' \
                        '"columnNum": "8", ' \
-                       '"columnName": "personal_year_income", ' \
+                       '"columnName": "PersonalYearIncome", ' \
                        '"columnBinning": {' \
                        '"binCategory":null,' \
                        '"binCountWoe": [0,0.1063,-0.0362,-0.0853,0.4706,0.6784],' \
@@ -151,7 +151,7 @@ loan_repayment_frequency_avg = '{"columnType": "N",' \
                                '"columnFlag": null, ' \
                                '"finalSelect": true, ' \
                                '"columnNum": "9", ' \
-                               '"columnName": "loan_repayment_frequency_avg", ' \
+                               '"columnName": "RepaymentFrequencyVariable", ' \
                                '"columnBinning": {' \
                                '"binCategory":null,' \
                                '"binCountWoe": [0,0.495,-0.179,0.0214],' \
@@ -166,7 +166,7 @@ age = '{"columnType": "N",' \
       '"columnFlag": null, ' \
       '"finalSelect": true, ' \
       '"columnNum": "10", ' \
-      '"columnName": "age", ' \
+      '"columnName": "AgeVariable", ' \
       '"columnBinning": {' \
       '"binCategory":null,' \
       '"binCountWoe": [0,-0.2699,-0.1819,0.0129,0.0263,0.1775,0.2687,-0.0439],' \

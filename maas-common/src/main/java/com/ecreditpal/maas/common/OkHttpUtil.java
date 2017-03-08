@@ -64,7 +64,6 @@ public class OkHttpUtil {
             }
         }
 
-        final long b = System.currentTimeMillis();
         RequestBody formBody = formBodyBuilder.build();
         Request request = requestBuilder
                 .url(url)
