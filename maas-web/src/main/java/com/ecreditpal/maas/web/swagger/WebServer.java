@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.web.swagger;
 
+import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -9,7 +10,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class WebServer {
     public static void main(String[] args) {
-        Server server = new Server(8181);
+
+        Server server = new Server(8081);
 
         WebAppContext context = new WebAppContext();
         context.setContextPath("/");
@@ -19,6 +21,7 @@ public class WebServer {
 
 
         server.setHandler(context);
+        IPBasedRateLimiter.getInstance();
 
         try {
             server.start();

@@ -1,6 +1,7 @@
 # coding=utf-8
 from flask import Flask, request
 from flask_restful import Api
+
 from util.restfultools import *
 
 app = Flask(__name__)
@@ -72,4 +73,4 @@ def delOne(name):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=8091, debug=True)
