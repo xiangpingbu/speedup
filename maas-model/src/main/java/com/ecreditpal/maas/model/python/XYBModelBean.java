@@ -1,11 +1,15 @@
 package com.ecreditpal.maas.model.python;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
  * @author lifeng
  * @version 1.0 on 2017/3/8.
  */
+
 public class XYBModelBean {
     /**
      * 三个月内的查询次数
