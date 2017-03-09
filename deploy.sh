@@ -12,7 +12,7 @@ scp $RESOURCE_PATH $SERVER_IP:~/ROOT.war
 ssh -Tq $SERVER_IP << remotessh
     ~/$tmp_kill_proc_sh
     rm -rf ~/$tmp_kill_proc_sh
-    rm -rf ${Jetty_Home}/ROOT.war`
+    rm -rf ${Jetty_Home}/ROOT.war
     mv ~/ROOT.war ${Jetty_Home}/webapps
 remotessh
 
