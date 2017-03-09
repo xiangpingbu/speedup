@@ -9,7 +9,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class WebServer {
     public static void main(String[] args) {
-        Server server = new Server(8888);
+        Server server = new Server(8181);
 
         WebAppContext context = new WebAppContext();
         context.setContextPath("/");
