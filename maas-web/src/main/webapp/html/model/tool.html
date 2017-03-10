@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    .MyRect:hover {
+        fill: brown;
+    }
+</style>
+
+
+<body>
+<div>
+</div>
+<button class="btn btn-primary" style="margin-left: 25px;;" id="merge">执行合并</button>
+</body>
+<script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
+<script src="/static/js/d3/d3.min.js"></script>
+<link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
+
+
+<script>
+    d3.json("http://localhost:8081/rest/d3/mock", function (error, json) {
+        console.log(json.data);
+    });
+
+    var height = 500,
+        width = 500,
+        margin = 25;
+
+    data = [{"bin_num": 0, "woe": 0.1564},
+        {"bin_num": 1, "woe": 0.0726},
+        {"bin_num": 2, "woe": 0.0236},
+        {"bin_num": 3, "woe": -0.1455},
+        {"bin_num": 4, "woe": -0.1472},
+        {"bin_num": 5, "woe": -0.4853},
+        {"bin_num": 6, "woe": -0.1629}];
+
+    var padding = {left: 25, right: 30, top: 5, bottom: 20};
+
+    //描绘一个画布
+    var svg = d3.select("div").append("svg")
+        .attr("class", "axis")
+        .attr("width", width)
+        .attr("height", height);
+    var xScale, yScale;
+
+    function renderXAxis() {
+        var axisLength = width - 2 * margin;
+
+        //设定比例
+        xScale = d3.scaleLinear()
+            .domain([-0.5, 0.2])//数值范围
+            .range([0, axisLength]);//该范围在屏幕内展示的长度
+
+        //ticks表示我们希望的刻度数,会根据数值调整
+        var axis = d3.axisBottom(xScale).ticks(5);
+
+        svg.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", function () {
+                return "translate(" + margin + "," + 475 + ")";
+            }).call(axis);
+
+
+        d3.selectAll("g.x-axis g.tick")
+            .attr("stroke", "#777")
+            .attr("stroke-dasharray", "2,2") //设置虚线
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", 0)
+            .attr("y2", -(height - 2 * margin));
+    }
+
+    function renderYAxis() {
+        var axisLength = width - 2 * margin;
+
+        //设定比例
+        yScale = d3.scaleLinear()
+            .domain([-0.5, 6])//数值范围
+            .range([0, axisLength]);//该范围在屏幕内展示的长度
+
+        var axis = d3.axisLeft(yScale).ticks(6);
+
+        svg.append("g")
+            .attr("class", "y-axis")
+            .attr("transform", function () {
+                return "translate(" + margin + "," + margin + ")";
+            }).call(axis);
+
+
+        d3.selectAll("g.x-axis")
+        //            .attr("stroke", "#777")
+        //            .attr("stroke-dasharray", "2,2") //设置虚线
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", axisLength)
+            .attr("y2", 0);
+    }
+
+    function render() {
+
+
+        d3.select("body") //找到body标签
+            .selectAll("div.h-bar")//得到包含所有拥有h-bar的div的选集,组成了一个图形领域
+            .data(data).enter() //组成了数据领域,enter方法可以返回没有与与图形领域绑定的数据,可以后续进行绑定
+            .append("div")//向选集中加入一个div
+            .attr("class", "h-bar")//向div中加入一个样式,名为h-bar
+            .append("span"); //往div中加入span,至此数据和图形绑定在了一起.可以在浏览器中观察h-bar的dom信息,其中_data_代表绑定的数据
+
+//        //下面将通过api根据数据调整图形的样式,
+        d3.select("body").selectAll("div.h-bar")
+            .data(data) //可以执行这个方法重新绑定数据,绑定的数组长度不会超过data的长度
+            .style("width", function (d) {
+                return (d * 3) + "px";
+            })
+            .select("span")
+            .text(function (d) {
+                return d;
+            });
+
+        //将未被绑定的数据丢弃,之后的数据都是和图形相匹配的
+        d3.select("body")
+            .selectAll("div.h-bar")
+            .data(data)
+            .exit()
+            .remove()
+    }
+
+    var body;
+    function renderBody(svg) {
+        if (!body) {
+            body = svg.append("g")
+                .attr("class", "body")
+                .attr("clip-path", "url" +
+                    "(#body-clip)");
+        }
+        renderBars()
+    }
+
+    function renderBars() {
+        var rects = svg.selectAll(".MyRect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("class", "MyRect")
+            .attr("fill", "steelblue")
+            .attr("id", function (d) {
+                return "index_" + d.bin_num;
+            })
+            .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function (d) {
+                return xScale(Math.min(0, d.woe))
+            })
+            .attr("y", function (d) {
+                return yScale(d.bin_num)
+            })
+            .attr("width", function (d) {
+                return Math.abs(xScale(d.woe) - xScale(0))
+            })
+            .attr("height", function (d) {
+                return 20
+            });
+    }
+
+    $(document).ready(function () {
+        var start = null;
+        var end = null;
+        var array = [$("#index_0")];
+        $(".MyRect").click(function () {
+            if (array.length == 1) {
+                var val = $(this).attr("id");
+                var index = val.split("_")[1];
+                if (!start) {
+                    $("#" + val).attr("fill", "brown");
+                    start = index;
+                } else if (!end) {
+                    end = index;
+                }
+                console.log(start+" "+end);
+                if (start && end) {
+                    for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
+                        var bar = $("#index_" + i);
+                        array.push(bar);
+                        bar.attr("fill", "brown");
+                    }
+                }
+            } else {
+                for (var m=0;m<array.length;m++) {
+                   array[m].attr("fill","steelblue");
+                }
+                array = [];
+                end = null;
+                array.push($(this));
+                $(this).attr("fill","brown");
+                start = $(this).attr("id").split("_")[1];
+                console.log(array.length);
+            }
+        });
+        
+        $("#merge").click(function () {
+            
+        })
+    });
+
+    renderXAxis();
+    renderYAxis();
+    renderBody(svg);
+</script>
+</html>
