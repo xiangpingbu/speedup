@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.common;
+package com.ecreditpal.maas.common.utils;
 
 import okhttp3.*;
 import okhttp3.OkHttpClient;

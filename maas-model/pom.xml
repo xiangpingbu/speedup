@@ -11,4 +11,23 @@
 
     <artifactId>maas-model</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.ecreditpal</groupId>
+            <artifactId>maas-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>

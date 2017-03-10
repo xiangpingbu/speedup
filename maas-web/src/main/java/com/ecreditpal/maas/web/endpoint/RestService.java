@@ -1,10 +1,9 @@
-package com.ecreditpal.maas.web.action;
+package com.ecreditpal.maas.web.endpoint;
 
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
-import com.ecreditpal.maas.common.OkHttpUtil;
+import com.ecreditpal.maas.common.utils.OkHttpUtil;
 import com.ecreditpal.maas.model.python.XYBModelBean;
-import com.ecreditpal.maas.web.bean.FileContent;
 import com.ecreditpal.maas.web.bean.User;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
