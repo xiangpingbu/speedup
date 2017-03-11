@@ -14,7 +14,7 @@
 <body>
 <div>
 </div>
-<button class="btn btn-primary" style="margin-left: 25px;;" id="merge">执行合并</button>
+<button class="btn btn-primary" style="margin-left: 25px;;" id="merge" disabled>执行合并</button>
 </body>
 <script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
 <script src="/static/js/d3/d3.min.js"></script>
@@ -22,10 +22,6 @@
 
 
 <script>
-    d3.json("http://localhost:8081/rest/d3/mock", function (error, json) {
-        console.log(json.data);
-    });
-
     var height = 500,
         width = 500,
         margin = 25;
@@ -47,7 +43,10 @@
         .attr("height", height);
     var xScale, yScale;
 
-    function renderXAxis() {
+    /**
+     * 描绘x轴
+     */
+    function renderXAxis(data) {
         var axisLength = width - 2 * margin;
 
         //设定比例
@@ -75,15 +74,18 @@
             .attr("y2", -(height - 2 * margin));
     }
 
-    function renderYAxis() {
+    /**
+     * 描绘y轴
+     */
+    function renderYAxis(data) {
         var axisLength = width - 2 * margin;
 
         //设定比例
-        yScale = d3.scaleLinear()
-            .domain([-0.5, 6])//数值范围
-            .range([0, axisLength]);//该范围在屏幕内展示的长度
+         yScale = d3.scaleBand()
+            .range([0,axisLength]).padding(0.1);
+        yScale.domain(data.map(function(d) { return d.bin_num; }));
 
-        var axis = d3.axisLeft(yScale).ticks(6);
+        var axis = d3.axisLeft(yScale);
 
         svg.append("g")
             .attr("class", "y-axis")
@@ -102,113 +104,111 @@
             .attr("y2", 0);
     }
 
-    function render() {
-
-
-        d3.select("body") //找到body标签
-            .selectAll("div.h-bar")//得到包含所有拥有h-bar的div的选集,组成了一个图形领域
-            .data(data).enter() //组成了数据领域,enter方法可以返回没有与与图形领域绑定的数据,可以后续进行绑定
-            .append("div")//向选集中加入一个div
-            .attr("class", "h-bar")//向div中加入一个样式,名为h-bar
-            .append("span"); //往div中加入span,至此数据和图形绑定在了一起.可以在浏览器中观察h-bar的dom信息,其中_data_代表绑定的数据
-
-//        //下面将通过api根据数据调整图形的样式,
-        d3.select("body").selectAll("div.h-bar")
-            .data(data) //可以执行这个方法重新绑定数据,绑定的数组长度不会超过data的长度
-            .style("width", function (d) {
-                return (d * 3) + "px";
-            })
-            .select("span")
-            .text(function (d) {
-                return d;
-            });
-
-        //将未被绑定的数据丢弃,之后的数据都是和图形相匹配的
-        d3.select("body")
-            .selectAll("div.h-bar")
-            .data(data)
-            .exit()
-            .remove()
-    }
-
     var body;
-    function renderBody(svg) {
+    function renderBody(svg,data) {
         if (!body) {
             body = svg.append("g")
-                .attr("class", "body")
-                .attr("clip-path", "url" +
-                    "(#body-clip)");
+                .attr("class", "body");
         }
-        renderBars()
+        renderBars(data)
     }
 
-    function renderBars() {
+    function renderBars(data) {
         var rects = svg.selectAll(".MyRect")
             .data(data)
             .enter()
             .append("rect")
             .attr("class", "MyRect")
-            .attr("fill", "steelblue")
-            .attr("id", function (d) {
+            .attr("fill", "steelblue")//设定bar的颜色
+            .attr("id", function (d) {//绑定id
                 return "index_" + d.bin_num;
             })
-            .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
             .attr("x", function (d) {
-                return xScale(Math.min(0, d.woe))
+                return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
             })
             .attr("y", function (d) {
-                return yScale(d.bin_num)
+                console.log(yScale(d.bin_num));
+                return yScale(d.bin_num);//根据bin_num的值设定y轴的值
             })
             .attr("width", function (d) {
-                return Math.abs(xScale(d.woe) - xScale(0))
+                return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
             })
             .attr("height", function (d) {
-                return 20
+                return 50;//设置高度
             });
     }
 
-    $(document).ready(function () {
-        var start = null;
-        var end = null;
-        var array = [$("#index_0")];
-        $(".MyRect").click(function () {
-            if (array.length == 1) {
-                var val = $(this).attr("id");
-                var index = val.split("_")[1];
-                if (!start) {
-                    $("#" + val).attr("fill", "brown");
-                    start = index;
-                } else if (!end) {
-                    end = index;
-                }
-                console.log(start+" "+end);
-                if (start && end) {
-                    for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
-                        var bar = $("#index_" + i);
-                        array.push(bar);
-                        bar.attr("fill", "brown");
-                    }
-                }
-            } else {
-                for (var m=0;m<array.length;m++) {
-                   array[m].attr("fill","steelblue");
-                }
-                array = [];
-                end = null;
-                array.push($(this));
-                $(this).attr("fill","brown");
-                start = $(this).attr("id").split("_")[1];
-                console.log(array.length);
-            }
-        });
-        
-        $("#merge").click(function () {
-            
-        })
+    d3.json("http://localhost:8091/tool", function (error, json) {
+        console.log(error);
+        console.log(json);
+
+        data = [{'name': 'javascript', 'useto': 'web development'},
+            {'name': 'python', 'useto': 'do anything'},
+            {'name': 'php', 'useto': 'web development'},
+            {'name': 'c++', 'useto': 'web server'}];
+
+        renderXAxis(json.data);
+        renderYAxis(json.data);
+        renderBody(svg,json.data);
+
+
+        renderXAxis(data);
+        renderYAxis(data);
+        renderBody(svg,data);
     });
 
-    renderXAxis();
-    renderYAxis();
-    renderBody(svg);
+//    $(document).ready(function () {
+//        var start = null;
+//        var end = null;
+//        var array = [$("#index_0")];
+//        /**
+//         * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
+//         */
+//        $(".MyRect").click(function () {
+//            if (array.length == 1) {
+//                var val = $(this).attr("id");
+//                var index = val.split("_")[1];
+//                if (!start) {
+//                    $("#" + val).attr("fill", "brown");
+//                    start = index;
+//                } else if (!end) {
+//                    end = index;
+//                }
+//                //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
+//                if (start && end) {
+//                    for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
+//                        var bar = $("#index_" + i);
+//                        array.push(bar);
+//                        bar.attr("fill", "brown");
+//                    }
+//                }
+//            } else {
+//                //将之前数组中添加的记录提取出来,重置颜色
+//                for (var m=0;m<array.length;m++) {
+//                   array[m].attr("fill","steelblue");
+//                }
+//                array = [];
+//                end = null;
+//                array.push($(this));
+//                $(this).attr("fill","brown");
+//                start = $(this).attr("id").split("_")[1];
+//            }
+//
+//            if (start && end) {
+//                $("#merge").removeAttr("disabled");
+//            } else{
+//                $("#merge").attr("disabled","disabled");
+//            }
+//        });
+//
+//        /**
+//         * 合并选择的集合
+//         */
+//        $("#merge").click(function () {
+//        })
+//    });
+
+
 </script>
 </html>
