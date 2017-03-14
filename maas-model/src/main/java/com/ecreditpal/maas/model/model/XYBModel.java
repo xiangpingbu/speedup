@@ -2,7 +2,7 @@ package com.ecreditpal.maas.model.model;
 
 
 import com.ecreditpal.maas.common.utils.PMMLUtils;
-import com.ecreditpal.maas.model.variable.Variable;
+import com.ecreditpal.maas.model.variables.Variable;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.ModelEvaluator;
@@ -23,12 +23,13 @@ import java.util.Map;
  */
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = configDir + "/modelconfig/xyb_model_variables.xml";
-    public static String localPmmlPath = configDir + "/modelconfig/xyb_model_pmml.pmml";
+    public static String localVariablePath = configDir + "/model_config/xyb_model_variables.xml";
+    public static String localPmmlPath = configDir + "/model_config/xyb_model_pmml.pmml";
     private static List<Variable> XYBModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
+
 
     /**
      * static block. load pmml file and init evaluator
@@ -136,5 +137,10 @@ public class XYBModel extends ModelNew {
 
     public String toString() {
         return "XinYongBao";
+    }
+
+
+    public static void main(String[] args) throws JAXBException {
+        XYBModel xybModel = new XYBModel();
     }
 }

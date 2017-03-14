@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.model.variable;
+package com.ecreditpal.maas.model.variables;
 
 import com.ecreditpal.maas.common.WorkDispatcher;
 import org.slf4j.Logger;

@@ -3,9 +3,9 @@ package com.ecreditpal.maas.model.model;
 
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.schedule.impl.ResReload;
-import com.ecreditpal.maas.model.variable.Variable;
+import com.ecreditpal.maas.model.variables.Variable;
 
-import com.ecreditpal.maas.model.variable.VariableConfiguration;
+import com.ecreditpal.maas.model.variables.VariableConfiguration;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,8 +29,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by xibu on 9/28/16.
  */
+
 public class ModelNew extends ResReload {
     private final static Logger log = LoggerFactory.getLogger(ModelNew.class);
+
     public String configPath;
     public String modelName;
     public List<Variable> variableList;
@@ -37,17 +40,17 @@ public class ModelNew extends ResReload {
     public Map<String, String> inputMap;
     public Map<String, Object> inputObjMap;
     public String inputJsonString;
-    public String packagePath = "com.ecreditpal.modelserv.variables.";
+    public String packagePath = "com.ecreditpal.maas.model.variables.";
     public List<HashMap<FieldName, String>> variablePool;
     public CountDownLatch cdl;
     private int CDL_TIMEOUT_SEC = 5;
-    public static String configDir = "itsrobin"+"src/main/resources";
+    static String configDir = "maas-model/src/main/resources";
 
     public static WorkDispatcher workDispatcher = new WorkDispatcher.Builder().
-            corePoolSize(Integer.valueOf("itsrobin"+"corePoolSize")).
-            maxPoolSize(Integer.valueOf("itsrobin"+"maxPoolSize")).
+            corePoolSize(8).
+            maxPoolSize(30).
             keepAliveTime(60).
-            queue(new LinkedBlockingQueue<>(Integer.valueOf("itsrobin"+"capacity"))).build();
+            queue(new LinkedBlockingQueue<>(50)).build();
 
     //Runtime.getRuntime().availableProcessors()
 
@@ -298,4 +301,6 @@ public class ModelNew extends ResReload {
     public void setInputObjMap(Map<String, Object> inputObjMap) {
         this.inputObjMap = inputObjMap;
     }
+
+
 }

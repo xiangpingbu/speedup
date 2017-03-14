@@ -139,76 +139,66 @@
             });
     }
 
+
+
+
     d3.json("http://localhost:8091/tool", function (error, json) {
-        console.log(error);
-        console.log(json);
-
-        data = [{'name': 'javascript', 'useto': 'web development'},
-            {'name': 'python', 'useto': 'do anything'},
-            {'name': 'php', 'useto': 'web development'},
-            {'name': 'c++', 'useto': 'web server'}];
-
         renderXAxis(json.data);
         renderYAxis(json.data);
         renderBody(svg,json.data);
 
 
-        renderXAxis(data);
-        renderYAxis(data);
-        renderBody(svg,data);
+        $(document).ready(function () {
+            var start = null;
+            var end = null;
+            var array = [$("#index_0")];
+            /**
+             * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
+             */
+            $('.MyRect').click(function () {
+                if (array.length == 1) {
+                    var val = $(this).attr("id");
+                    var index = val.split("_")[1];
+                    if (!start) {
+                        $("#" + val).attr("fill", "brown");
+                        start = index;
+                    } else if (!end) {
+                        end = index;
+                    }
+                    //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
+                    if (start && end) {
+                        for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
+                            var bar = $("#index_" + i);
+                            array.push(bar);
+                            bar.attr("fill", "brown");
+                        }
+                    }
+                } else {
+                    //将之前数组中添加的记录提取出来,重置颜色
+                    for (var m=0;m<array.length;m++) {
+                        array[m].attr("fill","steelblue");
+                    }
+                    array = [];
+                    end = null;
+                    array.push($(this));
+                    $(this).attr("fill","brown");
+                    start = $(this).attr("id").split("_")[1];
+                }
+
+                if (start && end) {
+                    $("#merge").removeAttr("disabled");
+                } else{
+                    $("#merge").attr("disabled","disabled");
+                }
+            });
+
+            /**
+             * 合并选择的集合
+             */
+            $("#merge").click(function () {
+            })
+        });
     });
-
-//    $(document).ready(function () {
-//        var start = null;
-//        var end = null;
-//        var array = [$("#index_0")];
-//        /**
-//         * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
-//         */
-//        $(".MyRect").click(function () {
-//            if (array.length == 1) {
-//                var val = $(this).attr("id");
-//                var index = val.split("_")[1];
-//                if (!start) {
-//                    $("#" + val).attr("fill", "brown");
-//                    start = index;
-//                } else if (!end) {
-//                    end = index;
-//                }
-//                //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
-//                if (start && end) {
-//                    for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
-//                        var bar = $("#index_" + i);
-//                        array.push(bar);
-//                        bar.attr("fill", "brown");
-//                    }
-//                }
-//            } else {
-//                //将之前数组中添加的记录提取出来,重置颜色
-//                for (var m=0;m<array.length;m++) {
-//                   array[m].attr("fill","steelblue");
-//                }
-//                array = [];
-//                end = null;
-//                array.push($(this));
-//                $(this).attr("fill","brown");
-//                start = $(this).attr("id").split("_")[1];
-//            }
-//
-//            if (start && end) {
-//                $("#merge").removeAttr("disabled");
-//            } else{
-//                $("#merge").attr("disabled","disabled");
-//            }
-//        });
-//
-//        /**
-//         * 合并选择的集合
-//         */
-//        $("#merge").click(function () {
-//        })
-//    });
-
 
 </script>
 </html>

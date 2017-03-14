@@ -1,5 +1,5 @@
 import com.ecreditpal.maas.model.model.XYBModel;
-import com.ecreditpal.maas.model.variable.Variable;
+import com.ecreditpal.maas.model.variables.Variable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Assert;

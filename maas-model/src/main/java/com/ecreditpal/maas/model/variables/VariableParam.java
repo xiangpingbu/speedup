@@ -1,7 +1,6 @@
-package com.ecreditpal.maas.model.variable;
+package com.ecreditpal.maas.model.variables;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
