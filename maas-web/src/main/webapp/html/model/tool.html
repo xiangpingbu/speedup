@@ -9,12 +9,36 @@
         fill: brown;
     }
 </style>
-
-
 <body>
-<div>
+<div style="display: inline-block;" id="svg"></div>
+
+<div style="display: inline-block;">
+    <table id="data_table" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>bin_num</th>
+            <th>woe</th>
+            <!--<th>min</th>-->
+            <!--<th>max</th>-->
+            <!--<th>bads</th>-->
+            <!--<th>goods</th>-->
+            <!--<th>total</th>-->
+            <!--<th>total_perc</th>-->
+            <!--<th>bad_rate</th>-->
+            <!--<th>bad_rate</th>-->
+            <!--<th>category_t</th>-->
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 </div>
-<button class="btn btn-primary" style="margin-left: 25px;;" id="merge" disabled>执行合并</button>
+
+
+<div>
+    <button class="btn btn-primary" style="margin-left: 25px;;" id="merge" disabled>执行合并</button>
+</div>
 </body>
 <script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
 <script src="/static/js/d3/d3.min.js"></script>
@@ -25,6 +49,10 @@
     var height = 500,
         width = 500,
         margin = 25;
+
+    var start = null;
+    var end = null;
+    var array = [$("#index_0")];
 
     data = [{"bin_num": 0, "woe": 0.1564},
         {"bin_num": 1, "woe": 0.0726},
@@ -37,7 +65,7 @@
     var padding = {left: 25, right: 30, top: 5, bottom: 20};
 
     //描绘一个画布
-    var svg = d3.select("div").append("svg")
+    var svg = d3.select("#svg").append("svg")
         .attr("class", "axis")
         .attr("width", width)
         .attr("height", height);
@@ -81,9 +109,11 @@
         var axisLength = width - 2 * margin;
 
         //设定比例
-         yScale = d3.scaleBand()
-            .range([0,axisLength]).padding(0.1);
-        yScale.domain(data.map(function(d) { return d.bin_num; }));
+        yScale = d3.scaleBand()
+            .range([0, axisLength]).padding(0.1);
+        yScale.domain(data.map(function (d) {
+            return d.bin_num;
+        }));
 
         var axis = d3.axisLeft(yScale);
 
@@ -105,7 +135,7 @@
     }
 
     var body;
-    function renderBody(svg,data) {
+    function renderBody(svg, data) {
         if (!body) {
             body = svg.append("g")
                 .attr("class", "body");
@@ -113,6 +143,9 @@
         renderBars(data)
     }
 
+    /**
+     * 绘制条状物
+     */
     function renderBars(data) {
         var rects = svg.selectAll(".MyRect")
             .data(data)
@@ -137,65 +170,99 @@
             .attr("height", function (d) {
                 return 50;//设置高度
             });
+
+        buttonInit();
+
+
+        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
+        var tbody = $('#data_table').find('tbody');
+
+        for (var a = 0; a < data.length; a++) {
+            tbody.append("<tr>" +
+                "<td>" + data[a].bin_num + "</td>" +
+                "<td>" + data[a].woe + "</td>" +
+                "</tr>");
+            var tr = tbody.find("tr").attr("height", height);
+        }
     }
 
+    function buttonInit() {
+        /**
+         * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
+         */
+        $('.MyRect').click(function () {
+            console.log(123);
+            if (array.length == 1) {
+                var val = $(this).attr("id");
+                var index = val.split("_")[1];
+                if (!start) {
+                    $("#" + val).attr("fill", "brown");
+                    start = index;
+                } else if (!end) {
+                    end = index;
+                }
+                //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
+                if (start && end) {
+                    for (var i = Math.min(start, end); i <= Math.max(start, end); i++) {
+                        var bar = $("#index_" + i);
+                        array.push(bar);
+                        bar.attr("fill", "brown");
+                    }
+                }
+            } else {
+                //将之前数组中添加的记录提取出来,重置颜色
+                for (var m = 0; m < array.length; m++) {
+                    array[m].attr("fill", "steelblue");
+                }
+                array = [];
+                end = null;
+                array.push($(this));
+                $(this).attr("fill", "brown");
+                start = $(this).attr("id").split("_")[1];
+            }
 
+            if (start && end) {
+                $("#merge").removeAttr("disabled");
+            } else {
+                $("#merge").attr("disabled", "disabled");
+            }
+        });
+    }
 
 
     d3.json("http://localhost:8091/tool", function (error, json) {
         renderXAxis(json.data);
         renderYAxis(json.data);
-        renderBody(svg,json.data);
+        renderBody(svg, json.data);
 
 
         $(document).ready(function () {
-            var start = null;
-            var end = null;
-            var array = [$("#index_0")];
-            /**
-             * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
-             */
-            $('.MyRect').click(function () {
-                if (array.length == 1) {
-                    var val = $(this).attr("id");
-                    var index = val.split("_")[1];
-                    if (!start) {
-                        $("#" + val).attr("fill", "brown");
-                        start = index;
-                    } else if (!end) {
-                        end = index;
-                    }
-                    //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
-                    if (start && end) {
-                        for (var i = Math.min(start,end); i <= Math.max(start,end); i++) {
-                            var bar = $("#index_" + i);
-                            array.push(bar);
-                            bar.attr("fill", "brown");
-                        }
-                    }
-                } else {
-                    //将之前数组中添加的记录提取出来,重置颜色
-                    for (var m=0;m<array.length;m++) {
-                        array[m].attr("fill","steelblue");
-                    }
-                    array = [];
-                    end = null;
-                    array.push($(this));
-                    $(this).attr("fill","brown");
-                    start = $(this).attr("id").split("_")[1];
-                }
 
-                if (start && end) {
-                    $("#merge").removeAttr("disabled");
-                } else{
-                    $("#merge").attr("disabled","disabled");
-                }
-            });
 
             /**
              * 合并选择的集合
              */
             $("#merge").click(function () {
+                var binNums = Math.min(start, end) + "," + Math.max(start, end);
+                $.ajax({
+                    url: "http://localhost:8091/tool",
+                    type: 'post',
+                    data: {
+                        "binNums": binNums
+                    },
+                    async: true,
+                    success: function (result) {
+                        $('#svg').html("");
+                        $('#data_table').find('tbody').html("");
+                        svg = d3.select("#svg").append("svg")
+                            .attr("class", "axis")
+                            .attr("width", width)
+                            .attr("height", height);
+                        renderXAxis(result.data);
+                        renderYAxis(result.data);
+                        renderBody(svg, result.data);
+                    }
+                });
             })
         });
     });

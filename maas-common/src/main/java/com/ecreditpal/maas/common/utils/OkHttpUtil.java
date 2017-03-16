@@ -153,6 +153,7 @@ public class OkHttpUtil {
 
     private static okhttp3.OkHttpClient getOkHttpClient() {
         okhttp3.OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectionPool(new ConnectionPool(10,5,TimeUnit.MINUTES))
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .writeTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(5, TimeUnit.SECONDS);

@@ -2,6 +2,7 @@
 from flask import Flask, request
 from flask_restful import Api
 from util.restfultools import *
+import copy
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,8 +23,12 @@ def getAll():
     return fullResponse(R200_OK, datas)\
 
 
-@app.route('/tool')
+@app.route('/tool',methods=['GET','POST'])
 def resp():
+    if request.method == "POST":
+        binNums = request.form.get('binNums')
+    else:
+        binNums = None
     data = [{"bin_num": 0, "woe": 0.1564},
             {"bin_num": 1, "woe": 0.0726},
             {"bin_num": 2, "woe": 0.0236},
@@ -31,6 +36,15 @@ def resp():
             {"bin_num": 4, "woe": -0.1472},
             {"bin_num": 5, "woe": -0.4853},
             {"bin_num": 6, "woe": -0.1629}]
+    data2 = copy.copy(data)
+    print data
+    if binNums is not None:
+        index=binNums.encode('utf8').split(',')
+        for i in range(int(index[0]),int(index[1])):
+            for d in data:
+                if d["bin_num"] == i:
+                    data.remove(d)
+    print binNums
     return responseto(data=data)
 
 
@@ -84,5 +98,5 @@ def delOne(name):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=8091,debug=True,use_reloader=False)
+    app.run(host='0.0.0.0',port=8091,debug=True,use_reloader=False,threaded=True)
 
