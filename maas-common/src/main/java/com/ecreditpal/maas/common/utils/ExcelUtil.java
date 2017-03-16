@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.common;
+package com.ecreditpal.maas.common.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
