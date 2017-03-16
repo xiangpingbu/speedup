@@ -13,6 +13,7 @@
         <module>maas-web</module>
         <module>maas-service</module>
         <module>maas-common</module>
+        <module>mass-schedule</module>
     </modules>
 
     <properties>
@@ -35,17 +36,25 @@
             <version>RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.20</version>
+        </dependency>
+
         <!--slf4j结合logback-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.logback-extensions</groupId>
-            <artifactId>logback-ext-spring</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.logback-extensions</groupId>-->
+            <!--<artifactId>logback-ext-spring</artifactId>-->
+        <!--</dependency>-->
 
+        <!--spring内部使用jcl输出日志,通过这个包可以将jcl-->
+        <!--的日志交由slf4j代理-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>

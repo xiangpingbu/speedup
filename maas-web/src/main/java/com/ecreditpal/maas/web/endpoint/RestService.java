@@ -3,7 +3,7 @@ package com.ecreditpal.maas.web.endpoint;
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import com.ecreditpal.maas.common.utils.OkHttpUtil;
-import com.ecreditpal.maas.model.python.XYBModelBean;
+import com.ecreditpal.maas.model.bean.XYBModelBean;
 import com.ecreditpal.maas.web.bean.User;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;

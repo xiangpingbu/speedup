@@ -36,6 +36,16 @@
             <artifactId>spring-context</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.luhuiguo</groupId>
+            <artifactId>chinese-utils</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

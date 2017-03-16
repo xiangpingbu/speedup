@@ -1,0 +1,62 @@
+<Dictionaries>
+   <Dictionary>
+        <Name>高敏感</Name>
+        <Path>GaoMinGan.txt</Path>
+        <Level>0</Level>
+        <Description>Highly Sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>政治</Name>
+        <Path>politics.txt</Path>
+        <Level>1</Level>
+        <Description>politics related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>色情</Name>
+        <Path>Huang.txt</Path>
+        <Level>1</Level>
+        <Description>Huang Du Du related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>赌</Name>
+        <Path>DuBo.txt</Path>
+        <Level>1</Level>
+        <Description>Huang Du Du related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>毒</Name>
+        <Path>DuPin.txt</Path>
+        <Level>1</Level>
+        <Description>Huang Du Du related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>非法广告</Name>
+        <Path>GuangGao.txt</Path>
+        <Level>2</Level>
+        <Description>Huang Du Du related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>脏话</Name>
+        <Path>cuKou.txt</Path>
+        <Level>2</Level>
+        <Description>cuKou related sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>涉枪涉爆</Name>
+        <Path>SheQiangSheBao.txt</Path>
+        <Level>2</Level>
+        <Description>涉枪涉爆</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>特殊</Name>
+        <Path>Special.txt</Path>
+        <Level>2</Level>
+        <Description>special sensitive word</Description>
+    </Dictionary>
+    <Dictionary>
+        <Name>敏感字库</Name>
+        <Path>SuperSensitiveBase.txt</Path>
+        <Level>-1</Level>
+        <Description>敏感字库</Description>
+    </Dictionary>
+</Dictionaries>

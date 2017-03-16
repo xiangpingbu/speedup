@@ -2,6 +2,7 @@ package com.ecreditpal.maas.common.schedule.impl;
 
 import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.common.schedule.Subject;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author lifeng
  * @version 1.0 on 2017/3/6.
  */
+
 public class ResReload implements Job, Subject {
     private final static Logger log = LoggerFactory.getLogger(ResReload.class);
 

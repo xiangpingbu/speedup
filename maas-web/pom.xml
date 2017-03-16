@@ -11,16 +11,16 @@
     <name>maas-web Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.ecreditpal</groupId>
             <artifactId>maas-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ecreditpal</groupId>
+            <artifactId>mass-schedule</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
