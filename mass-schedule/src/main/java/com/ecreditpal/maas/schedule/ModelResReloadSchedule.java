@@ -3,7 +3,6 @@ package com.ecreditpal.maas.schedule;
 import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.common.schedule.Subject;
 import com.ecreditpal.maas.model.model.minganci.MinGanCiFilter;
-import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author lifeng
  * @version 1.0 on 2017/3/16.
  */
-public class ModelResReloadSchedule implements Subject{
+public class ModelResReloadSchedule implements Subject {
     private final static Logger log = LoggerFactory.getLogger(com.ecreditpal.maas.common.schedule.impl.ResReload.class);
 
     //loaded model will be put into this map;

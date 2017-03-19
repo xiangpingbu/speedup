@@ -21,7 +21,7 @@ public class ModelReloadSchedule {
         Scheduler scheduler;
         try {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
-            JobDetail jobDetail = newJob(ResReload.class).
+            JobDetail jobDetail = newJob(null).
                     withIdentity("model_resource_reload","group_1").
                     build();
             Trigger trigger=

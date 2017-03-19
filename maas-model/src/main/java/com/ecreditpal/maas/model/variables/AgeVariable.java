@@ -24,8 +24,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class AgeVariable extends Variable {
     private final static Logger logger = LoggerFactory.getLogger(AgeVariable.class);
-    private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("yyyy/MM/dd");
-    private static DateTimeFormatter dayTimeFormatter = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+    private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static DateTimeFormatter dayTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void execute(final CountDownLatch cdl, final Map<String, Object> map) {

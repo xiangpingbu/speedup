@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0 on 2017/3/6.
  */
 
-public class ResReload implements Job, Subject {
+public class ResReload implements  Subject {
     private final static Logger log = LoggerFactory.getLogger(ResReload.class);
 
     //loaded model will be put into this map;
@@ -48,8 +48,8 @@ public class ResReload implements Job, Subject {
     /**
      * automatically load model resource
      */
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) {
+
+    public void execute() {
         log.info("automatically refresh " + registers.size() + "  model resource which registered in the modelInstances");
         reload();
     }

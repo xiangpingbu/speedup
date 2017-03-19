@@ -21,32 +21,38 @@ public class RepaymentFrequencyVariable extends Variable {
 
 
     @SuppressWarnings("unchecked")
-    public void execute(CountDownLatch cdl,Map<String,Object> inputMap) {
+    public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    List<Double> repaymentFrequencyList = (List<Double>) inputMap.get("repaymentFrequencyList");
-                    Double sum = null;
-                    int count = 0;
-                    if (repaymentFrequencyList!=null && repaymentFrequencyList.size()>0) {
-                        sum = 0.0;
-                        for (Double a : repaymentFrequencyList) {
-                            if (a != null && a> 0) {
-                                sum += a;
-                                count++;
+                    Object obj = inputMap.get("repaymentFrequencyList");
+                    if (obj == null) {
+                        setValue(MISSING);
+                    } else if (obj instanceof String) {
+                        setValue(obj.toString());
+                    } else if (obj instanceof List) {
+                        List<Double> repaymentFrequencyList = (List<Double>) obj;
+                        Double sum = null;
+                        int count = 0;
+                        if (repaymentFrequencyList.size() > 0) {
+                            sum = 0.0;
+                            for (Double a : repaymentFrequencyList) {
+                                if (a != null && a > 0) {
+                                    sum += a;
+                                    count++;
+                                }
                             }
                         }
-                    }
-                    if (sum == null) {
-                        setValue(MISSING);
-                        return;
-                    }
-                    if (count !=0) {
-                        logger.info(">>>>>>>>>>>{}",String.valueOf(sum / count));
-                        setValue(String.valueOf(sum / count));
-                    } else{
-                        setValue(MISSING);
+                        if (sum == null) {
+                            setValue(MISSING);
+                            return;
+                        }
+                        if (count != 0) {
+                            setValue(String.valueOf(sum / count));
+                        } else {
+                            setValue(MISSING);
+                        }
                     }
                 } catch (Exception e) {
                     logger.error("variable calculate error", e);

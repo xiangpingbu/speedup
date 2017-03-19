@@ -11,7 +11,6 @@ import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.*;
 import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * Created by xibu on 9/28/16.
  */
 
-public class ModelNew extends ResReload {
+public class ModelNew {
     private final static Logger log = LoggerFactory.getLogger(ModelNew.class);
 
     public String configPath;
@@ -47,7 +46,7 @@ public class ModelNew extends ResReload {
     static String configDir = "maas-model/src/main/resources";
 
     public static WorkDispatcher workDispatcher = new WorkDispatcher.Builder().
-            corePoolSize(8).
+            corePoolSize(16).
             maxPoolSize(30).
             keepAliveTime(60).
             queue(new LinkedBlockingQueue<>(50)).build();
@@ -75,19 +74,6 @@ public class ModelNew extends ResReload {
 
     public static void setEvaluator(Evaluator input_evaluator) {
         evaluator = input_evaluator;
-    }
-
-
-    /**
-     * automatically load model resource
-     */
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) {
-        log.info("automatically refresh " + modelInstances.size() + "  model resource which registered in the modelInstances");
-        log.info(workDispatcher.getModelExecutor().toString());
-        for (ModelNew modelNew : modelInstances.values()) {
-            modelNew.work();
-        }
     }
 
 

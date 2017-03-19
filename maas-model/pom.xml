@@ -28,6 +28,7 @@
             <artifactId>guava</artifactId>
         </dependency>
 
+
         <!--SpringIoC(依赖注入)的基础实现	spring-core，spring 3.1 jar，(CGLIB)。-->
         <!--spring-context.jar	Spring提供在基础IoC功能上的扩展服务，此外还提供许多企业级服务的支持，-->
         <!--如邮件服务、任务调度、JNDI定位、EJB集成、远程访问、缓存以及各种视图层框架的封装等-->
@@ -44,6 +45,16 @@
         <dependency>
             <groupId>com.luhuiguo</groupId>
             <artifactId>chinese-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jpmml</groupId>
+            <artifactId>pmml-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jpmml</groupId>
+            <artifactId>pmml-evaluator</artifactId>
         </dependency>
 
     </dependencies>

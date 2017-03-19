@@ -21,6 +21,4 @@
     <task:scheduled-tasks>
         <task:scheduled ref="modelResReloadTask" method="execute" cron="0/30 * * * * ?"/>
     </task:scheduled-tasks>
-
-
 </beans>
