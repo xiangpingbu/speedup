@@ -85,7 +85,7 @@
         <LocalTransformations>
             <DerivedField name="CreditQueryTimes_woe" optype="continuous" dataType="double">
                 <Discretize field="CreditQueryTimes" mapMissingTo="-0.1245" defaultValue="-0.1245" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                    <DiscretizeBin binValue="-0.1245">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="0.3289">
@@ -107,7 +107,7 @@
             </DerivedField>
             <DerivedField name="CreditAmountSumVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="CreditAmountSumVariable" mapMissingTo="-0.1309" defaultValue="-0.1309" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                    <DiscretizeBin binValue="-0.1309">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="-0.5007">
@@ -129,7 +129,7 @@
             </DerivedField>
             <DerivedField name="CreditUtilizationVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="CreditUtilizationVariable" mapMissingTo="-0.1496" defaultValue="-0.1496" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                    <DiscretizeBin binValue="-0.1496">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="0.2881">
@@ -206,7 +206,7 @@
                         </row>
                         <row>
                             <origin>Relatives</origin>
-                            <out>-0.0559</out>
+                            <out>-0.1686</out>
                         </row>
                         <row>
                             <origin>dormitory</origin>
@@ -214,7 +214,7 @@
                         </row>
                         <row>
                             <origin>others</origin>
-                            <out>-0.1686</out>
+                            <out>-0.0559</out>
                         </row>
                         <row>
                             <origin>missing</origin>
@@ -298,8 +298,8 @@
                 </MapValues>
             </DerivedField>
             <DerivedField name="PersonalYearIncome_woe" optype="continuous" dataType="double">
-                <Discretize field="PersonalYearIncome" mapMissingTo="0.6784" defaultValue="0.6784" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                <Discretize field="PersonalYearIncome" mapMissingTo="-0.6784" defaultValue="-0.6784" dataType="double">
+                    <DiscretizeBin binValue="-0.6784">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="0.1063">
@@ -318,7 +318,7 @@
             </DerivedField>
             <DerivedField name="RepaymentFrequencyVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="RepaymentFrequencyVariable" mapMissingTo="0.0214" defaultValue="0.0214" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                    <DiscretizeBin binValue="0.0214">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="0.495">
@@ -331,7 +331,7 @@
             </DerivedField>
             <DerivedField name="AgeVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="AgeVariable" mapMissingTo="-0.0439" defaultValue="-0.0439" dataType="double">
-                    <DiscretizeBin binValue="0.0">
+                    <DiscretizeBin binValue="-0.0439">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="-0.2699">
