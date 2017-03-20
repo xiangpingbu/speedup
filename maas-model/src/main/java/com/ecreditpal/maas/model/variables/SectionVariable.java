@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.model.variables;
 
+import com.ecreditpal.maas.common.WorkDispatcher;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,79 +19,86 @@ public class SectionVariable extends Variable {
 
     @Override
     public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
-        try {
-            VariableParam param = getParam();
-            String name = param.getParamName();
-            Object val = inputMap.get(name);
-            if (val == null) {
-                setValue(MISSING);
-                return;
-            }
-            String valStr = val.toString();
-            if (valStr.length() == 0) {
-                setValue(MISSING);
-                return;
-            }
-            String setStr = param.getParamValue();
-            //type为categorical的区间是独立的字符
-            if ("categorical".equals(param.getParamType())) {
+        Thread t = new Thread(){
+            @Override
+            public void run() {
                 try {
-                    String[] rangeArray = setStr.split("\\|");
-                    String[] mappings = null;
-                    if (param.getMapping() != null) {
-                        mappings = param.getMapping().split("\\|");
-                    }
-//                    Set<String> set = Sets.newHashSetWithExpectedSize(rangeArray.length);
-                    Map<String, String> map = Maps.newHashMap();
-                    if (mappings == null) {
-                        for (String s : rangeArray) {
-                            map.put(s, "");
-                        }
-                    } else {
-                        for (int i = 0; i < rangeArray.length; i++) {
-                            map.put(rangeArray[i], mappings[i]);
-                        }
-                    }
-                    String result = map.get(valStr);
-                    if (result == null) {
+                    VariableParam param = getParam();
+                    String name = param.getParamName();
+                    Object val = inputMap.get(name);
+                    if (val == null) {
                         setValue(MISSING);
                         return;
                     }
-                    setValue(result);
-                } catch (Exception e) {
-                    logger.error("exception occurs while processing the val", e);
-                    setValue(CATEGORICAL_INVALID);
-                }
-            } else if ("numerical".equals(param.getParamType())) {
-                try {
-                    double dbVal = Double.valueOf(valStr);
-                    String[] array = setStr.split("-");
-                    String leftBra = array[0].substring(0, 1);
-                    String leftLimit = array[0].substring(1, array[0].length());
+                    String valStr = val.toString();
+                    if (valStr.length() == 0) {
+                        setValue(MISSING);
+                        return;
+                    }
+                    String setStr = param.getParamValue();
+                    //type为categorical的区间是独立的字符
+                    if ("categorical".equals(param.getParamType())) {
+                        try {
+                            String[] rangeArray = setStr.split("\\|");
+                            String[] mappings = null;
+                            if (param.getMapping() != null) {
+                                mappings = param.getMapping().split("\\|");
+                            }
+//                    Set<String> set = Sets.newHashSetWithExpectedSize(rangeArray.length);
+                            Map<String, String> map = Maps.newHashMap();
+                            if (mappings == null) {
+                                for (String s : rangeArray) {
+                                    map.put(s, "");
+                                }
+                            } else {
+                                for (int i = 0; i < rangeArray.length; i++) {
+                                    map.put(rangeArray[i], mappings[i]);
+                                }
+                            }
+                            String result = map.get(valStr);
+                            if (result == null) {
+                                setValue(MISSING);
+                                return;
+                            }
+                            setValue(result);
+                        } catch (Exception e) {
+                            logger.error("exception occurs while processing the val", e);
+                            setValue(CATEGORICAL_INVALID);
+                        }
+                    } else if ("numerical".equals(param.getParamType())) {
+                        try {
+                            double dbVal = Double.valueOf(valStr);
+                            String[] array = setStr.split("-");
+                            String leftBra = array[0].substring(0, 1);
+                            String leftLimit = array[0].substring(1, array[0].length());
 
-                    String rightBra = array[1].substring(array[1].length() - 1, array[1].length());
-                    String rightLimit = array[1].substring(0, array[1].length() - 1);
-                    //负无穷到特定值
-                    if ("min".equals(leftLimit) && !"max".equals(rightLimit)) {
-                        hitRight(rightLimit, rightBra, dbVal);
-                        //特定值到正无穷
-                    } else if (!"min".equals(leftLimit) && "max".equals(rightLimit)) {
-                        hitLeft(leftLimit, leftBra, dbVal);
+                            String rightBra = array[1].substring(array[1].length() - 1, array[1].length());
+                            String rightLimit = array[1].substring(0, array[1].length() - 1);
+                            //负无穷到特定值
+                            if ("min".equals(leftLimit) && !"max".equals(rightLimit)) {
+                                hitRight(rightLimit, rightBra, dbVal);
+                                //特定值到正无穷
+                            } else if (!"min".equals(leftLimit) && "max".equals(rightLimit)) {
+                                hitLeft(leftLimit, leftBra, dbVal);
+                            }
+                            //最小值和最大值都有限制
+                            else {
+                                hitRight(rightLimit, rightBra, dbVal);
+                                hitLeft(leftLimit, leftBra, dbVal);
+                            }
+                        } catch (Exception e) {
+                            logger.error("exception occurs while processing the val", e);
+                            setValue(NUMERICAL_INVALID);
+                        }
+                        setValue(valStr);
                     }
-                    //最小值和最大值都有限制
-                    else {
-                        hitRight(rightLimit, rightBra, dbVal);
-                        hitLeft(leftLimit, leftBra, dbVal);
-                    }
-                } catch (Exception e) {
-                    logger.error("exception occurs while processing the val", e);
-                    setValue(NUMERICAL_INVALID);
+                } finally {
+                    cdl.countDown();
                 }
-                setValue(valStr);
             }
-        } finally {
-            cdl.countDown();
-        }
+        };
+
+        WorkDispatcher.getInstance().modelExecute(t);
     }
 
     /**

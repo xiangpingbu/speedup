@@ -46,7 +46,7 @@ public class AgeVariable extends Variable {
                     }
                     DateTime birthday = getDateTime(aStr);
                     DateTime nowaday = getDateTime(bStr);
-                    int age = Years.yearsBetween(birthday, nowaday).getYears();
+                    int age = nowaday.getYear()-birthday.getYear();
                     setValue(String.valueOf(age));
                 } catch (Exception e) {
                     logger.error("variable calculate error", e);

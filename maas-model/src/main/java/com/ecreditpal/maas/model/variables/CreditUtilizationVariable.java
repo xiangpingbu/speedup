@@ -43,7 +43,7 @@ public class CreditUtilizationVariable extends Variable {
                         setValue(MISSING);
                     }
                         else{
-                            setValue(totalUsedLimit.multiply(new BigDecimal(100)).divide(totalCreditLimit, 1, BigDecimal.ROUND_HALF_UP).toString());
+                            setValue(totalUsedLimit.divide(totalCreditLimit, 5, BigDecimal.ROUND_HALF_UP).toString());
                             logger.info("calculator complete");
                         }
                     } catch(NumberFormatException e){

@@ -88,8 +88,11 @@
                     <DiscretizeBin binValue="-0.1245">
                         <Interval closure="openOpen" rightMargin="-999998.0"/>
                     </DiscretizeBin>
+                    <DiscretizeBin binValue="0.3838">
+                        <Interval closure="openClosed" leftMargin="-999998.0" rightMargin="0"/>
+                    </DiscretizeBin>
                     <DiscretizeBin binValue="0.3289">
-                        <Interval closure="openClosed" leftMargin="-999998.0" rightMargin="1.0"/>
+                        <Interval closure="openClosed" leftMargin="0" rightMargin="1.0"/>
                     </DiscretizeBin>
                     <DiscretizeBin binValue="0.0939">
                         <Interval closure="openClosed" leftMargin="1.0" rightMargin="5.0"/>
