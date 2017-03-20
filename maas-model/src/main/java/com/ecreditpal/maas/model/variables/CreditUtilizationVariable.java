@@ -38,30 +38,26 @@ public class CreditUtilizationVariable extends Variable {
                     BigDecimal totalCreditLimit = new BigDecimal(b.toString());
                     if (totalUsedLimit.signum() < 0 || totalCreditLimit.signum() < 0) {
                         setValue(INVALID);
-                    }
-                     else if ( zero.equals(totalCreditLimit)) {
+                    } else if (zero.equals(totalCreditLimit)) {
                         setValue(MISSING);
+                    } else {
+                        setValue(totalUsedLimit.divide(totalCreditLimit, 5, BigDecimal.ROUND_HALF_UP).toString());
+                        logger.info("calculator complete");
                     }
-                        else{
-                            setValue(totalUsedLimit.multiply(new BigDecimal(100)).divide(totalCreditLimit, 1, BigDecimal.ROUND_HALF_UP).toString());
-                            logger.info("calculator complete");
-                        }
-                    } catch(NumberFormatException e){
-                        logger.error("数值转换异常", e);
-                        setValue(INVALID);
-                    } finally{
-                        cdl.countDown();
-                    }
-
+                } catch (NumberFormatException e) {
+                    logger.error("数值转换异常", e);
+                    setValue(NUMERICAL_INVALID);
+                } finally {
+                    cdl.countDown();
                 }
-            }
 
-            ;
+            }
+        };
 
         WorkDispatcher.getInstance().
 
-            modelExecute(t);
-
-        }
+                modelExecute(t);
 
     }
+
+}

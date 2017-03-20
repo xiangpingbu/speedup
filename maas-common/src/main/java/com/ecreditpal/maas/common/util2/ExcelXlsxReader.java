@@ -316,7 +316,7 @@ public class ExcelXlsxReader extends DefaultHandler {
             if (!ref.equals(preRef)) {
                 int len = countNullCell(ref, preRef);
                 for (int i = 0; i < len; i++) {
-                    rowlist.add(curCol, "");
+                    rowlist.add(curCol, null);
                     curCol++;
                 }
             }

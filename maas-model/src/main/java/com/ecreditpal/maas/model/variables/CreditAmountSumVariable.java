@@ -26,16 +26,16 @@ public class CreditAmountSumVariable extends Variable {
             @Override
             public void run() {
                 try {
-                    Object obj = inputMap.get("creditLimitList");
+                    Object obj = inputMap.get("creditLimit");
                     if (obj == null) {
                         setValue(MISSING);
                     } else if (obj instanceof String) {
                         setValue(obj.toString());
                     } else if(obj instanceof List) {
-                        List<Double> amountList = (List<Double>) inputMap.get("creditLimitList");
+                        List<Double> amountList = (List<Double>) obj;
                         Double sum = null;
                         int m = 0;
-                        if (amountList != null && amountList.size() > 0) {
+                        if ( amountList.size() > 0) {
                             sum = 0.0;
                             for (Double a : amountList) {
                                 if (a != null && a > 0) {

@@ -46,10 +46,10 @@ public class ModelNew {
     static String configDir = "maas-model/src/main/resources";
 
     public static WorkDispatcher workDispatcher = new WorkDispatcher.Builder().
-            corePoolSize(16).
-            maxPoolSize(30).
+            corePoolSize(20).
+            maxPoolSize(100).
             keepAliveTime(60).
-            queue(new LinkedBlockingQueue<>(50)).build();
+            queue(new LinkedBlockingQueue<>(100)).build();
 
     //Runtime.getRuntime().availableProcessors()
 

@@ -4,9 +4,11 @@ package com.ecreditpal.maas.web.endpoint;
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import com.ecreditpal.maas.common.utils.OkHttpUtil;
 import com.ecreditpal.maas.model.bean.XYBModelBean;
+import com.ecreditpal.maas.model.model.XYBModel;
 import com.ecreditpal.maas.web.bean.User;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import scala.util.parsing.combinator.testing.Str;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author lifeng
@@ -103,23 +106,26 @@ public class RestService {
             @ApiParam(value = "loanDay", required = true) @FormParam("loanDay") String loanDay,
             @ApiParam(value = "clientGender", required = true) @FormParam("clientGender") String clientGender
     ) throws Exception {
-        Map<String, String> map = new HashMap<String, String>(12);
+        Map<String, Object> map = new HashMap<String, Object>(12);
 
-        map.put("creditQueryTimes", creditQueryTimes);
-        map.put("creditLimit", creditLimitList);
-        map.put("totalUsedLimit", totalUsedLimit);
-        map.put("totalCreditLimit", totalCreditLimit);
-        map.put("personalEducation", personalEducation);
-        map.put("personalLiveCase", personalLiveCase);
-        map.put("personalLiveJoin", personalLiveJoin);
-        map.put("personalYearIncome", personalYearIncome);
-        map.put("repaymentFrequency", repaymentFrequency);
-        map.put("birthday", birthday);
-        map.put("loanDay", loanDay);
-        map.put("clientGender", clientGender);
+        map.put("creditQueryTimes", null);
+        map.put("creditLimit", "9000");
+        map.put("totalUsedLimit", 8983);
+        map.put("totalCreditLimit", 9000);
+        map.put("personalEducation", 3);
+        map.put("personalLiveCase", 4);
+        map.put("personalLiveJoin", "1,");
+        map.put("personalYearIncome", 18);
+        map.put("repaymentFrequency", null);
+        map.put("birthday", "1988-1-1");
+        map.put("loanDay", "2015-7-1");
+        map.put("clientGender", 1);
 
-        String result = OkHttpUtil.getInstance().doPost("http://dolphin.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
+        XYBModel xybModel = new XYBModel();
+       Integer score = (Integer) xybModel.run(map);
+//        String result = OkHttpUtil.getInstance().doPost("http://dolphin.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
+//        String result = OkHttpUtil.getInstance().doPost("http://localhost:8888/ecreditpal/rest/model/xyb", map, null);
 
-        return Response.status(Response.Status.OK).entity(result).type(MediaType.TEXT_PLAIN_TYPE).build();
+        return Response.status(Response.Status.OK).entity(score).type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 }

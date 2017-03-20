@@ -31,6 +31,7 @@ public class XYBModel extends ModelNew {
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
+    private Double prob;//未处理的总分数
 
 
     /**
@@ -132,6 +133,7 @@ public class XYBModel extends ModelNew {
         }
 
         double prob = scores.get(0);
+        setProb(prob);
         int finalScore = (int)scoreAlign(scoreToLogit(prob));
 
         return finalScore;
@@ -144,5 +146,13 @@ public class XYBModel extends ModelNew {
 
     public static void main(String[] args) throws JAXBException {
         XYBModel xybModel = new XYBModel();
+    }
+
+    public Double getProb() {
+        return prob;
+    }
+
+    public void setProb(Double prob) {
+        this.prob = prob;
     }
 }

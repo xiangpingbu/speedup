@@ -24,7 +24,7 @@ public class Variable {
     /**
      * 如果数值型变量的值非法,默认设置为"-999998"
      */
-    protected static final String NUMERICAL_INVALID = "-999998";
+    protected static final String NUMERICAL_INVALID = "-999999";
     /**
      * 如果分类数据的值非法,默认设置为"invalid"
      */
@@ -32,7 +32,7 @@ public class Variable {
     /**
      * 值非法,默认也为"invalid"
      */
-    protected static final String INVALID = CATEGORICAL_INVALID;
+    protected static final String INVALID = NUMERICAL_INVALID;
     /**
      * * 变量的名称
      */

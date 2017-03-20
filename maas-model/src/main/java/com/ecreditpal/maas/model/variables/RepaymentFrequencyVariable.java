@@ -26,7 +26,7 @@ public class RepaymentFrequencyVariable extends Variable {
             @Override
             public void run() {
                 try {
-                    Object obj = inputMap.get("repaymentFrequencyList");
+                    Object obj = inputMap.get("repaymentFrequency");
                     if (obj == null) {
                         setValue(MISSING);
                     } else if (obj instanceof String) {
