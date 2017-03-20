@@ -127,10 +127,9 @@ public class XYBModelTest {
             map.put("creditQueryTimes", list.get(head.get("credit_query_times_three")));  //信用卡过去三个月查询次数
 
 //                List<Double> list = Lists.newArrayList(1000.0, 5100.0);
-            map.put("creditLimitList", list.get(head.get("credit_total_credit_limit")));//信用卡的总额度
-
+            map.put("creditLimit", list.get(head.get("credit_c_credit_amount_sum")));//信用卡的总额度
             map.put("totalUsedLimit", list.get(head.get("credit_total_used_limit"))); //已经使用的总额度
-            map.put("totalCreditLimit", list.get(head.get("credit_c_credit_amount_sum")));//信用卡的总额度
+            map.put("totalCreditLimit", list.get(head.get("credit_total_credit_limit")));//信用总额度
             map.put("personalEducation", list.get(head.get("personal_education")));//个人学历,2为本科
             map.put("personalLiveCase", list.get(head.get("personal_live_case")));//居住情况,预期的值中并不存在9
             map.put("clientGender", list.get(head.get("client_gender")));//客户的性别 1为男
@@ -138,7 +137,7 @@ public class XYBModelTest {
             map.put("personalYearIncome", list.get(head.get("personal_year_income")));//年收入
 
 //                List<Double> list2 = Lists.newArrayList(2.0, 3.0);
-            map.put("repaymentFrequencyList", list.get(head.get("loan_repayment_frequency_avg")));//平均贷款的还款频率,前两个是不合格数据
+            map.put("repaymentFrequency", list.get(head.get("loan_repayment_frequency_avg")));//平均贷款的还款频率,前两个是不合格数据
             map.put("birthday", list.get(head.get("client_birthday")));//客户的生日
             map.put("loanDay", list.get(head.get("app_income_time")));//申请时间
             Integer score = (Integer) model.run(map);

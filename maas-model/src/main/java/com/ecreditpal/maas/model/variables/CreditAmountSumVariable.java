@@ -26,13 +26,13 @@ public class CreditAmountSumVariable extends Variable {
             @Override
             public void run() {
                 try {
-                    Object obj = inputMap.get("creditLimitList");
+                    Object obj = inputMap.get("creditLimit");
                     if (obj == null) {
                         setValue(MISSING);
                     } else if (obj instanceof String) {
                         setValue(obj.toString());
                     } else if(obj instanceof List) {
-                        List<Double> amountList = (List<Double>) inputMap.get("creditLimitList");
+                        List<Double> amountList = (List<Double>) inputMap.get("creditLimit");
                         Double sum = null;
                         int m = 0;
                         if (amountList != null && amountList.size() > 0) {
@@ -57,7 +57,7 @@ public class CreditAmountSumVariable extends Variable {
                     logger.info("calculator complete");
                 } catch (Exception e) {
                     logger.error("variable calculate error", e);
-                    setValue(INVALID);
+                    setValue(NUMERICAL_INVALID);
                 } finally {
                     cdl.countDown();
                 }

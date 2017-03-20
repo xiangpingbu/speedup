@@ -19,7 +19,7 @@
             <Engine>SectionVariable</Engine>
             <Description>return one's education</Description>
             <type>Integer</type>
-            <!--value="硕士及以上|本科|专科|其它"-->
+            <!--value="硕士及以上|本科|专科|其他"-->
             <param type="categorical" name="personalEducation"
                    value="1|2|3|4"
                    mapping="masterOrAbove|undergraduate|junior|others"/>

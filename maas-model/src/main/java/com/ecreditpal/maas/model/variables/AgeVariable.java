@@ -24,8 +24,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class AgeVariable extends Variable {
     private final static Logger logger = LoggerFactory.getLogger(AgeVariable.class);
-    private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-    private static DateTimeFormatter dayTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+    private static DateTimeFormatter dayFormatter = DateTimeFormat.forPattern("yyyy-MM-dd").withZoneUTC();
+    private static DateTimeFormatter dayTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC();
 
     @Override
     public void execute(final CountDownLatch cdl, final Map<String, Object> map) {
@@ -50,7 +50,7 @@ public class AgeVariable extends Variable {
                     setValue(String.valueOf(age));
                 } catch (Exception e) {
                     logger.error("variable calculate error", e);
-                    setValue(INVALID);
+                    setValue(NUMERICAL_INVALID);
 
                 } finally {
                     cdl.countDown();
@@ -64,7 +64,7 @@ public class AgeVariable extends Variable {
 
     private DateTime getDateTime(String s) {
         DateTime dateTime;
-        if (s.length() < 11) {
+        if (s.length() < 12) {
             dateTime = dayFormatter.parseDateTime(s);
         } else {
             dateTime = dayTimeFormatter.parseDateTime(s);
