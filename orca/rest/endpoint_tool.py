@@ -4,19 +4,19 @@ from util import Initial_Binning as ib
 import numpy
 
 base = '/tool'
+base_path = "./util/"
+df_test = base_path + "df_test.xlsx"
+df_train = base_path + "df_train.xlsx"
+dataMap = ib.cal(df_train, df_test)
 
 
 @app.route(base + "/init")
 def hello_world():
-    base_path = "./util/"
-    df_test = base_path + "df_test.xlsx"
-    df_train = base_path + "df_train.xlsx"
-    dataMap = ib.cal(df_train, df_test)
     keys = dataMap.keys()
     out = {}
     for k in keys:
-        c = dataMap[k]
         data = {}
+        c = dataMap[k]
         subList = []
         var_name = c[0]
         # var_type = c[1]
@@ -27,8 +27,9 @@ def hello_world():
                 if isinstance(row[col_name], numpy.ndarray):
                     data[col_name] = row[col_name].tolist()
                 else:
-                    data[col_name] = row[col_name]
-                subList.append(data)
+                    data[col_name] = str(row[col_name])
+            subList.append(data)
+            data = {}
         out[var_name] = subList
 
     return responseto(data=out)
