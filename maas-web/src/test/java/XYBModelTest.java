@@ -158,9 +158,9 @@ public class XYBModelTest {
         }
 
 
-        for (int rownum = 1; rownum < content.getContent().size(); rownum++) {
-             row = sh.createRow(rownum);
-             List<String> rowList = content.getContent().get(rownum-1);
+        for (int rownum = 0; rownum < content.getContent().size(); rownum++) {
+             row = sh.createRow(rownum+1);
+             List<String> rowList = content.getContent().get(rownum);
             for (int cellnum = 0; cellnum < rowList.size(); cellnum++) {
                 Cell cell = row.createCell(cellnum);
 //                String address = new CellReference(cell).formatAsString();

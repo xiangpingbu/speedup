@@ -10,7 +10,7 @@
     <!--顺序不能随便换,biz必须先加载-->
     <param-value>
       classpath:beans.xml
-      classpath:maas-schedule.xml
+      <!--classpath:maas-schedule.xml-->
     </param-value>
   </context-param>
 

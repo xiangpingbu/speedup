@@ -1,6 +1,7 @@
 package com.ecreditpal.maas.model.model.minganci;
 
 
+import com.ecreditpal.maas.common.file.FileUtil;
 import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.model.model.minganci.wordcut.JiebaSegmenter;
 import com.ecreditpal.maas.model.model.minganci.wordcut.SegToken;
@@ -26,9 +27,9 @@ import java.util.regex.PatternSyntaxException;
 public class MinGanCiFilter implements Register {
 
     private final static Logger logger = LoggerFactory.getLogger(MinGanCiFilter.class);
-    private final static String BASE_PATH = "maas-model/src/main/resources";
-    private static final String MGC_DICT = "/minganci/mgcDict/mgc.txt";
-    private static final String MGZ_DICT = "/minganci/mgcDict/mgz.txt";
+//    private final static String BASE_PATH = "maas-model/src/main/resources";
+    private static final String MGC_DICT = FileUtil.getFilePath("minganci/mgcDict/mgc.txt");
+    private static final String MGZ_DICT = FileUtil.getFilePath("minganci/mgcDict/mgz.txt");
     private static MinGanCiFilter instance = null;
     private String post;
     private Set<String> mgzDict;
@@ -129,8 +130,8 @@ public class MinGanCiFilter implements Register {
     public void loadDict() {
         long total = Runtime.getRuntime().totalMemory(); // byte
         long m1 = Runtime.getRuntime().freeMemory();
-        loadMgc(new File(BASE_PATH + MGC_DICT));
-        loadMgz(new File(BASE_PATH + MGZ_DICT));
+        loadMgc(new File( MGC_DICT));
+        loadMgz(new File( MGZ_DICT));
         logger.info("before:{}", total - m1);
 
         long total1 = Runtime.getRuntime().totalMemory();
@@ -160,7 +161,7 @@ public class MinGanCiFilter implements Register {
     }
 
     public void loadMgz(File file) {
-        file = new File(BASE_PATH + MGZ_DICT);
+        file = new File( MGZ_DICT);
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -217,12 +218,12 @@ public class MinGanCiFilter implements Register {
 
     @Override
     public void work() {
-        File file = new File(BASE_PATH + MGC_DICT);
+        File file = new File( MGC_DICT);
         if (file.lastModified() > mgcModifyTime) {
             loadMgc(file);
         }
 
-        file = new File(BASE_PATH + MGZ_DICT);
+        file = new File( MGZ_DICT);
         if (file.lastModified() > mgzModifyTime) {
             loadMgz(file);
         }
