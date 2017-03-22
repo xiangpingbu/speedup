@@ -7,7 +7,11 @@
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:beans.xml</param-value>
+    <!--顺序不能随便换,biz必须先加载-->
+    <param-value>
+      classpath:beans.xml
+      classpath:maas-schedule.xml
+    </param-value>
   </context-param>
 
   <!--监听器,依赖于spring-mvc-->

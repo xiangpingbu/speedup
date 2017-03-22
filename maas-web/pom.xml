@@ -11,33 +11,19 @@
     <name>maas-web Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.ecreditpal</groupId>
-            <artifactId>maas-common</artifactId>
+            <artifactId>maas-service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.ecreditpal</groupId>
-            <artifactId>maas-model</artifactId>
+            <artifactId>mass-schedule</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!--SpringIoC(依赖注入)的基础实现	spring-core，spring 3.1 jar，(CGLIB)。-->
-        <!--spring-context.jar	Spring提供在基础IoC功能上的扩展服务，此外还提供许多企业级服务的支持，-->
-        <!--如邮件服务、任务调度、JNDI定位、EJB集成、远程访问、缓存以及各种视图层框架的封装等-->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring-version}</version>
-        </dependency>
         <!--这个jar 文件包含Spring MVC 框架相关的所有类。包括框架的Servlets，Web MVC框架，控制器和视图支持。-->
         <!--当然，如果你的应用使用了独立的MVC 框架，则无需这个JAR 文件里的任何类。-->
         <dependency>
@@ -88,6 +74,11 @@
             <artifactId>jetty-webapp</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+        </dependency>
 
     </dependencies>
     <build>

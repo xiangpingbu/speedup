@@ -1,0 +1,106 @@
+<VariableConfiguration>
+    <Model>XYBModel</Model>
+    <Variables>
+        <Variable Name="CreditQueryTimes">
+            <Engine>SectionVariable</Engine>
+            <Description>return one's credit query time in three month</Description>
+            <type>Integer</type>
+            <param type="numerical" name="creditQueryTimes" value="(0-max)"/>
+        </Variable>
+        <Variable Name="CreditAmountSumVariable">
+            <Description>return one's total credit limit</Description>想
+            <type>Double</type>
+        </Variable>
+        <Variable Name="CreditUtilizationVariable">
+            <Description>return one's credit usage rate</Description>
+            <type>Double</type>
+        </Variable>
+        <Variable Name="PersonalEducation">
+        <Engine>SectionVariable</Engine>
+        <Description>return one's education</Description>
+        <type>Integer</type>
+        <!--value="硕士及以上|本科|专科|其它"-->
+        <param type="categorical" name="personalEducation"
+        value="1|2|3|4"
+        mapping="masterOrAbove|undergraduate|junior|others"/>
+        </Variable>
+        <!--<Variable Name="PersonalEducation">-->
+            <!--<Engine>SectionVariable</Engine>-->
+            <!--<Description>return one's education</Description>-->
+            <!--<type>Integer</type>-->
+            <!--&lt;!&ndash;value="硕士及以上|本科|专科|其它"&ndash;&gt;-->
+            <!--<param type="categorical" name="personalEducation"-->
+                   <!--value="硕士及以上|本科|专科|其它"-->
+                   <!--mapping="masterOrAbove|undergraduate|junior|others"/>-->
+        <!--</Variable>-->
+        <Variable Name="PersonalLiveCase">
+        <Engine>SectionVariable</Engine>
+        <Description>return one's credit query time in three month</Description>
+        <type>Integer</type>
+        <!--value="自有商业按揭房|自有无按揭购房|自有公积金按揭购房|自建房|租房|亲戚住房|宿舍|其他"-->
+        <param type="categorical" name="personalLiveCase"
+        value="1|2|3|4|5|6|7|8"
+        mapping="commercialMortgageRoom|noMortgageRoom|fundMortgageRoom|selfBuildingRoom|rentalRoom|Relatives|dormitory|others"/>
+        </Variable>
+        <!--<Variable Name="PersonalLiveCase">-->
+            <!--<Engine>SectionVariable</Engine>-->
+            <!--<Description>return one's credit query time in three month</Description>-->
+            <!--<type>Integer</type>-->
+            <!--&lt;!&ndash;value="自有商业按揭房|自有无按揭购房|自有公积金按揭购房|自建房|租房|亲戚住房|宿舍|其他"&ndash;&gt;-->
+            <!--<param type="categorical" name="personalLiveCase"-->
+                   <!--value="自有商业按揭房|自有无按揭购房|自有公积金按揭购房|自建房|租房|亲戚住房|宿舍|其他"-->
+                   <!--mapping="commercialMortgageRoom|noMortgageRoom|fundMortgageRoom|selfBuildingRoom|rentalRoom|Relatives|dormitory|others"/>-->
+        <!--</Variable>-->
+        <Variable Name="ClientGender">
+        <Engine>SectionVariable</Engine>
+        <Description>return one's gender</Description>
+        <type>Integer</type>
+        <!--value="男|女"-->
+        <param type="categorical" name="clientGender"
+        value="1|2"
+        mapping="male|female"/>
+        </Variable>
+        <!--<Variable Name="ClientGender">-->
+            <!--<Engine>SectionVariable</Engine>-->
+            <!--<Description>return one's gender</Description>-->
+            <!--<type>Integer</type>-->
+            <!--&lt;!&ndash;value="1|2"&ndash;&gt;-->
+            <!--<param type="categorical" name="clientGender"-->
+                   <!--value="男|女"-->
+                   <!--mapping="male|female"/>-->
+        <!--</Variable>-->
+        <Variable Name="PersonalLiveJoin">
+        <Engine>SectionVariable</Engine>
+        <Description>return one's personal live join</Description>
+        <type>Integer</type>
+        <!--value="父母|配偶及子女|父母,配偶及子女|其他|朋友|配偶及子女,其他|父母,其他|父母,配偶及子女,其他"-->
+        <param type="categorical" name="personalLiveJoin"
+        value="1,|2,|1,2,|4,|3,|2,4,|1,4,|1,2,4,"
+        mapping="parents|spouse&amp;child|parents&amp;spouse&amp;child|others|friend|spouse&amp;child&amp;others|parents&amp;others|parents&amp;spouse&amp;child&amp;others"/>
+        </Variable>
+        <!--<Variable Name="PersonalLiveJoin">-->
+            <!--<Engine>SectionVariable</Engine>-->
+            <!--<Description>return one's personal live join</Description>-->
+            <!--<type>Integer</type>-->
+
+            <!--<param type="categorical" name="personalLiveJoin"-->
+                   <!--value="父母|配偶及子女|父母,配偶及子女|其他|朋友|配偶及子女,其他|父母,其他|父母,配偶及子女,其他"-->
+                   <!--mapping="parents|spouse&amp;child|parents&amp;spouse&amp;child|others|friend|spouse&amp;child&amp;others|parents&amp;others|parents&amp;spouse&amp;child&amp;others"/>-->
+        <!--</Variable>-->
+        <Variable Name="PersonalYearIncome">
+            <Engine>SectionVariable</Engine>
+            <Description>return one's yearly income</Description>
+            <type>Integer</type>
+            <param type="numerical" name="personalYearIncome"
+                   value="(0-max)"/>
+        </Variable>
+        <Variable Name="RepaymentFrequencyVariable">
+            <Description>return one's average repayment frequency</Description>
+            <type>Double</type>
+        </Variable>
+        <Variable Name="AgeVariable">
+            <Description>return one's age according to birthday and certain day</Description>
+            <type>Integer</type>
+        </Variable>
+    </Variables>
+</VariableConfiguration>
