@@ -1,3 +1,10 @@
 *.iml
 .idea
 *.out
+*/target/
+maas-common/target/generated-sources/
+maas-model/target/generated-sources/
+maas-model/target/surefire/
+maas-service/target/generated-sources/
+maas-web/target/generated-sources/
+maas-web/target/maas-web/META-INF/
