@@ -103,46 +103,23 @@
 //                renderBody(svg, result.data['credit_c_utilization'],num);
 //            }
 
+           var initList = [];
             for (var key in result.data) {
                 var table_head = [];
                 for (var subKey in result.data[key][0]) {
                     table_head.push(subKey);
                 }
                 var svg = initPanel(key, num, table_head);
-                renderXAxis(result.data[key]);
-                renderYAxis(result.data[key]);
+                renderXAxis(svg,num,result.data[key]);
+                renderYAxis(svg,num,result.data[key]);
                 renderBody(svg, result.data[key], num);
+                initList.push(num);
                 num++;
+
             }
 
-            buttonInit(num);
+            buttonInit(initList);
 
-
-            /**
-             * 合并选择的集合
-             */
-            $("#merge").click(function () {
-                var binNums = Math.min(start, end) + "," + Math.max(start, end);
-                $.ajax({
-                    url: "http://localhost:8091/tool",
-                    type: 'post',
-                    data: {
-                        "binNums": binNums
-                    },
-                    async: true,
-                    success: function (result) {
-                        for (var num = 0; num < result.data.length; num++) {
-                            console.log(result.data);
-//                            $('.axis').html("");
-//                            $('#data_table').find('tbody').html("");
-                            initPanel(num);
-                            renderXAxis(result.data);
-                            renderYAxis(result.data);
-                            renderBody(svg, result.data, num);
-                        }
-                    }
-                });
-            })
         });
     });
 
@@ -157,6 +134,7 @@
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
+            .attr("id","my_svg_"+num)
             .attr("width", width)
             .attr("height", height);
 
@@ -182,7 +160,8 @@
             .append("div")
             .append("button")
             .attr("class", "btn btn-primary")
-            .attr("id", "btn" + num)
+            .attr("id", "merge_" + num)
+            .attr("name", rowName)
             .attr("disabled", "disabled")
             .text("执行合并")
             .style("margin-left", "25px");
@@ -192,7 +171,7 @@
     /**
      * 描绘x轴
      */
-    function renderXAxis(data) {
+    function renderXAxis(svg,num,data) {
         var axisLength = width - 2 * margin;
         var min = 0, max = 0;
         for (var obj of data) {
@@ -211,8 +190,10 @@
         //ticks表示我们希望的刻度数,会根据数值调整
         var axis = d3.axisBottom(xScale).ticks(5);
 
+        svg.select("#x_"+num).remove();
         svg.append("g")
             .attr("class", "x-axis")
+            .attr("id","x_"+num)
             .attr("transform", function () {
                 return "translate(" + margin + "," + 475 + ")";
             }).call(axis);
@@ -231,7 +212,7 @@
     /**
      * 描绘y轴
      */
-    function renderYAxis(data) {
+    function renderYAxis(svg,num,data) {
         var axisLength = width - 2 * margin;
         //设定比例
         yScale = d3.scaleBand()
@@ -242,8 +223,10 @@
 
         var axis = d3.axisLeft(yScale);
 
+        svg.select("#y_"+num).remove();
         svg.append("g")
             .attr("class", "y-axis")
+            .attr("id","y_"+num)
             .attr("transform", function () {
                 return "translate(" + margin + "," + margin + ")";
             }).call(axis);
@@ -261,13 +244,29 @@
 
     var body;
     function renderBody(svg, data, num) {
-        if (!body) {
-            body = svg.append("g")
-                .attr("class", "body");
-        }
-        renderBars(data,num);
+//        if (!body) {
+//            body = svg.append("g").attr("class", "body");
+//        }
+        renderBars(svg,data, num,false);
 
+        renderTable(data,num);
+//        var tbody = d3.select("#tbody_" + num);
+//        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
+//        for (var obj of data) {
+//            //设置每一行的高度
+//            var tr = tbody.append("tr").attr("height", height);
+//
+//            //根据结果添加列,并设置宽度
+//            for (var key in obj) {
+//                tr.append("td").style("width", "100px").text(obj[key]);
+//            }
+//        }
+
+    }
+
+    function renderTable (data,num) {
         var tbody = d3.select("#tbody_" + num);
+        tbody.selectAll("tr").remove();
         var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
         for (var obj of data) {
             //设置每一行的高度
@@ -278,60 +277,80 @@
                 tr.append("td").style("width", "100px").text(obj[key]);
             }
         }
-
     }
 
     /**
      * 绘制条状物
      */
-    function renderBars(data,num) {
-        svg.selectAll(".MyRect")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("class", "MyRect")
-            .attr("fill", "steelblue")//设定bar的颜色
-            .attr("id", function (d) {//绑定id
-                return "index_" +num+"_"+ d.bin_num;
-            })
-            .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
-            .attr("x", function (d) {
-                return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
-            })
-            .attr("y", function (d) {
+    function renderBars(svg,data, num, isSingle) {
+        var bar;
+        if (isSingle == false) {
+            bar = svg.selectAll(".MyRect");
+            svg.selectAll(".MyRect").data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "MyRect")
+                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("id", function (d) {//绑定id
+                    return "index_" + num + "_" + d.bin_num;
+                })
+                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
+                .attr("x", function (d) {
+                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
+                })
+                .attr("y", function (d) {
 //                console.log(yScale(d.bin_num));
-                return yScale(d.bin_num);//根据bin_num的值设定y轴的值
-            })
-            .attr("width", function (d) {
-                return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
-            })
-            .attr("height", function (d) {
-                return 50;//设置高度
-            });
+                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
+                })
+                .attr("width", function (d) {
+                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                })
+                .attr("height", function (d) {
+                    return 50;//设置高度
+                });
+        }
+        else{
 
-
-//        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
-//        var tbody = $('#data_table').find('tbody');
-//
-//        for (var a = 0; a < data.length; a++) {
-//            tbody.append("<tr>" +
-//                "<td>" + data[a].bin_num + "</td>" +
-//                "<td>" + data[a].woe + "</td>" +
-//                "</tr>");
-//            var tr = tbody.find("tr").attr("height", height);
-//        }
+            svg = d3.select("#my_svg_" + num);
+            renderXAxis(svg,num,data);
+            renderYAxis(svg,num,data);
+            svg.selectAll(".MyRect").remove();
+            svg.selectAll(".MyRect").data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "MyRect")
+                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("id", function (d) {//绑定id
+                    return "index_" + num + "_" + d.bin_num;
+                })
+                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
+                .attr("x", function (d) {
+                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
+                })
+                .attr("y", function (d) {
+//                console.log(yScale(d.bin_num));
+                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
+                })
+                .attr("width", function (d) {
+                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                })
+                .attr("height", function (d) {
+                    return 50;//设置高度
+                });
+        }
     }
 
-    function buttonInit(num) {
+    function buttonInit(initList) {
         /**
          * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
          */
-        for (var a = 0; a < num; a++) {
+        //初始化每一个variable的点击事件,预先为初始化相关变量
+        for (var a of initList) {
             controlMap[a] = {};
             var map = controlMap[a];
             map.start = {};
             map.end = {};
-            map.array = [$("#index_"+a)];
+            map.array = [$("#index_" + a)];
             $('#svg_' + a).find('.MyRect').click(function () {
                 //id和a的值是一致的,因此可以通过这个值从map中得到数据
                 var id = $(this).parent().parent().attr("id").split("_")[1];
@@ -354,7 +373,7 @@
                         var ei = parseInt(end.index);
                         for (var i = Math.min(si, ei); i <= Math.max(si, ei); i++) {
 
-                            var bar = $("#index_"+id+"_" + i);
+                            var bar = $("#index_" + id + "_" + i);
                             array.push(bar);
                             bar.attr("fill", "brown");
                         }
@@ -364,7 +383,7 @@
                     for (var m = 0; m < array.length; m++) {
                         array[m].attr("fill", "steelblue");
                     }
-                    array = controlMap[id].array=[];
+                    array = controlMap[id].array = [];
                     controlMap[id].end = {};
                     end = controlMap[id].end;
                     array.push($(this));
@@ -373,14 +392,63 @@
                 }
 
                 if (!$.isEmptyObject(start) && !$.isEmptyObject(end)) {
-                    $("#merge").removeAttr("disabled");
+                    $("#merge_" + id).removeAttr("disabled");
                 } else {
-                    $("#merge").attr("disabled", "disabled");
+                    $("#merge_" + id).attr("disabled", "disabled");
                 }
 //                console.log(controlMap[id].start);
 //                console.log(controlMap[id].end);
 //                console.log(start);
             });
+
+
+            /**
+             * 合并选择的集合
+             */
+            $("#merge_" + a).click(function () {
+                var id = $(this).attr("id").split("_")[1];
+                var name = $(this).attr("name");
+                var start = controlMap[id].start;
+                var end = controlMap[id].end;
+                var list = [];
+                var wholeList = [];
+                var childTrs = $('#tbody_' + id).children("tr");
+                for (var i = Math.min(start.index, end.index); i < Math.max(start.index, end.index); i++) {
+                    //5为列的位置,列名为max
+                    list.push($(childTrs.get(i)).children("td").get(5).innerHTML);
+                }
+
+                for (var index = 0; index < childTrs.length; index++) {
+                    wholeList.push($(childTrs.get(index)).children("td").get(5).innerHTML);
+                }
+
+                $.ajax({
+                    url: "http://localhost:8091/tool/merge",
+                    type: 'post',
+                    data: {
+                        "varName": name,
+                        "boundary": list.toString(),
+                        "allBoundary": wholeList.toString()
+                    },
+                    async: true,
+                    success: function (result) {
+                        var svg = null;
+                        renderBars(svg,result.data[name], id, true);
+                         initList = [id];
+                        buttonInit(initList);
+                        renderTable(result.data[name],id);
+//                        for (var num = 0; num < result.data.length; num++) {
+//                            console.log(result.data);
+////                            $('.axis').html("");
+////                            $('#data_table').find('tbody').html("");
+//                            initPanel(num);
+//                            renderXAxis(result.data);
+//                            renderYAxis(result.data);
+//                            renderBody(svg, result.data, num);
+//                        }
+                    }
+                });
+            })
         }
     }
 </script>

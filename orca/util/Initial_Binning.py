@@ -3,11 +3,10 @@ import os
 from Binning_Function import *
 
 
-def cal(train,test,target='bad_7mon_60'):
-    print os.path.abspath('.')
+def cal(df_train,target='bad_7mon_60'):
     ########################## dev vs val ##############################
-    df_train = pd.read_excel(train)
-    df_test = pd.read_excel(test)
+    # df_train = pd.read_excel(train)
+    # df_test = pd.read_excel(test)
     invalid_vars_list = [target]
     # from sklearn.cross_validation import train_test_split
     # target = df[['bad_7mon_60']]
