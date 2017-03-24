@@ -51,29 +51,13 @@
 
 </style>
 <body>
-<!--<div style="display: inline-block;" id="svg"></div>-->
+<input type="hidden" id="rowNum">
+<button class="btn btn-primary" style="" id="merge" disabled>apply</button>
 
-<!--<div style='display: inline-block;'>-->
-<!--<table id="data_table" class="table table-bordered">-->
-<!--<thead>-->
-<!--<tr>-->
-<!--<th>bin_num</th>-->
-<!--<th>woe</th>-->
-<!--</tr>-->
-<!--</thead>-->
-<!--<tbody>-->
-
-<!--</tbody>-->
-<!--</table>-->
-<!--</div>-->
 <div>
 
 </div>
 
-
-<!--<div>-->
-<!--<button class="btn btn-primary" style="margin-left: 25px;" id="merge" disabled>执行合并</button>-->
-<!--</div>-->
 </body>
 <script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
 <script src="/static/js/d3/d3.min.js"></script>
@@ -103,19 +87,18 @@
 //                renderBody(svg, result.data['credit_c_utilization'],num);
 //            }
 
-           var initList = [];
+            var initList = [];
             for (var key in result.data) {
                 var table_head = [];
                 for (var subKey in result.data[key][0]) {
                     table_head.push(subKey);
                 }
                 var svg = initPanel(key, num, table_head);
-                renderXAxis(svg,num,result.data[key]);
-                renderYAxis(svg,num,result.data[key]);
+                renderXAxis(svg, num, result.data[key]);
+                renderYAxis(svg, num, result.data[key]);
                 renderBody(svg, result.data[key], num);
                 initList.push(num);
                 num++;
-
             }
 
             buttonInit(initList);
@@ -134,7 +117,7 @@
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
-            .attr("id","my_svg_"+num)
+            .attr("id", "my_svg_" + num)
             .attr("width", width)
             .attr("height", height);
 
@@ -171,7 +154,7 @@
     /**
      * 描绘x轴
      */
-    function renderXAxis(svg,num,data) {
+    function renderXAxis(svg, num, data) {
         var axisLength = width - 2 * margin;
         var min = 0, max = 0;
         for (var obj of data) {
@@ -190,10 +173,10 @@
         //ticks表示我们希望的刻度数,会根据数值调整
         var axis = d3.axisBottom(xScale).ticks(5);
 
-        svg.select("#x_"+num).remove();
+        svg.select("#x_" + num).remove();
         svg.append("g")
             .attr("class", "x-axis")
-            .attr("id","x_"+num)
+            .attr("id", "x_" + num)
             .attr("transform", function () {
                 return "translate(" + margin + "," + 475 + ")";
             }).call(axis);
@@ -212,7 +195,7 @@
     /**
      * 描绘y轴
      */
-    function renderYAxis(svg,num,data) {
+    function renderYAxis(svg, num, data) {
         var axisLength = width - 2 * margin;
         //设定比例
         yScale = d3.scaleBand()
@@ -223,10 +206,10 @@
 
         var axis = d3.axisLeft(yScale);
 
-        svg.select("#y_"+num).remove();
+        svg.select("#y_" + num).remove();
         svg.append("g")
             .attr("class", "y-axis")
-            .attr("id","y_"+num)
+            .attr("id", "y_" + num)
             .attr("transform", function () {
                 return "translate(" + margin + "," + margin + ")";
             }).call(axis);
@@ -247,9 +230,9 @@
 //        if (!body) {
 //            body = svg.append("g").attr("class", "body");
 //        }
-        renderBars(svg,data, num,false);
+        renderBars(svg, data, num, false);
 
-        renderTable(data,num);
+        renderTable(data, num);
 //        var tbody = d3.select("#tbody_" + num);
 //        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
 //        for (var obj of data) {
@@ -264,10 +247,15 @@
 
     }
 
-    function renderTable (data,num) {
+    function renderTable(data, num) {
         var tbody = d3.select("#tbody_" + num);
         tbody.selectAll("tr").remove();
-        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
+        var height;
+        if (data.length==1){
+            height = yScale(data[0].bin_num);
+        }else {
+             height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
+        }
         for (var obj of data) {
             //设置每一行的高度
             var tr = tbody.append("tr").attr("height", height);
@@ -282,7 +270,7 @@
     /**
      * 绘制条状物
      */
-    function renderBars(svg,data, num, isSingle) {
+    function renderBars(svg, data, num, isSingle) {
         var bar;
         if (isSingle == false) {
             bar = svg.selectAll(".MyRect");
@@ -309,11 +297,11 @@
                     return 50;//设置高度
                 });
         }
-        else{
+        else {
 
             svg = d3.select("#my_svg_" + num);
-            renderXAxis(svg,num,data);
-            renderYAxis(svg,num,data);
+            renderXAxis(svg, num, data);
+            renderYAxis(svg, num, data);
             svg.selectAll(".MyRect").remove();
             svg.selectAll(".MyRect").data(data)
                 .enter()
@@ -396,9 +384,6 @@
                 } else {
                     $("#merge_" + id).attr("disabled", "disabled");
                 }
-//                console.log(controlMap[id].start);
-//                console.log(controlMap[id].end);
-//                console.log(start);
             });
 
 
@@ -410,42 +395,54 @@
                 var name = $(this).attr("name");
                 var start = controlMap[id].start;
                 var end = controlMap[id].end;
-                var list = [];
+                var list = '';
                 var wholeList = [];
                 var childTrs = $('#tbody_' + id).children("tr");
-                for (var i = Math.min(start.index, end.index); i < Math.max(start.index, end.index); i++) {
+
+                //判断是否为categorical还是numerical
+                var type = $(childTrs.get(0)).children("td").get(3).innerHTML;
+                //得到每个bin的最大值
+                var min = Math.min(start.index, end.index);
+                var max = Math.max(start.index,end.index);
+                for (var i = min; i <= max; i++) {
+                    if (i == max) {
+                        //如果存在'F',代表type为false,variable为numerical,
+                        if (type.indexOf("F") >=0){
+                            continue;
+                        }
+                    }
                     //5为列的位置,列名为max
-                    list.push($(childTrs.get(i)).children("td").get(5).innerHTML);
+//                    list.push($(childTrs.get(i)).children("td").get(5).innerHTML);
+
+                    list = list+($(childTrs.get(i)).children("td").get(5).innerHTML)+("&");
                 }
 
+                list = list.substring(0,list.length-1);
+
+
+
+
                 for (var index = 0; index < childTrs.length; index++) {
-                    wholeList.push($(childTrs.get(index)).children("td").get(5).innerHTML);
+                    wholeList=wholeList+($(childTrs.get(index)).children("td").get(5).innerHTML)+("&");
                 }
+                wholeList = wholeList.substring(0,wholeList.length-1);
 
                 $.ajax({
                     url: "http://localhost:8091/tool/merge",
                     type: 'post',
                     data: {
                         "varName": name,
-                        "boundary": list.toString(),
-                        "allBoundary": wholeList.toString()
+                        "boundary": list,
+                        "allBoundary": wholeList,
+                        "type": type
                     },
                     async: true,
                     success: function (result) {
                         var svg = null;
-                        renderBars(svg,result.data[name], id, true);
-                         initList = [id];
+                        renderBars(svg, result.data[name], id, true);
+                        initList = [id];
                         buttonInit(initList);
-                        renderTable(result.data[name],id);
-//                        for (var num = 0; num < result.data.length; num++) {
-//                            console.log(result.data);
-////                            $('.axis').html("");
-////                            $('#data_table').find('tbody').html("");
-//                            initPanel(num);
-//                            renderXAxis(result.data);
-//                            renderYAxis(result.data);
-//                            renderBody(svg, result.data, num);
-//                        }
+                        renderTable(result.data[name], id);
                     }
                 });
             })

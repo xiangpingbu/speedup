@@ -43,7 +43,7 @@ def cal(df_train,target='bad_7mon_60'):
             iv_rank_map[v] = (v, t, new_df_map, boundary_list, var_iv)
 
     df_iv = df_iv[['var_name', 'iv', 'tree_boundary']]
-    df_iv.to_excel("df_iv.xlsx", ",", header=True, index=False)
+    # df_iv.to_excel("df_iv.xlsx", ",", header=True, index=False)
 
     return iv_rank_map
 
@@ -60,7 +60,7 @@ def cal(df_train,target='bad_7mon_60'):
 #     boundary = c[3]
 #     html_file.write('<br>')
 #     html_file.write('<b>IV: '+str(k)+'</b>')
-    generate_bin_table_html(woe_map, var_name, var_type, html_file)
+#     generate_bin_table_html(woe_map, var_name, var_type, html_file)
 #     html_file.write('<br>')
 #     html_file.write(boundary)
 #     html_file.write('<br>')

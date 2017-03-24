@@ -534,8 +534,11 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     return [df_train_woe, df_test_woe]
 
 
-def single_numerical_no_html(df_train, df_test, my_var, my_target, my_boundary_list):
-    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+def single_numerical_no_html(df_train, type, my_var, my_target, my_boundary_list):
+    if type is False:
+        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+    else:
+        my_result_0 = get_manual_bin_categorical(df_train,my_var,my_target,my_boundary_list)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     # new_name = my_var + '_woe'
