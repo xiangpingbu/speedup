@@ -7,11 +7,11 @@ from sklearn import tree
 # from pylab import *
 
 
-def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeaf=200):
+def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3):
     '''
     porcess single variable
     '''
-
+    minLeaf=int(len(df) * 0.05)
     for nv in nullValue:
         df[var] = df[var].replace(nv, np.nan)
 

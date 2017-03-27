@@ -49,21 +49,83 @@
         min-height: 48px;
     }
 
+    .spinner {
+        margin: 100px auto;
+        width: 50px;
+        height: 60px;
+        text-align: center;
+        font-size: 10px;
+    }
+
+    .spinner > div {
+        background-color: #000000;
+        height: 100%;
+        width: 6px;
+        display: inline-block;
+
+        -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+        animation: stretchdelay 1.2s infinite ease-in-out;
+    }
+
+    .spinner .rect2 {
+        -webkit-animation-delay: -1.1s;
+        animation-delay: -1.1s;
+    }
+
+    .spinner .rect3 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+    }
+
+    .spinner .rect4 {
+        -webkit-animation-delay: -0.9s;
+        animation-delay: -0.9s;
+    }
+
+    .spinner .rect5 {
+        -webkit-animation-delay: -0.8s;
+        animation-delay: -0.8s;
+    }
+
+    @-webkit-keyframes stretchdelay {
+        0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+        20% { -webkit-transform: scaleY(1.0) }
+    }
+
+    @keyframes stretchdelay {
+        0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+        }  20% {
+               transform: scaleY(1.0);
+               -webkit-transform: scaleY(1.0);
+           }
+    }
+
 </style>
 <body>
 <input type="hidden" id="rowNum">
-<button class="btn btn-primary" style="" id="merge" disabled>apply</button>
+<button class="btn btn-success" style="" id="output">apply</button>
 
 <div>
 
 </div>
 
+<div class="spinner" style="width:50px;height:38px;position:absolute;left:50%;top:50%;margin-top:-150px;">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+</div>
+
+
 </body>
-<script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
-<script src="/static/js/d3/d3.min.js"></script>
 <link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
 
-
+<script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
+<script src="/static/js/d3/d3.min.js"></script>
+<script src="/static/js/model/tool_button.js"></script>
 <script>
     var height = 500,
         width = 500,
@@ -77,15 +139,10 @@
     var xScale, yScale;
 
     $(document).ready(function () {
+        outputDateMap();
+
         d3.json("http://localhost:8091/tool/init", function (error, result) {
-//            console.log(result);
             var num = 0;
-//            for (var key in result.data) {
-//                var svg= initPanel(num);
-//                renderXAxis(result.data['credit_c_utilization']);
-//                renderYAxis(result.data['credit_c_utilization']);
-//                renderBody(svg, result.data['credit_c_utilization'],num);
-//            }
 
             var initList = [];
             for (var key in result.data) {
@@ -100,9 +157,10 @@
                 initList.push(num);
                 num++;
             }
-
+            //记录行数
+            $("#rowNum").val(num);
             buttonInit(initList);
-
+            $(".spinner").css('display','none');
         });
     });
 
@@ -138,21 +196,30 @@
 
 
         //设置按钮
-        d3.select("body")
+        var buttonDiv = d3.select("body")
             .select("div")
-            .append("div")
-            .append("button")
+            .append("div");
+
+        buttonDiv.append("button")
             .attr("class", "btn btn-primary")
             .attr("id", "merge_" + num)
             .attr("name", rowName)
             .attr("disabled", "disabled")
-            .text("执行合并")
+            .text("合并")
+            .style("margin-left", "25px");
+
+        buttonDiv.append("button")
+            .attr("class", "btn btn-danger")
+            .attr("id", "divide_" + num)
+            .attr("name", rowName)
+            .text("分裂")
             .style("margin-left", "25px");
 
         return svg
     }
     /**
      * 描绘x轴
+     * 需要指定画布(svg),variable的下标,variable的相关数据
      */
     function renderXAxis(svg, num, data) {
         var axisLength = width - 2 * margin;
@@ -225,123 +292,40 @@
             .attr("y2", 0);
     }
 
-    var body;
-    function renderBody(svg, data, num) {
-//        if (!body) {
-//            body = svg.append("g").attr("class", "body");
-//        }
-        renderBars(svg, data, num, false);
 
-        renderTable(data, num);
-//        var tbody = d3.select("#tbody_" + num);
-//        var height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
-//        for (var obj of data) {
-//            //设置每一行的高度
-//            var tr = tbody.append("tr").attr("height", height);
-//
-//            //根据结果添加列,并设置宽度
-//            for (var key in obj) {
-//                tr.append("td").style("width", "100px").text(obj[key]);
-//            }
-//        }
-
-    }
-
-    function renderTable(data, num) {
-        var tbody = d3.select("#tbody_" + num);
-        tbody.selectAll("tr").remove();
-        var height;
-        if (data.length==1){
-            height = yScale(data[0].bin_num);
-        }else {
-             height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
-        }
-        for (var obj of data) {
-            //设置每一行的高度
-            var tr = tbody.append("tr").attr("height", height);
-
-            //根据结果添加列,并设置宽度
-            for (var key in obj) {
-                tr.append("td").style("width", "100px").text(obj[key]);
-            }
-        }
-    }
-
+    var columnMap =
+        {
+            0: "bad_rate",
+            1: "bads",
+            2: "bin_num",
+            3: "category_t",
+            4: "goods",
+            5: "max",
+            6: "min",
+            7: "total",
+            8: "total_perc",
+            9: "woe"
+        };
     /**
-     * 绘制条状物
+     * 初始化合并操作按钮
+     * @param initList 一个列表,通过该列表指定需要绑定事件的按钮
+     * 例如 [0,1,2] ,初始化三个前三个variable的合并按钮
      */
-    function renderBars(svg, data, num, isSingle) {
-        var bar;
-        if (isSingle == false) {
-            bar = svg.selectAll(".MyRect");
-            svg.selectAll(".MyRect").data(data)
-                .enter()
-                .append("rect")
-                .attr("class", "MyRect")
-                .attr("fill", "steelblue")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
-                })
-                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
-                .attr("x", function (d) {
-                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
-                })
-                .attr("y", function (d) {
-//                console.log(yScale(d.bin_num));
-                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
-                })
-                .attr("width", function (d) {
-                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
-                })
-                .attr("height", function (d) {
-                    return 50;//设置高度
-                });
-        }
-        else {
-
-            svg = d3.select("#my_svg_" + num);
-            renderXAxis(svg, num, data);
-            renderYAxis(svg, num, data);
-            svg.selectAll(".MyRect").remove();
-            svg.selectAll(".MyRect").data(data)
-                .enter()
-                .append("rect")
-                .attr("class", "MyRect")
-                .attr("fill", "steelblue")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
-                })
-                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
-                .attr("x", function (d) {
-                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
-                })
-                .attr("y", function (d) {
-//                console.log(yScale(d.bin_num));
-                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
-                })
-                .attr("width", function (d) {
-                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
-                })
-                .attr("height", function (d) {
-                    return 50;//设置高度
-                });
-        }
-    }
-
     function buttonInit(initList) {
         /**
          * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
          */
-        //初始化每一个variable的点击事件,预先为初始化相关变量
+        //初始化每一个variable的点击事件,预先初始化相关变量
         for (var a of initList) {
             controlMap[a] = {};
             var map = controlMap[a];
             map.start = {};
             map.end = {};
             map.array = [$("#index_" + a)];
-            $('#svg_' + a).find('.MyRect').click(function () {
+            var rects = $('#svg_' + a).find('.MyRect').click(function () {
                 //id和a的值是一致的,因此可以通过这个值从map中得到数据
                 var id = $(this).parent().parent().attr("id").split("_")[1];
+                //觉得应该可以用队列来实现
                 var array = controlMap[id].array;
                 var start = controlMap[id].start;
                 var end = controlMap[id].end;
@@ -353,7 +337,6 @@
                         start.index = index;
                     } else if ($.isEmptyObject(end)) {
                         end.index = index;
-                        console.log(end.index);
                     }
                     //如果前后两次都点击完毕,会按照次序将bar填充颜色.并在数组里添加记录
                     if (!$.isEmptyObject(start) && !$.isEmptyObject(end)) {
@@ -386,6 +369,51 @@
                 }
             });
 
+            $("#divide_" + a).click(function () {
+                $(".spinner").css('display','block');
+                var data = {};
+                var id = $(this).attr("id").split("_")[1];
+                var start = controlMap[id].start;
+
+                var childs = $('#tbody_' + id).children("tr");
+//                var td = $(childs.get(start.index)).children("td");
+
+                var list = [];
+                data.table = list;
+                var name = $(this).attr("name");
+                data.name = name;
+                for (var i = 0; i < childs.length; i++) {
+                    var td = $(childs.get(i)).children("td");
+                    var obj = {};
+                    for (var j = 0; j < td.length; j++) {
+                        obj[columnMap[j]] = td.get(j).innerHTML;
+                    }
+                    list.push(obj);
+                    if (start.index == i){
+                        data.selected = obj;
+                        data.selectedIndex = i;
+                    }
+                }
+                $.ajax({
+                    url: "http://localhost:8091/tool/divide",
+                    type: 'post',
+                    data: {
+                        "data":JSON.stringify(data)
+                    },
+                    async: true,
+                    success: function (result) {
+                        var svg = null;
+                        renderBars(svg, result.data[name], id, true);
+                        initList = [id];
+                        buttonInit(initList);
+                        renderTable(result.data[name], id);
+                        controlMap[id].start = {};
+                        controlMap[id].end = {};
+                        $("#merge_" + id).attr("disabled", "disabled");
+                        $(".spinner").css('display','none');
+                    }
+                });
+            });
 
             /**
              * 合并选择的集合
@@ -403,30 +431,24 @@
                 var type = $(childTrs.get(0)).children("td").get(3).innerHTML;
                 //得到每个bin的最大值
                 var min = Math.min(start.index, end.index);
-                var max = Math.max(start.index,end.index);
+                var max = Math.max(start.index, end.index);
                 for (var i = min; i <= max; i++) {
                     if (i == max) {
                         //如果存在'F',代表type为false,variable为numerical,
-                        if (type.indexOf("F") >=0){
+                        if (type.indexOf("F") >= 0) {
                             continue;
                         }
                     }
-                    //5为列的位置,列名为max
-//                    list.push($(childTrs.get(i)).children("td").get(5).innerHTML);
 
-                    list = list+($(childTrs.get(i)).children("td").get(5).innerHTML)+("&");
+                    list = list + ($(childTrs.get(i)).children("td").get(5).innerHTML) + ("&");
                 }
 
-                list = list.substring(0,list.length-1);
-
-
-
-
+                list = list.substring(0, list.length - 1);
                 for (var index = 0; index < childTrs.length; index++) {
-                    wholeList=wholeList+($(childTrs.get(index)).children("td").get(5).innerHTML)+("&");
+                    wholeList = wholeList + ($(childTrs.get(index)).children("td").get(5).innerHTML) + ("&");
                 }
-                wholeList = wholeList.substring(0,wholeList.length-1);
-
+                wholeList = wholeList.substring(0, wholeList.length - 1);
+                $(".spinner").css('display','block');
                 $.ajax({
                     url: "http://localhost:8091/tool/merge",
                     type: 'post',
@@ -443,11 +465,110 @@
                         initList = [id];
                         buttonInit(initList);
                         renderTable(result.data[name], id);
+                        controlMap[id].start = {};
+                        controlMap[id].end = {};
+                        $("#merge_" + id).attr("disabled", "disabled");
+                        $(".spinner").css('display','none');
+
                     }
                 });
-            })
+            });
+
+
         }
     }
+
+    function renderBody(svg, data, num) {
+        renderBars(svg, data, num, false);
+        renderTable(data, num);
+
+    }
+
+    function renderTable(data, num) {
+        var tbody = d3.select("#tbody_" + num);
+        tbody.selectAll("tr").remove();
+        var height;
+        if (data.length == 1) {
+            height = yScale(data[0].bin_num);
+        } else {
+            height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
+        }
+        for (var obj of data) {
+            //设置每一行的高度
+            var tr = tbody.append("tr").attr("height", height);
+
+            //根据结果添加列,并设置宽度
+            for (var key in obj) {
+                tr.append("td").style("width", "100px").text(obj[key]);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param svg 画布
+     * @param data 单个variable的数据
+     * @param num  variable的下标
+     * @param isSingle 如果是初始化所有数据,
+     */
+    function renderBars(svg, data, num, isSingle) {
+        var bar;
+        if (isSingle == false) {
+            bar = svg.selectAll(".MyRect");
+            svg.selectAll(".MyRect").data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "MyRect")
+                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("id", function (d) {//绑定id
+                    return "index_" + num + "_" + d.bin_num;
+                })
+                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
+                .attr("x", function (d) {
+                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
+                })
+                .attr("y", function (d) {
+//                console.log(yScale(d.bin_num));
+                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
+                })
+                .attr("width", function (d) {
+                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                })
+                .attr("height", function (d) {
+                    return 230/data.length;//设置高度
+                });
+        }
+        else {
+            svg = d3.select("#my_svg_" + num);
+            renderXAxis(svg, num, data);
+            renderYAxis(svg, num, data);
+            svg.selectAll(".MyRect").remove();
+            svg.selectAll(".MyRect").data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "MyRect")
+                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("id", function (d) {//绑定id
+                    return "index_" + num + "_" + d.bin_num;
+                })
+                .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
+                .attr("x", function (d) {
+                    return xScale(Math.min(0, d.woe)); //根据woe值设置x轴的位置
+                })
+                .attr("y", function (d) {
+//                console.log(yScale(d.bin_num));
+                    return yScale(d.bin_num);//根据bin_num的值设定y轴的值
+                })
+                .attr("width", function (d) {
+                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                })
+                .attr("height", function (d) {
+                    return 230/data.length;//设置高度
+                });
+        }
+    }
+
+
 </script>
 
 </html>
