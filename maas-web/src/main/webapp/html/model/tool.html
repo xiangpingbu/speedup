@@ -4,108 +4,10 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<style>
-    .MyRect:hover {
-        fill: brown;
-    }
-
-    .sheet {
-        display: inline-block;
-    }
-
-    .axis {
-        display: inline-block;
-    }
-
-    .svg-title {
-        -moz-border-bottom-colors: none;
-        -moz-border-left-colors: none;
-        -moz-border-right-colors: none;
-        -moz-border-top-colors: none;
-        background-color: #ffffff;
-        /*border-color: #e7eaec;*/
-        border-image: none;
-        /*border-style: solid solid none;*/
-        border-width: 3px 0 0;
-        color: inherit;
-        margin-bottom: 0;
-        /*padding: 14px 15px 7px;*/
-        min-height: 48px;
-    }
-
-    .svg-content {
-        -moz-border-bottom-colors: none;
-        -moz-border-left-colors: none;
-        -moz-border-right-colors: none;
-        -moz-border-top-colors: none;
-        background-color: #ffffff;
-        border-color: #e7eaec;
-        border-image: none;
-        border-style: solid solid none;
-        border-width: 3px 0 0;
-        color: inherit;
-        margin-bottom: 0;
-        padding: 0px 15px 7px;
-        min-height: 48px;
-    }
-
-    .spinner {
-        margin: 100px auto;
-        width: 50px;
-        height: 60px;
-        text-align: center;
-        font-size: 10px;
-    }
-
-    .spinner > div {
-        background-color: #000000;
-        height: 100%;
-        width: 6px;
-        display: inline-block;
-
-        -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
-        animation: stretchdelay 1.2s infinite ease-in-out;
-    }
-
-    .spinner .rect2 {
-        -webkit-animation-delay: -1.1s;
-        animation-delay: -1.1s;
-    }
-
-    .spinner .rect3 {
-        -webkit-animation-delay: -1.0s;
-        animation-delay: -1.0s;
-    }
-
-    .spinner .rect4 {
-        -webkit-animation-delay: -0.9s;
-        animation-delay: -0.9s;
-    }
-
-    .spinner .rect5 {
-        -webkit-animation-delay: -0.8s;
-        animation-delay: -0.8s;
-    }
-
-    @-webkit-keyframes stretchdelay {
-        0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
-        20% { -webkit-transform: scaleY(1.0) }
-    }
-
-    @keyframes stretchdelay {
-        0%, 40%, 100% {
-            transform: scaleY(0.4);
-            -webkit-transform: scaleY(0.4);
-        }  20% {
-               transform: scaleY(1.0);
-               -webkit-transform: scaleY(1.0);
-           }
-    }
-
-</style>
+<link href="/static/css/tool.css" rel="stylesheet"/>
 <body>
 <input type="hidden" id="rowNum">
-<button class="btn btn-success" style="" id="output">apply</button>
+<!--<button class="btn btn-success" style="" id="output">apply</button>-->
 
 <div>
 
@@ -117,6 +19,14 @@
     <div class="rect3"></div>
     <div class="rect4"></div>
     <div class="rect5"></div>
+</div>
+
+<div class="side-bar">
+    <a href="#" id="output" class="bar">apply</a>
+    <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
+        <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
+    <!--<a target="_blank" href="" class="icon-blog">微博</a>-->
+    <!--<a href="http://www.helloweba.com/gbook.html" class="icon-mail">mail</a>-->
 </div>
 
 
