@@ -1,12 +1,10 @@
-package com.ecreditpal.maas.common.util2;
+package com.ecreditpal.maas.common.excel;
 
-import com.ecreditpal.maas.common.utils.ExcelContent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lifeng

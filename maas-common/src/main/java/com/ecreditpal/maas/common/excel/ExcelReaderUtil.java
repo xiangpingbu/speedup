@@ -1,14 +1,9 @@
-package com.ecreditpal.maas.common.util2;
+package com.ecreditpal.maas.common.excel;
 
 /**
  * @author lifeng
  * @version 1.0 on 2017/3/17.
  */
-
-import com.ecreditpal.maas.common.utils.ExcelContent;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 名称: ExcelReaderUtil.java<br>

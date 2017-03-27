@@ -59,6 +59,11 @@
             <artifactId>pmml-evaluator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>xerces</groupId>-->
             <!--<artifactId>xerces</artifactId>-->

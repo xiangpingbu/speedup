@@ -5,6 +5,7 @@ import com.ecreditpal.maas.model.bean.Result;
 import com.ecreditpal.maas.web.bean.User;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author lifeng
  * @version 1.0 on 2017/3/10.
  */
+@Slf4j
 @Api(value = "d3", description = "Endpoint for rest test")
 @Path("/d3")
 public class D3TestEndpoint {
@@ -42,6 +44,7 @@ public class D3TestEndpoint {
         data.setNumber(24);
         list.add(data);
 
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>test");
 
         return Result.wrapSuccessfulResult(list);
     }
