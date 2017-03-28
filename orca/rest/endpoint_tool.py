@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from werkzeug.utils import secure_filename
+
 from rest.app_base import *
 from util import Initial_Binning as ib
 import pandas as pd
@@ -25,13 +27,15 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
-df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-
+# df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+df_train = None
+# df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
+df_test = None
 
 
 @app.route(base + "/init")
-def init(df=df_train):
+def init():
+    df = df_train
     out = get_init(df)
     return responseto(data=out)
 
@@ -146,11 +150,18 @@ def apply():
                     # 根据category_t的布尔值区分类别,如果为false为numerical
                     if obj["category_t"] == "False":
                         # 比对区间,获得woe的值
-                        if float(obj["min"]) <= row[column] < float(obj["max"]):
+                        bin_min = float(obj["min"])
+                        bin_max = float(obj["max"])
+                        bin_val = float(row[column])
+                        if bin_max == bin_min and bin_val == bin_min:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-                        if obj["max"] == 'nan':
+                        elif bin_min <= bin_val < bin_max:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
+                            break
+                        elif obj["max"] == 'nan' and str(row[column]) == 'nan':
+                            test.loc[index, [column + "_woe"]] = obj["woe"]
+                            break
                     else:
                         # categorical,直接进行匹配
                         if row[column] in obj[column]:
@@ -158,6 +169,24 @@ def apply():
                             break
     test.to_excel("df_iv.xlsx", ",", header=True, index=False)
     return responseto(data=test)
+
+
+@app.route(base + "/upload", methods=['OPTIONS', 'POST'])
+def upload():
+    """工具依赖的源文件修改"""
+    # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
+    if request.method == 'POST':
+        global df_train
+        global df_test
+        files = request.files.getlist("file[]")
+        for file in files:
+            filename = secure_filename(file.filename)
+            print filename
+            if filename == 'df_test.xlsx':
+                df_test = pd.read_excel(file)
+            elif filename == 'df_train.xlsx':
+                df_train = pd.read_excel(file)
+    return responseto(data="success")
 
 
 def get_init(df=df_train):

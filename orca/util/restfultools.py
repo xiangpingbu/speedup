@@ -24,7 +24,7 @@ def statusResponse(statu_dic):
 def responseto(data=None,message=None, error=None, **kwargs):
     """ 封装 json 响应"""
     result = kwargs
-    result['error'] = error
+    result['success'] = True
     result['message'] = message
     result['data'] = data
 
@@ -48,4 +48,6 @@ def responseto(data=None,message=None, error=None, **kwargs):
     resp = jsonify(result)
     # 跨域设置
     resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
+    resp.headers["Access-Control-Allow-Headers"]= "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
     return resp

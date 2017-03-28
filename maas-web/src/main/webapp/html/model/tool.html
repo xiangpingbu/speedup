@@ -262,7 +262,7 @@
                 } else {
                     //将之前数组中添加的记录提取出来,重置颜色
                     for (var m = 0; m < array.length; m++) {
-                        array[m].attr("fill", "steelblue");
+                        array[m].attr("fill", "#000000");
                     }
                     array = controlMap[id].array = [];
                     controlMap[id].end = {};
@@ -429,7 +429,7 @@
                 .enter()
                 .append("rect")
                 .attr("class", "MyRect")
-                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("fill", "#000000")//设定bar的颜色
                 .attr("id", function (d) {//绑定id
                     return "index_" + num + "_" + d.bin_num;
                 })
@@ -457,7 +457,7 @@
                 .enter()
                 .append("rect")
                 .attr("class", "MyRect")
-                .attr("fill", "steelblue")//设定bar的颜色
+                .attr("fill", "#000000")//设定bar的颜色
                 .attr("id", function (d) {//绑定id
                     return "index_" + num + "_" + d.bin_num;
                 })
