@@ -11,15 +11,23 @@ import collections
 
 base = '/tool'
 base_path = "./util/"
-# df_test = base_path + "df_test.xlsx"
-train_file = base_path + "df_train.xlsx"
-df_train = pd.read_excel(train_file)
-
-test_file = base_path + "df_test.xlsx"
-df_test = pd.read_excel(test_file)
 
 
-merge_record = {}
+def file_init():
+    train_file = base_path + "df_train.xlsx"
+    train = pd.read_excel(train_file)
+
+    test_file = base_path + "df_test.xlsx"
+    test = pd.read_excel(test_file)
+    return [train, test]
+
+
+# df_list = file_init()
+# df_train = file_init()
+# df_test = file_init()
+df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
+
 
 
 @app.route(base + "/init")
@@ -99,7 +107,7 @@ def divide():
         if float(min) < float(row[name]) <= float(max):
             pass
         else:
-            df.drop(index,inplace=True)
+            df.drop(index, inplace=True)
     out = get_init(df)
     print json.dumps(out[name])
     list = map["table"]
@@ -107,15 +115,15 @@ def divide():
 
     index = map["selectedIndex"]
     for v in out[name]:
-        obj={}
+        obj = {}
         for key in v.keys():
             obj[key] = v[key]
-        list.insert(index,obj)
-        index = index+1
+        list.insert(index, obj)
+        index = index + 1
 
-        for index,v in enumerate(list):
+        for index, v in enumerate(list):
             v["bin_num"] = index
-    return responseto(data={name:list})
+    return responseto(data={name: list})
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -124,13 +132,12 @@ def apply():
     data = request.form.get('data')
     dict = json.loads(data)
 
-    vars = df_test.columns
     test = df_test.drop('bad_7mon_60', 1)
+    vars = df_test.columns
     test_copy = test.copy()
     # 初始化列
     for v in vars:
         test[v + "_woe"] = ""
-
     for index, row in test_copy.iterrows():
         for column in test_copy.columns:
             bins = dict[column]
@@ -139,17 +146,16 @@ def apply():
                     # 根据category_t的布尔值区分类别,如果为false为numerical
                     if obj["category_t"] == "False":
                         # 比对区间,获得woe的值
-                        if float(obj["min"]) < row[column] <= float(obj["max"]):
+                        if float(obj["min"]) <= row[column] < float(obj["max"]):
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
                         if obj["max"] == 'nan':
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                     else:
                         # categorical,直接进行匹配
-                        if row[column] == obj[column]:
+                        if row[column] in obj[column]:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-
     test.to_excel("df_iv.xlsx", ",", header=True, index=False)
     return responseto(data=test)
 

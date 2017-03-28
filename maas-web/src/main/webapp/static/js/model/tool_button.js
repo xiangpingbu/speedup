@@ -27,7 +27,7 @@ function outputDateMap() {
                     } else{
                         var ca = $(childTrs.get(innerRow)).children("td").get(maxIndex).innerHTML;
 
-                        innerDate[name] = ca.split('|').toString();
+                        innerDate[name] = ca.split('|');
                     }
                     var woe;
                     try {
