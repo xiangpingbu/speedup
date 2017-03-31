@@ -54,8 +54,8 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3):
         #df_mapping = df_group[org_var].agg({'max': np.max, 'min': np.min, 'total': np.size, 'bads': np.bad.sum()}).reset_index()
         df_mapping = pd.DataFrame(
             {'total': df_cur_grp.size(),
-             'max': df_cur_grp[org_var].max().apply('{:.15f}'.format),
-             'min': df_cur_grp[org_var].min().apply('{:.15f}'.format),
+             'max': df_cur_grp[org_var].max(),
+             'min': df_cur_grp[org_var].min(),
              'bads': df_cur_grp['bad'].sum(),
              'goods': df_cur_grp['good'].sum(),
              'bad_rate': (df_cur_grp['bad'].sum().astype(float) / df_cur_grp.size())
@@ -76,6 +76,8 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3):
         # df_mapping['max'] = df_mapping['max'].apply('{0:.15%}'.format())
         df_mapping.sort_values(['max'], ascending=[1], inplace=True)
         df_mapping['bin_num'] = range(len(df_mapping))
+        df_mapping['max'] = df_mapping['max'].apply('{:.15f}'.format)
+        df_mapping['min'] = df_mapping['min'].apply('{:.15f}'.format)
         df_mapping = df_mapping[['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'category_t']]
 
     df_mapping['index'] = range(len(df_mapping))

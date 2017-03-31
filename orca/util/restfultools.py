@@ -53,3 +53,5 @@ def responseto(data=None,message=None, error=None, **kwargs):
     resp.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
     resp.headers["Access-Control-Allow-Headers"]= "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
     return resp
+
+

@@ -21,6 +21,7 @@
 
 <div class="side-bar">
     <a href="#" id="output" class="bar">apply</a>
+    <a href="#" id="columnConfig" class="bar">column</a>
     <!--<a href="#" id="init" class="bar">prev</a>-->
     <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
     <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
@@ -338,7 +339,7 @@
                     for (var j = 0; j < tds.length; j++) {
                         var key = columnMap[j];
                         if (key == 'total') {
-                            all += parseInt(total);
+                            all += parseInt(tds.get(j).innerHTML);
                         }
                         obj[key] = tds.get(j).innerHTML;
                     }
@@ -409,7 +410,8 @@
 
 
                     if (isNum) {
-                        valIndex = maxIndex;
+//                        valIndex = maxIndex;
+                        valIndex = maxBoundIndex;
                     }
                     else valIndex = categoricalIndex;
                     list = list + ($(childTrs.get(i)).children("td").get(valIndex).innerHTML) + ("&");
@@ -418,9 +420,17 @@
                 list = list.substring(0, list.length - 1);
 
                 for (var index = 0; index < childTrs.length; index++) {
+                   var tdVal;
                     if (isNum) {
-                        wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
+                        //整个区间的大部分从max_bound列中得到,除了inf一列
+                        if (index == childTrs.length-2) {
+                            tdVal = $(childTrs.get(index)).children("td").get(maxIndex).innerHTML;
+                        } else {
+                            tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML
+                        }
+                        wholeList = wholeList + (tdVal) + ("&");
                     } else {
+                        //获取categorical的除选中以外的值
                         if (index < min || index > max) {
                             wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
                         }

@@ -23,7 +23,7 @@ def cal(df_train,target='bad_7mon_60'):
         if v not in invalid_vars_list:
             t = str(df[v].dtype)
             unique_value = len(df[v].value_counts())
-            max_cardinality = 10
+            max_cardinality = 3
             if unique_value <= max_cardinality:
                 t = 'object'
             print "current variable: " + v + " current type: " + t

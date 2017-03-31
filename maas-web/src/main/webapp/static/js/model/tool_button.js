@@ -1,5 +1,6 @@
 maxIndex = 2;
 minIndex = 1;
+maxBoundIndex = 4;
 woeIndex = 10;
 binNumIndex = 0;
 cateIndex = 11;
@@ -103,6 +104,11 @@ $("#prev").click(function () {
 $("#init").click(function () {
     $('#preDefine').html("");
     init();
+});
+
+
+$("#columnConfig").click(function () {
+
 });
 
 

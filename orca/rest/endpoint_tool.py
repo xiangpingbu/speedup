@@ -81,7 +81,7 @@ def merge():
         boundary_list.append(np.nan)
         selected_list = boundary_list
 
-        columns = ['bin_num', 'min', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+        columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
     else:
         type_bool = True
@@ -101,76 +101,97 @@ def merge():
     df = pd.DataFrame(result[0],
                       columns=columns)
 
-    data = {var_name: []}
-    row_index = 0
-
-    for index, row in df.iterrows():  # 获取每行的index、row
-        sub_data = collections.OrderedDict()
-        for col_name in df.columns:
-            if isinstance(row[col_name],list):
-                sub_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name])
-            else:
-                sub_data[col_name] = str(row[col_name])
-            if col_name == 'max':
-                # 在max后额外增加两列
-                sub_data['min_bound'] = row["min"]
-                sub_data['max_bound'] = row["max"]
-                if row_index == len(df) - 1:
-                    if [row["bin_num"] - df.iloc[[row_index - 1]]["bin_num"]] > 1:
-                        sub_data["bin_num"] = row["bin_num"] - 1
-                row_index += 1
-        data[var_name].append(sub_data)
-
-        data = get_boundary(data, min)
+    data = get_merged(var_name,df,min_val)
     return responseto(data=data)
 
 
 @app.route(base + "/divide", methods=['POST'])
 def divide():
+    min_val = 0
     data = request.form.get('data')
-
-    map = json.loads(data,object_pairs_hook=OrderedDict)
-    name = map["name"]
+    # 解析json
+    data_map = json.loads(data, object_pairs_hook=OrderedDict)
+    name = data_map["name"]
     target = "bad_7mon_60"
+    # 将excel转化为dataframe,只读取target和name两列
     df = pd.DataFrame(df_train, columns={target, name})
-    if map["selected"]["category_t"] == 'False':
-        min = map["selected"]["min"]
-        max = map["selected"]["max"]
+
+
+    bound_list = None
+    if data_map["selected"]["category_t"] == 'False':
+        # 根据min和max的边界去筛选数据
+        min = data_map["selected"]["min_bound"]
+        max = data_map["selected"]["max_bound"]
         for index, row in df.iterrows():
             if float(min) <= float(row[name]) < float(max):
                 pass
             else:
                 df.drop(index, inplace=True)
+
+        out = get_init(df)
+        bound_list = get_divide_max_bound(out)
+
+        list = data_map["table"]
+        # 删除要被分裂的项
+        del list[data_map["selectedIndex"]]
+
+        for v in list:
+            bound_list.append(float(v["max"]))
+        bound_list.append(np.nan)
+
+        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
+        columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+               'category_t']
+        df = pd.DataFrame(result[0],
+                      columns=columns)
+        data = get_merged(name,df,min_val)
+
+        return responseto(data=data)
+
     else:
-        val = map["selected"][name].split("|")
+        val = data_map["selected"][name].split("|")
         for index, row in df.iterrows():
             if row[name] in val:
                 pass
             else:
                 df.drop(index, inplace=True)
-    #得到分裂的结果
-    out = get_init(df)
-    print json.dumps(out[name])
-    list = map["table"]
-    #删除要被分裂的项
-    del list[map["selectedIndex"]]
-    #被分裂的项的下标
-    index = map["selectedIndex"]
-    #将分裂的结果加入原有的列表中
-    for v in out[name]:
-        obj = collections.OrderedDict()
-        for key in v.keys():
-            obj[key] = v[key]
-        list.insert(index, obj)
-        index += 1
 
-    #重新划定index
-    for index, v in enumerate(list):
-        v["bin_num"] = index
-        v["total"] = (round(v['total']/map["all"],4) * 100 )+ '%'
+        list = data_map["table"]
+        # 删除要被分裂的项
+        del list[data_map["selectedIndex"]]
 
-    list = get_boundary((name,list),0)[1]
-    return responseto(data={name:list})
+        out = get_init(df)
+        bound_list = get_divide_caterotical_bound(out,name)
+        # 被分裂的项的下标
+        index = data_map["selectedIndex"]
+        # 将分裂的结果加入原有的列表中
+        for v in list:
+            bound_list.append(map(cmm.transfer,v[name].split("|")))
+        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
+        columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'category_t']
+        df = pd.DataFrame(result[0],
+                          columns=columns)
+        data = get_merged(name,df,min_val)
+        return responseto(data=data)
+
+    # # 被分裂的项的下标
+    # index = map["selectedIndex"]
+    # # 将分裂的结果加入原有的列表中
+    # for v in out[name]:
+    #     obj = collections.OrderedDict()
+    #     for key in v.keys():
+    #         obj[key] = v[key]
+    #     list.insert(index, obj)
+    #     index += 1
+    #
+    # # 重新划定index
+    # for index, v in enumerate(list):
+    #     v["bin_num"] = index
+    #     v["total_perc"] = str((round(float(v['total']) / float(map["all"]), 4) * 100)) + '%'
+    #
+    # list = get_boundary((name, list), 0)[1]
+    # return responseto(data=data)
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -232,6 +253,11 @@ def upload():
     return responseto(data="success")
 
 
+@app.route(base + "/column-config")
+def column_config():
+    return responseto()
+
+
 def get_init(df=df_train):
     data_map = ib.cal(df)
     keys = data_map.keys()
@@ -247,7 +273,7 @@ def get_init(df=df_train):
         for index, row in woe_map.iterrows():  # 获取每行的index、row
             for col_name in woe_map.columns:
                 if isinstance(row[col_name], np.ndarray):
-                    row_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name].tolist())
+                    row_data[col_name] = "|".join(str(i).encode('utf-8') for i in row[col_name].tolist())
                 else:
                     row_data[col_name] = str(row[col_name])
                     if col_name == 'max':
@@ -260,8 +286,8 @@ def get_init(df=df_train):
     return out
 
 
-def get_boundary(out, min_val):
-    if isinstance(out,dict):
+def get_boundary(out, min_val = 0):
+    if isinstance(out, dict):
         data = out.items()
     else:
         data = [out]
@@ -273,7 +299,8 @@ def get_boundary(out, min_val):
                 if index == 0:
                     # if float(bin_row["min"]) >= min_val:
                     last_bin = bin_row
-                    bin_row["min_bound"] = min_val
+                    if float(bin_row["min"]) > min_val:
+                        bin_row["min_bound"] = min_val
                 else:
                     if bin_row["min"] != 'nan':
                         last_bin["max_bound"] = bin_row["min_bound"]
@@ -285,3 +312,47 @@ def get_boundary(out, min_val):
                 break
 
     return out
+
+
+def get_divide_max_bound(out):
+    out = get_boundary(out)
+
+    bound = []
+    for key, list in out.items():
+        for val in list:
+            bound.append(float(val["max_bound"]))
+    return bound
+
+def get_divide_caterotical_bound(out,name):
+    bound = []
+    for key,list in out.items():
+        for val in list:
+            s = val[name]
+            bound.append(map(cmm.transfer,s.split("|")))
+    return bound
+
+
+
+def get_merged(var_name,df,min_val):
+    data = {var_name: []}
+    row_index = 0
+
+    for index, row in df.iterrows():  # 获取每行的index、row
+        sub_data = collections.OrderedDict()
+        for col_name in df.columns:
+            if isinstance(row[col_name], list):
+                sub_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name])
+            else:
+                sub_data[col_name] = str(row[col_name])
+            if col_name == 'max':
+                # 在max后额外增加两列
+                sub_data['min_bound'] = row["min"]
+                sub_data['max_bound'] = row["max"]
+                if row_index == len(df) - 1:
+                    if [row["bin_num"] - df.iloc[[row_index - 1]]["bin_num"]] > 1:
+                        sub_data["bin_num"] = row["bin_num"] - 1
+                row_index += 1
+        data[var_name].append(sub_data)
+
+        data = get_boundary(data, min_val)
+    return data
