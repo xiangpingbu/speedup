@@ -2,7 +2,8 @@
 import copy
 
 from flask import request
-import rest.test,rest.endpoint_tool
+import rest.test
+import rest.endpoint_tool
 from rest.app_base import *
 
 

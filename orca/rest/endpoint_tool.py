@@ -167,6 +167,7 @@ def divide():
     #重新划定index
     for index, v in enumerate(list):
         v["bin_num"] = index
+        v["total"] = (round(v['total']/map["all"],4) * 100 )+ '%'
 
     list = get_boundary((name,list),0)[1]
     return responseto(data={name:list})

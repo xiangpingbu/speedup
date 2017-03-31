@@ -48,6 +48,8 @@
         width = 500,
         margin = 25;
 
+    var host = "http://localhost:8091";
+
     var controlMap = {};
 
     var padding = {left: 25, right: 30, top: 5, bottom: 20};
@@ -62,7 +64,7 @@
     function init() {
         outputDateMap();
         $(".spinner").css('display', 'block');
-        d3.json("http://192.168.31.187:8091/tool/init", function (error, result) {
+        d3.json(host+"/tool/init", function (error, result) {
             var num = 0;
 
             var initList = [];
@@ -328,11 +330,17 @@
                 var list = [];
                 data.table = list;
                 data.name = name;
+
+                var all = 0;
                 for (var i = 0; i < childs.length; i++) {
                     var tds = $(childs.get(i)).children("td");
                     var obj = {};
                     for (var j = 0; j < tds.length; j++) {
-                        obj[columnMap[j]] = tds.get(j).innerHTML;
+                        var key = columnMap[j];
+                        if (key == 'total') {
+                            all += parseInt(total);
+                        }
+                        obj[key] = tds.get(j).innerHTML;
                     }
                     list.push(obj);
                     if (start.index == i) {
@@ -340,9 +348,11 @@
                         data.selectedIndex = i;
                     }
                 }
+
+                data.all = all;
                 $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: "http://192.168.31.187:8091/tool/divide",
+                    url: host+"/tool/divide",
                     type: 'post',
                     data: {
                         "data": JSON.stringify(data)
@@ -419,7 +429,7 @@
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: "http://192.168.31.187:8091/tool/merge",
+                    url: host+"/tool/merge",
                     type: 'post',
                     data: {
                         "varName": name,
@@ -481,7 +491,7 @@
                         td = td.attr("name", key);
                     }
                 }
-                else if (key == 'woe') {
+                 if (key == 'woe') {
                     td = td.attr("name", key);
                 }
 
