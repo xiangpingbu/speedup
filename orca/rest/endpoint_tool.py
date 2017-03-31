@@ -7,6 +7,7 @@ import pandas as pd
 from util import Adjust_Binning as ab
 from util import common as cmm
 import json
+from collections import OrderedDict
 
 import numpy as np
 import collections
@@ -27,16 +28,24 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
-# df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
-df_train = None
+df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+# df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
 
 
 @app.route(base + "/init")
 def init():
+    # min = request.form.get("min")
+    min_val = 0
     df = df_train
     out = get_init(df)
+
+    out = get_boundary(out, min_val)
+    # for
+    # first_bin = val[0]
+    # if first_bin["category_t"] == False:
+    #     val[0]["min"] = min_val
     return responseto(data=out)
 
 
@@ -52,8 +61,11 @@ def merge():
     # 总的范围
     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
 
+    min_val = 0
+
     result = None
     type_bool = False
+    df = None
     if type == 'False':
         # 将字符转换为list
         boundary_list = map(eval, boundary.split("&"))
@@ -68,66 +80,96 @@ def merge():
         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
         boundary_list.append(np.nan)
         selected_list = boundary_list
+
+        columns = ['bin_num', 'min', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'category_t']
     else:
         type_bool = True
+        selected_list = []
         temp = []
         for s in boundary.split("&"):
-            temp.extend(map(cmm.transfer, s.split('|')))
+            temp.extend(map(cmm.transfer, s.split("|")))
 
-        all_temp = []
-
+        selected_list = [temp]
         for s in all_boundary.split("&"):
-            all_temp.extend(map(cmm.transfer, s.split("|")))
-        extra_list = list(set(all_temp).difference(set(temp)))
-        selected_list = []
-        # 可能合并了所有的选项,就不必加入这个list
-        if len(selected_list) != 0:
-            selected_list.append(extra_list)
-        # boundary_list = map(cmm.replace,boundary_list)
-        selected_list.append(temp)
+            selected_list.append(map(cmm.transfer, s.split("|")))
+
+        columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'category_t']
 
     result = ab.adjust(df_train, type_bool, var_name, selected_list)  # 获得合并的结果
+    df = pd.DataFrame(result[0],
+                      columns=columns)
+
     data = {var_name: []}
-    for index, row in result[0].iterrows():  # 获取每行的index、row
+    row_index = 0
+
+    for index, row in df.iterrows():  # 获取每行的index、row
         sub_data = collections.OrderedDict()
-        for col_name in result[0].columns:
-            if col_name == 'IV' or col_name == 'odds' or col_name == 'ks':
-                continue
-            sub_data[col_name] = str(row[col_name])
+        for col_name in df.columns:
+            if isinstance(row[col_name],list):
+                sub_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name])
+            else:
+                sub_data[col_name] = str(row[col_name])
+            if col_name == 'max':
+                # 在max后额外增加两列
+                sub_data['min_bound'] = row["min"]
+                sub_data['max_bound'] = row["max"]
+                if row_index == len(df) - 1:
+                    if [row["bin_num"] - df.iloc[[row_index - 1]]["bin_num"]] > 1:
+                        sub_data["bin_num"] = row["bin_num"] - 1
+                row_index += 1
         data[var_name].append(sub_data)
+
+        data = get_boundary(data, min)
     return responseto(data=data)
 
 
 @app.route(base + "/divide", methods=['POST'])
 def divide():
     data = request.form.get('data')
-    map = json.loads(data)
-    min = map["selected"]["min"]
-    max = map["selected"]["max"]
+
+    map = json.loads(data,object_pairs_hook=OrderedDict)
     name = map["name"]
     target = "bad_7mon_60"
     df = pd.DataFrame(df_train, columns={target, name})
-    for index, row in df.iterrows():
-        if float(min) < float(row[name]) <= float(max):
-            pass
-        else:
-            df.drop(index, inplace=True)
+    if map["selected"]["category_t"] == 'False':
+        min = map["selected"]["min"]
+        max = map["selected"]["max"]
+        for index, row in df.iterrows():
+            if float(min) <= float(row[name]) < float(max):
+                pass
+            else:
+                df.drop(index, inplace=True)
+    else:
+        val = map["selected"][name].split("|")
+        for index, row in df.iterrows():
+            if row[name] in val:
+                pass
+            else:
+                df.drop(index, inplace=True)
+    #得到分裂的结果
     out = get_init(df)
     print json.dumps(out[name])
     list = map["table"]
+    #删除要被分裂的项
     del list[map["selectedIndex"]]
-
+    #被分裂的项的下标
     index = map["selectedIndex"]
+    #将分裂的结果加入原有的列表中
     for v in out[name]:
-        obj = {}
+        obj = collections.OrderedDict()
         for key in v.keys():
             obj[key] = v[key]
         list.insert(index, obj)
-        index = index + 1
+        index += 1
 
-        for index, v in enumerate(list):
-            v["bin_num"] = index
-    return responseto(data={name: list})
+    #重新划定index
+    for index, v in enumerate(list):
+        v["bin_num"] = index
+
+    list = get_boundary((name,list),0)[1]
+    return responseto(data={name:list})
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -192,7 +234,7 @@ def upload():
 def get_init(df=df_train):
     data_map = ib.cal(df)
     keys = data_map.keys()
-    out = {}
+    out = collections.OrderedDict()
     for k in keys:
         row_data = collections.OrderedDict()
         c = data_map[k]
@@ -207,7 +249,38 @@ def get_init(df=df_train):
                     row_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name].tolist())
                 else:
                     row_data[col_name] = str(row[col_name])
+                    if col_name == 'max':
+                        row_data['min_bound'] = row["min"]
+                        row_data['max_bound'] = row["max"]
+
             subList.append(row_data)
             row_data = collections.OrderedDict()
         out[var_name] = subList
+    return out
+
+
+def get_boundary(out, min_val):
+    if isinstance(out,dict):
+        data = out.items()
+    else:
+        data = [out]
+    for val in data:
+        index = 0
+        last_bin = None
+        for bin_row in val[1]:
+            if bin_row["category_t"] == "False":
+                if index == 0:
+                    # if float(bin_row["min"]) >= min_val:
+                    last_bin = bin_row
+                    bin_row["min_bound"] = min_val
+                else:
+                    if bin_row["min"] != 'nan':
+                        last_bin["max_bound"] = bin_row["min_bound"]
+                        last_bin = bin_row
+                    else:
+                        last_bin["max_bound"] = 'inf'
+                index = index + 1
+            else:
+                break
+
     return out

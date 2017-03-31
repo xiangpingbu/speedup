@@ -277,14 +277,14 @@ def cmp(x,y):
         return 1
     return 0
 
-def get_manual_bin_numeric(df, var, target, boundary_list):
+def get_manual_bin_numeric(df, var, target, boundary_list,pre):
     # process single variable
     # sort the boundary_list
     bl = sorted(boundary_list,cmp)
     df_cur = df[[var, target]].copy()
 
     bin_map = get_boundary_mapping(bl)
-    bin_map_reverse = get_boundary_mapping_reverse(bl)
+    bin_map_reverse = get_boundary_mapping_reverse(bl,pre)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
     df_woe = get_categorical_woe(df_cur, 'bin_num', target)
     df_woe['min'] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_min(bin_map_reverse, x)).apply('{:.15f}'.format)
@@ -482,7 +482,7 @@ def plot_woe_pic_single(new_df_map, variable, pic_path):
 def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_html_file = open('Adjust_Binning.html', 'w')
     my_var_type = str(df_train[my_var].dtype)
-    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list,0)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     new_name = my_var + '_woe'
@@ -509,7 +509,7 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     #
     #    my_html_file = open('single_var_test.html', 'w')
     my_var_type = str(df_test[my_var].dtype)
-    my_result_0 = get_manual_bin_numeric(df_test, my_var, my_target, my_boundary_list)
+    my_result_0 = get_manual_bin_numeric(df_test, my_var, my_target, my_boundary_list,0)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     new_name = my_var + '_woe'
@@ -536,7 +536,7 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
 
 def single_numerical_no_html(df_train, type, my_var, my_target, my_boundary_list):
     if type is False:
-        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list,0)
     else:
         my_result_0 = get_manual_bin_categorical(df_train,my_var,my_target,my_boundary_list)
     my_result = my_result_0['df_woe']

@@ -1,8 +1,10 @@
-maxIndex = 5;
-minIndex = 6;
-woeIndex = 9;
-binNumIndex = 2;
-cateIndex = 3;
+maxIndex = 2;
+minIndex = 1;
+woeIndex = 10;
+binNumIndex = 0;
+cateIndex = 11;
+
+categoricalIndex = 1;
 
 
 function outputDateMap() {
@@ -24,36 +26,83 @@ function outputDateMap() {
                         var min = $(childTrs.get(innerRow)).children("td").get(minIndex).innerHTML;
                         innerDate["max"] = max;
                         innerDate["min"] = min;
-                    } else{
-                        var ca = $(childTrs.get(innerRow)).children("td").get(maxIndex).innerHTML;
+                    } else {
+                        var ca = $(childTrs.get(innerRow)).children("td").get(categoricalIndex).innerHTML;
 
                         innerDate[name] = ca.split('|');
                     }
                     var woe;
                     try {
-                         woe = $(childTrs.get(innerRow)).children("td").get(woeIndex).innerHTML;
-                    }catch (e) {
-                        woe = $(childTrs.get(innerRow)).children("td").get(woeIndex-1).innerHTML;
+                        woe = $(childTrs.get(innerRow)).children("td").get(woeIndex).innerHTML;
+                    } catch (e) {
+                        woe = $(childTrs.get(innerRow)).children("td").get(woeIndex - 1).innerHTML;
                     }
-                    var binNum = $(childTrs.get(innerRow)).children("td").get(binNum).innerHTML;
+                    var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
                     innerDate["woe"] = woe;
                     innerDate["binNum"] = binNum;
                     innerDate["category_t"] = category_t;
                 }
             }
-        console.log(data);
-        $.ajax({
-            url: "http://localhost:8091/tool/apply",
-            type: 'post',
-            data: {
-                "data": JSON.stringify(data)
-            },
-            async: true,
-            success: function (result) {
+            console.log(data);
+            $.ajax({
+                url: "http://localhost:8091/tool/apply",
+                type: 'post',
+                data: {
+                    "data": JSON.stringify(data)
+                },
+                async: true,
+                success: function (result) {
 
-            }
-        });
+                }
+            });
         }
     )
 }
+
+function changeTd() {
+    $("td[name='woe']").click(function () {
+        if (!$(this).is('.input')) {
+            $(this).addClass("input")
+                .html('<input type="text" style="width:60px" value="' + $(this).text() + '"/>')
+                .find('input').focus().blur(function () {
+                $(this).parent().removeClass('input').html($(this).val() || 0);
+            });
+        }
+    });
+
+    $("td[name='min_bound']").click(function () {
+        if (!$(this).is('.input')) {
+            $(this).addClass("input")
+                .html('<input type="text" style="width:80px" value="' + $(this).text() + '"/>')
+                .find('input').focus().blur(function () {
+                $(this).parent().removeClass('input').html($(this).val() || 0);
+            });
+        }
+    });
+
+    $("td[name='max_bound']").click(function () {
+        if (!$(this).is('.input')) {
+            $(this).addClass("input")
+                .html('<input type="text" style="width:80px" value="' + $(this).text() + '"/>')
+                .find('input').focus().blur(function () {
+                $(this).parent().removeClass('input').html($(this).val() || 0);
+            });
+        }
+    });
+}
+
+$("#prev").click(function () {
+    $('#data').html("");
+    // $('#data').html($('#preDefine').html());
+    // $('#preDefine').load("/html/model/xyb.html");
+    $('#preDefine').css('display','block');
+
+
+});
+
+$("#init").click(function () {
+    $('#preDefine').html("");
+    init();
+});
+
 

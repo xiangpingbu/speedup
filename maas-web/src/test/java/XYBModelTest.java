@@ -114,7 +114,7 @@ public class XYBModelTest {
     public void excelHelp() throws Exception {
 
         ExcelRowReader rowReader = new ExcelRowReader();
-        ExcelReaderUtil.readExcel(rowReader, "/Users/lifeng/Desktop/all_data_selected.xlsx");
+        ExcelReaderUtil.readExcel(rowReader, "/Users/lifeng/Desktop/wo_pai/all_data_selected.xlsx");
         ExcelContent content = rowReader.getRows();
 
         Map<String, Integer> head = content.getHead();

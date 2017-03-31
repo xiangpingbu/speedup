@@ -1,5 +1,6 @@
 #-*- coding: UTF-8 -*-
 from flask import jsonify
+from flask import make_response
 import json
 
 
@@ -45,9 +46,10 @@ def responseto(data=None,message=None, error=None, **kwargs):
     #             data['error'] = False
     # # if not isinstance(data, dict):
     # #     data = {'error':True, 'message':'data 必须是一个 dict！'}
-    resp = jsonify(result)
+    resp = make_response(json.dumps(result))
     # 跨域设置
     resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Content-Type'] = 'application/json'
     resp.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
     resp.headers["Access-Control-Allow-Headers"]= "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
     return resp

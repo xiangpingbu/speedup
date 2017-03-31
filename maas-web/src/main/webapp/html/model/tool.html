@@ -7,12 +7,10 @@
 <link href="/static/css/tool.css" rel="stylesheet"/>
 <body>
 <input type="hidden" id="rowNum">
-<!--<button class="btn btn-success" style="" id="output">apply</button>-->
 
-<div>
+<div id="data">
 
 </div>
-
 <div class="spinner" style="width:50px;height:38px;position:absolute;left:50%;top:50%;margin-top:-150px;">
     <div class="rect1"></div>
     <div class="rect2"></div>
@@ -23,8 +21,9 @@
 
 <div class="side-bar">
     <a href="#" id="output" class="bar">apply</a>
+    <!--<a href="#" id="init" class="bar">prev</a>-->
     <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
-        <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
+    <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
     <!--<a target="_blank" href="" class="icon-blog">微博</a>-->
     <!--<a href="http://www.helloweba.com/gbook.html" class="icon-mail">mail</a>-->
 </div>
@@ -32,6 +31,14 @@
 
 </body>
 <link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/lib/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/animate.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/style.css" rel="stylesheet">
+
+
+<!-- Mainly scripts -->
+<!--<script src="/static/lib/inspinia/js/bootstrap.min.js"></script>-->
+<!--<script src="/static/lib/inspinia/js/inspinia.js"></script>-->
 
 <script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
 <script src="/static/js/d3/d3.min.js"></script>
@@ -49,9 +56,13 @@
     var xScale, yScale;
 
     $(document).ready(function () {
-        outputDateMap();
+        init();
+    });
 
-        d3.json("http://localhost:8091/tool/init", function (error, result) {
+    function init() {
+        outputDateMap();
+        $(".spinner").css('display', 'block');
+        d3.json("http://192.168.31.187:8091/tool/init", function (error, result) {
             var num = 0;
 
             var initList = [];
@@ -69,10 +80,11 @@
             }
             //记录行数
             $("#rowNum").val(num);
+            changeTd();
             buttonInit(initList);
-            $(".spinner").css('display','none');
+            $(".spinner").css('display', 'none');
         });
-    });
+    }
 
     function initPanel(rowName, num, table_head) {
         d3.select("body")
@@ -203,18 +215,34 @@
     }
 
 
-    var columnMap =
+    var num_columnMap =
         {
-            0: "bad_rate",
-            1: "bads",
-            2: "bin_num",
-            3: "category_t",
-            4: "goods",
-            5: "max",
-            6: "min",
+            0: "bin_num",
+            1: "min",
+            2: "max",
+            3: "min_bound",
+            4: "max_bound",
+            5: "bads",
+            6: "goods",
             7: "total",
             8: "total_perc",
-            9: "woe"
+            9: "bad_rate",
+            10: "woe",
+            11: "category_t"
+        };
+
+
+    var cate_columnMap =
+        {
+            0: "bin_num",
+            1: "name",
+            2: "bads",
+            3: "goods",
+            4: "total",
+            5: "total_perc",
+            6: "bad_rate",
+            7: "woe",
+            8: "category_t"
         };
     /**
      * 初始化合并操作按钮
@@ -280,35 +308,44 @@
             });
 
             $("#divide_" + a).click(function () {
-                $(".spinner").css('display','block');
+                $(".spinner").css('display', 'block');
                 var data = {};
                 var id = $(this).attr("id").split("_")[1];
                 var start = controlMap[id].start;
+                var name = $(this).attr("name");
 
                 var childs = $('#tbody_' + id).children("tr");
+                var tds_0 = $(childs.get(0)).children("td");
 //                var td = $(childs.get(start.index)).children("td");
-
+                var category_t = tds_0.get(tds_0.length - 1).innerHTML;
+                var columnMap;
+                if (category_t.indexOf('F') >= 0) {
+                    columnMap = num_columnMap;
+                } else{
+                    cate_columnMap[1] = name;
+                    columnMap = cate_columnMap;
+                }
                 var list = [];
                 data.table = list;
-                var name = $(this).attr("name");
                 data.name = name;
                 for (var i = 0; i < childs.length; i++) {
-                    var td = $(childs.get(i)).children("td");
+                    var tds = $(childs.get(i)).children("td");
                     var obj = {};
-                    for (var j = 0; j < td.length; j++) {
-                        obj[columnMap[j]] = td.get(j).innerHTML;
+                    for (var j = 0; j < tds.length; j++) {
+                        obj[columnMap[j]] = tds.get(j).innerHTML;
                     }
                     list.push(obj);
-                    if (start.index == i){
+                    if (start.index == i) {
                         data.selected = obj;
                         data.selectedIndex = i;
                     }
                 }
+                $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: "http://localhost:8091/tool/divide",
+                    url: "http://192.168.31.187:8091/tool/divide",
                     type: 'post',
                     data: {
-                        "data":JSON.stringify(data)
+                        "data": JSON.stringify(data)
                     },
                     async: true,
                     success: function (result) {
@@ -317,10 +354,11 @@
                         initList = [id];
                         buttonInit(initList);
                         renderTable(result.data[name], id);
+                        changeTd();
                         controlMap[id].start = {};
                         controlMap[id].end = {};
                         $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display','none');
+                        $(".spinner").css('display', 'none');
                     }
                 });
             });
@@ -337,30 +375,51 @@
                 var wholeList = [];
                 var childTrs = $('#tbody_' + id).children("tr");
 
+                var tds = $(childTrs.get(0)).children("td");
                 //判断是否为categorical还是numerical
-                var type = $(childTrs.get(0)).children("td").get(3).innerHTML;
+                var type = tds.get(tds.length - 1).innerHTML;
                 //得到每个bin的最大值
                 var min = Math.min(start.index, end.index);
                 var max = Math.max(start.index, end.index);
+                var isNum = type.indexOf("F") >= 0;
+                //判断应该从哪一列获取相应的值
+                var valIndex;
+                if (isNum) valIndex = maxIndex;
+                else valIndex = categoricalIndex;
+
                 for (var i = min; i <= max; i++) {
+
                     if (i == max) {
                         //如果存在'F',代表type为false,variable为numerical,
-                        if (type.indexOf("F") >= 0) {
+                        if (isNum) {
+                            //此时该max的值可以被丢弃
                             continue;
                         }
                     }
 
-                    list = list + ($(childTrs.get(i)).children("td").get(5).innerHTML) + ("&");
+
+                    if (isNum) {
+                        valIndex = maxIndex;
+                    }
+                    else valIndex = categoricalIndex;
+                    list = list + ($(childTrs.get(i)).children("td").get(valIndex).innerHTML) + ("&");
                 }
 
                 list = list.substring(0, list.length - 1);
+
                 for (var index = 0; index < childTrs.length; index++) {
-                    wholeList = wholeList + ($(childTrs.get(index)).children("td").get(5).innerHTML) + ("&");
+                    if (isNum) {
+                        wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
+                    } else {
+                        if (index < min || index > max) {
+                            wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
+                        }
+                    }
                 }
                 wholeList = wholeList.substring(0, wholeList.length - 1);
-                $(".spinner").css('display','block');
+                $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: "http://localhost:8091/tool/merge",
+                    url: "http://192.168.31.187:8091/tool/merge",
                     type: 'post',
                     data: {
                         "varName": name,
@@ -375,10 +434,11 @@
                         initList = [id];
                         buttonInit(initList);
                         renderTable(result.data[name], id);
+                        changeTd();
                         controlMap[id].start = {};
                         controlMap[id].end = {};
                         $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display','none');
+                        $(".spinner").css('display', 'none');
 
                     }
                 });
@@ -403,14 +463,33 @@
         } else {
             height = yScale(data[1].bin_num) - yScale(data[0].bin_num);
         }
+        var index = 0;
         for (var obj of data) {
             //设置每一行的高度
             var tr = tbody.append("tr").attr("height", height);
 
             //根据结果添加列,并设置宽度
             for (var key in obj) {
-                tr.append("td").style("width", "100px").text(obj[key]);
+                var td = tr.append("td");
+
+                if (index == 0 || index == obj.length - 2) {
+                    if (key == 'min_bound') {
+                        td = td.attr("name", key);
+                    }
+                } else if (index == data.length - 2) {
+                    if (key == 'max_bound') {
+                        td = td.attr("name", key);
+                    }
+                }
+                else if (key == 'woe') {
+                    td = td.attr("name", key);
+                }
+
+                td.style("text-align", "center")
+                    .style("vertical-align", "middle").text(obj[key]);
+
             }
+            index++;
         }
     }
 
@@ -445,7 +524,7 @@
                     return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
                 })
                 .attr("height", function (d) {
-                    return 230/data.length;//设置高度
+                    return 230 / data.length;//设置高度
                 });
         }
         else {
@@ -473,7 +552,7 @@
                     return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
                 })
                 .attr("height", function (d) {
-                    return 230/data.length;//设置高度
+                    return 230 / data.length;//设置高度
                 });
         }
     }
