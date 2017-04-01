@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from werkzeug.utils import secure_filename
 
+from beans.Pmml import *
 from rest.app_base import *
 from util import Initial_Binning as ib
 import pandas as pd
@@ -8,9 +9,9 @@ from util import Adjust_Binning as ab
 from util import common as cmm
 import json
 from collections import OrderedDict
-
 import numpy as np
 import collections
+from util import A99_Functions as a99
 
 base = '/tool'
 base_path = "./util/"
@@ -101,7 +102,7 @@ def merge():
     df = pd.DataFrame(result[0],
                       columns=columns)
 
-    data = get_merged(var_name,df,min_val)
+    data = get_merged(var_name, df, min_val)
     return responseto(data=data)
 
 
@@ -115,7 +116,6 @@ def divide():
     target = "bad_7mon_60"
     # 将excel转化为dataframe,只读取target和name两列
     df = pd.DataFrame(df_train, columns={target, name})
-
 
     bound_list = None
     if data_map["selected"]["category_t"] == 'False':
@@ -141,10 +141,10 @@ def divide():
 
         result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-               'category_t']
+                   'category_t']
         df = pd.DataFrame(result[0],
-                      columns=columns)
-        data = get_merged(name,df,min_val)
+                          columns=columns)
+        data = get_merged(name, df, min_val)
 
         return responseto(data=data)
 
@@ -161,37 +161,19 @@ def divide():
         del list[data_map["selectedIndex"]]
 
         out = get_init(df)
-        bound_list = get_divide_caterotical_bound(out,name)
+        bound_list = get_divide_caterotical_bound(out, name)
         # 被分裂的项的下标
         index = data_map["selectedIndex"]
         # 将分裂的结果加入原有的列表中
         for v in list:
-            bound_list.append(map(cmm.transfer,v[name].split("|")))
+            bound_list.append(map(cmm.transfer, v[name].split("|")))
         result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
         df = pd.DataFrame(result[0],
                           columns=columns)
-        data = get_merged(name,df,min_val)
+        data = get_merged(name, df, min_val)
         return responseto(data=data)
-
-    # # 被分裂的项的下标
-    # index = map["selectedIndex"]
-    # # 将分裂的结果加入原有的列表中
-    # for v in out[name]:
-    #     obj = collections.OrderedDict()
-    #     for key in v.keys():
-    #         obj[key] = v[key]
-    #     list.insert(index, obj)
-    #     index += 1
-    #
-    # # 重新划定index
-    # for index, v in enumerate(list):
-    #     v["bin_num"] = index
-    #     v["total_perc"] = str((round(float(v['total']) / float(map["all"]), 4) * 100)) + '%'
-    #
-    # list = get_boundary((name, list), 0)[1]
-    # return responseto(data=data)
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -226,6 +208,9 @@ def apply():
                         elif obj["max"] == 'nan' and str(row[column]) == 'nan':
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
+                        elif obj['min'] == 'nan' and  bin_val < bin_max:
+                            test.loc[index, [column + "_woe"]] = obj["woe"]
+                            break
                     else:
                         # categorical,直接进行匹配
                         if row[column] in obj[column]:
@@ -252,10 +237,84 @@ def upload():
                 df_train = pd.read_excel(file)
     return responseto(data="success")
 
+@app.route(base+"/parse",methods=['GET'])
+def parse():
+    df = a99.GetDFSummary(df_train)
+    data_map = cmm.df_for_html(df)
+    return responseto(data = data_map)
 
-@app.route(base + "/column-config")
+
+
+@app.route(base + "/column-config",methods=['POST'])
 def column_config():
-    return responseto()
+    """
+    将配置完成的variable数据转化一定格式的json数据
+    这些数据会用于生成pmml
+
+    Parameters:
+        data: variable的的行列信息
+    """
+    data = request.form.get('data')
+    dataMap = json.loads(data)
+    result = []
+    columnNum = 1
+    for key, list in dataMap.items():
+        pmml = Pmml()
+        pmml.columnNum = columnNum
+
+        first_bin = list[0]
+
+        columnBinning = {"binCountNeg": [],
+                         "binCountPos": [],
+                         "binWeightedPos":[],
+                         "binWeightedWoe":[],
+                         "binAvgScore":[],
+                         "binWeightedNeg":[],
+                         "binPosRate":[]}
+        pmml.columnFlag = None
+        pmml.finalSelect = True
+        pmml.columnName = key
+        pmml.columnBinning = columnBinning
+
+        type = first_bin["category_t"] == "False"
+
+        if type:
+            pmml.columnType = "N"
+            columnBinning["binBoundary"] = ["-Infinity"]
+            columnBinning["binCategory"] = None
+            columnBinning["binCountWoe"] = [0]
+        else:
+            pmml.columnType = "C"
+            columnBinning["binCategory"] = ["missing", "invalid"]
+            columnBinning["binBoundary"] = None
+            columnBinning["binCountWoe"] = [0, 0]
+
+        index = 0
+        for val in list:
+            columnBinning["binCountNeg"].append(1)
+            columnBinning["binCountPos"].append(2)
+
+            if type:
+                if index != len(list)-1:
+                    columnBinning["binBoundary"].append(float(val["min_bound"]))
+
+                columnBinning["binCountWoe"].append(float(val["woe"]))
+
+            else:
+                # categorical的woe值
+                for cate in val[key] :
+                    columnBinning["binCategory"].insert(0,cate)
+                    columnBinning["binCountWoe"].insert(0,float(val["woe"]))
+            index+=1
+
+        if type:
+            columnBinning["length"] = len(columnBinning['binBoundary'])
+        else:
+            columnBinning["length"] = len(columnBinning["binCategory"])
+        result.append(pmml.__dict__)
+        columnNum +=1
+    print json.dumps(result)
+    return ""
 
 
 def get_init(df=df_train):
@@ -286,7 +345,7 @@ def get_init(df=df_train):
     return out
 
 
-def get_boundary(out, min_val = 0):
+def get_boundary(out, min_val=0):
     if isinstance(out, dict):
         data = out.items()
     else:
@@ -323,23 +382,61 @@ def get_divide_max_bound(out):
             bound.append(float(val["max_bound"]))
     return bound
 
-def get_divide_caterotical_bound(out,name):
+
+def get_divide_caterotical_bound(out, name):
     bound = []
-    for key,list in out.items():
+    for key, list in out.items():
         for val in list:
             s = val[name]
-            bound.append(map(cmm.transfer,s.split("|")))
+            bound.append(map(cmm.transfer, s.split("|")))
     return bound
 
 
+def get_merged(var_name, df, min_val):
+    """
+    adjust方法产生的数据转换成dict.
+    如果为numerical,那么每一个bin会额外增加min_bound和max_bound
+    min_bound和max_bound的大小取决于min和max.
+    唯一区别为min_bound和max_bound在get_boundary中会被调整为连续的,min和max是不连续的.
+    后续的adjust的boundary都以min_bound和max_bound的值为标准
+    且在get_boundary方法中可以重新划定bound的区间
 
-def get_merged(var_name,df,min_val):
+    Parameters:
+        var_name: 变量的名字
+        df: pandas dataframe
+        min_val: 可以认为指定变量的最小值
+
+    Returns:
+        返回一个dict对象
+
+        格式:
+        {
+        "credit_c_utilization":
+        [{
+            "bin_num": "0",
+            "min": "0.000000000000000",
+            "max": "0.377100000000000",
+            "min_bound": "0.000000000000000",
+            "max_bound": "0.377100000000000",
+            "bads": "30",
+            "goods": "161",
+            "total": "191",
+            "total_perc": "19.10%",
+            "bad_rate": "15.71%",
+            "woe": "0.1157",
+            "category_t": "False"
+        },
+        {..},
+        {..}]
+}
+    """
     data = {var_name: []}
     row_index = 0
 
     for index, row in df.iterrows():  # 获取每行的index、row
         sub_data = collections.OrderedDict()
         for col_name in df.columns:
+            # 如果返回的数据是list,那么转换为字符,并以"|"分割
             if isinstance(row[col_name], list):
                 sub_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name])
             else:
@@ -349,6 +446,8 @@ def get_merged(var_name,df,min_val):
                 sub_data['min_bound'] = row["min"]
                 sub_data['max_bound'] = row["max"]
                 if row_index == len(df) - 1:
+                    # 在调试当中,adjust之后产生的最后一行数据的bin_num可能会不连续
+                    # 这里帮助做处理
                     if [row["bin_num"] - df.iloc[[row_index - 1]]["bin_num"]] > 1:
                         sub_data["bin_num"] = row["bin_num"] - 1
                 row_index += 1

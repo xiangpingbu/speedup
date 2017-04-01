@@ -216,6 +216,7 @@ for v in variableList:
 
 
 
+
 str = json.dumps(list, ensure_ascii=False)
 
 print str

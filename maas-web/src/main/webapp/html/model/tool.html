@@ -5,13 +5,30 @@
     <title>Title</title>
 </head>
 <link href="/static/css/tool.css" rel="stylesheet"/>
+<link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/lib/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/animate.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/style.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/plugins/dropzone/basic.css" rel="stylesheet">
+<link href="/static/lib/inspinia/css/plugins/dropzone/dropzone.css" rel="stylesheet">
+
 <body>
 <input type="hidden" id="rowNum">
 
-<div id="data">
+<div id="analyze">
 
 </div>
-<div class="spinner" style="width:50px;height:38px;position:absolute;left:50%;top:50%;margin-top:-150px;">
+<div class="ibox-content">
+    <div id="dataframe"></div>
+    <div id="upload" style="display: none">
+        <form id="myAwesomeDropzone" class="dropzone" method="POST" enctype="multipart/form-data">
+            <div class="dropzone-previews"></div>
+            <button type="submit" class="btn btn-primary pull-right">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="spinner" style="display:none;width:50px;height:38px;position:absolute;left:50%;top:50%;margin-top:-150px;">
     <div class="rect1"></div>
     <div class="rect2"></div>
     <div class="rect3"></div>
@@ -22,7 +39,7 @@
 <div class="side-bar">
     <a href="#" id="output" class="bar">apply</a>
     <a href="#" id="columnConfig" class="bar">column</a>
-    <!--<a href="#" id="init" class="bar">prev</a>-->
+    <a href="#" id="prev" class="bar">prev</a>
     <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
     <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
     <!--<a target="_blank" href="" class="icon-blog">微博</a>-->
@@ -31,10 +48,7 @@
 
 
 </body>
-<link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
-<link href="/static/lib/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
-<link href="/static/lib/inspinia/css/animate.css" rel="stylesheet">
-<link href="/static/lib/inspinia/css/style.css" rel="stylesheet">
+
 
 
 <!-- Mainly scripts -->
@@ -43,6 +57,8 @@
 
 <script src="/static/lib/inspinia/js/jquery-2.1.1.js"></script>
 <script src="/static/js/d3/d3.min.js"></script>
+<script src="/static/lib/inspinia/js/plugins/dropzone/dropzone.js"></script>
+<script src="/static/js/model/upload_init.js"></script>
 <script src="/static/js/model/tool_button.js"></script>
 <script>
     var height = 500,
@@ -59,13 +75,21 @@
     var xScale, yScale;
 
     $(document).ready(function () {
-        init();
+        var url = window.location.href;
+        var ut= url.split("#")[1];
+        if (!ut || ut.length == 0) {
+            $('#upload').css("display","block");
+        } else if (ut == 'uploaded') {
+            getTable();
+        }
+
+
     });
 
     function init() {
         outputDateMap();
         $(".spinner").css('display', 'block');
-        d3.json(host+"/tool/init", function (error, result) {
+        d3.json(host + "/tool/init", function (error, result) {
             var num = 0;
 
             var initList = [];
@@ -324,7 +348,7 @@
                 var columnMap;
                 if (category_t.indexOf('F') >= 0) {
                     columnMap = num_columnMap;
-                } else{
+                } else {
                     cate_columnMap[1] = name;
                     columnMap = cate_columnMap;
                 }
@@ -353,7 +377,7 @@
                 data.all = all;
                 $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: host+"/tool/divide",
+                    url: host + "/tool/divide",
                     type: 'post',
                     data: {
                         "data": JSON.stringify(data)
@@ -399,7 +423,6 @@
                 else valIndex = categoricalIndex;
 
                 for (var i = min; i <= max; i++) {
-
                     if (i == max) {
                         //如果存在'F',代表type为false,variable为numerical,
                         if (isNum) {
@@ -420,10 +443,10 @@
                 list = list.substring(0, list.length - 1);
 
                 for (var index = 0; index < childTrs.length; index++) {
-                   var tdVal;
+                    var tdVal;
                     if (isNum) {
                         //整个区间的大部分从max_bound列中得到,除了inf一列
-                        if (index == childTrs.length-2) {
+                        if (index == childTrs.length - 2) {
                             tdVal = $(childTrs.get(index)).children("td").get(maxIndex).innerHTML;
                         } else {
                             tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML
@@ -433,13 +456,15 @@
                         //获取categorical的除选中以外的值
                         if (index < min || index > max) {
                             wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
+                        } else {
+                            wholeList = "&"
                         }
                     }
                 }
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');
                 $.ajax({
-                    url: host+"/tool/merge",
+                    url: host + "/tool/merge",
                     type: 'post',
                     data: {
                         "varName": name,
@@ -501,7 +526,7 @@
                         td = td.attr("name", key);
                     }
                 }
-                 if (key == 'woe') {
+                if (key == 'woe') {
                     td = td.attr("name", key);
                 }
 
