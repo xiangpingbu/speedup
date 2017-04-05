@@ -108,6 +108,16 @@ def merge():
 
 @app.route(base + "/divide", methods=['POST'])
 def divide():
+    """
+    分裂操作
+    先将根据从data中得到的范围,从excel中筛选相应的数据
+    筛选完成后,调用init方法对数据进行初始化,得到一定数据的范围区间
+    将该范围区间与原来的区间合并.
+    调用adjust方法获得的结果即为分裂后的结果
+
+    :return:
+    """
+
     min_val = 0
     data = request.form.get('data')
     # 解析json

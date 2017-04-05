@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link href="/public/stylesheets/tool.css" rel="stylesheet"/>
+<link href="/public/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
+<link href="/public/lib/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="/public/lib/inspinia/css/animate.css" rel="stylesheet">
+<link href="/public/lib/inspinia/css/style.css" rel="stylesheet">
+<link href="/public/lib/inspinia/css/plugins/dropzone/basic.css" rel="stylesheet">
+<link href="/public/lib/inspinia/css/plugins/dropzone/dropzone.css" rel="stylesheet">
+
+<body>
+<input type="hidden" id="rowNum">
+
+<div id="analyze">
+
+</div>
+<div class="ibox-content">
+    <div id="dataframe"></div>
+    <div id="upload" style="display: none">
+        <form id="myAwesomeDropzone" class="dropzone" method="POST" enctype="multipart/form-data">
+            <div class="dropzone-previews"></div>
+            <input type="hidden" id="111" value="333"/>
+            <button type="submit" class="btn btn-primary pull-right">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="spinner" style="display:none;width:50px;height:38px;position:absolute;left:50%;top:50%;margin-top:-150px;">
+    <div class="rect1"></div>
+    <div class="rect2"></div>
+    <div class="rect3"></div>
+    <div class="rect4"></div>
+    <div class="rect5"></div>
+</div>
+
+<div class="side-bar">
+    <a id="getBar" class="bar">getBar</a>
+    <a href="#" id="output" class="bar">apply</a>
+    <a href="#" id="columnConfig" class="bar">column</a>
+    <a href="#" id="prev" class="bar">prev</a>
+    <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
+    <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
+    <!--<a target="_blank" href="" class="icon-blog">微博</a>-->
+    <!--<a href="http://www.helloweba.com/gbook.html" class="icon-mail">mail</a>-->
+</div>
+
+
+</body>
+
+<script src="/public/lib/inspinia/js/plugins/dropzone/dropzone.js"></script>
+<script>
+    Dropzone.options.myAwesomeDropzone = {
+        url: "http://localhost:8091/tool/upload",
+        paramName: "file",
+        autoProcessQueue: false,
+        uploadMultiple: true,
+        parallelUploads: 100,
+        maxFiles: 100,
+        method: "post",
+
+        // Dropzone settings
+        init: function () {
+            var myDropzone = this;
+
+            this.element.querySelector("button[type=submit]").addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                myDropzone.processQueue();
+            });
+            this.on("sendingmultiple", function () {
+            });
+            this.on("successmultiple", function (files, response) {
+                console.log(response.success);
+                if (response.success == true) {
+
+                    window.location.href = window.location.href + "#uploaded";
+                    window.location.reload()
+                }
+            });
+            this.on("errormultiple", function (files, response) {
+            });
+        }
+    };
+</script>
+
+<script data-main="/public/lib/entry/tool-main" src="/public/lib/require.js" ></script>
+
+</html>
