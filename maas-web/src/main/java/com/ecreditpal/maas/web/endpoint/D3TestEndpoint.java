@@ -4,6 +4,7 @@ import com.ecreditpal.maas.model.bean.Data;
 import com.ecreditpal.maas.model.bean.Result;
 import com.ecreditpal.maas.web.bean.User;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,15 @@ public class D3TestEndpoint {
         data.setNumber(24);
         list.add(data);
 
-        log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>test");
+        Gson gson = new Gson();
+        String result = gson.toJson(list);
+        for (int i = 0; i<1000;i++) {
+            log.info(result);
+            log.info(result);
+            log.info(result);
+            log.info(result);
+            log.info(result);
+        }
 
         return Result.wrapSuccessfulResult(list);
     }

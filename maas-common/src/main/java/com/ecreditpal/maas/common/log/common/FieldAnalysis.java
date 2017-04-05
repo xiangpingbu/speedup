@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.common;
+package com.ecreditpal.maas.common.log.common;
 
 import java.util.HashMap;
 import java.util.Map;

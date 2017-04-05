@@ -1,12 +1,12 @@
-package cn.rmt.logback.kafka;
+package com.ecreditpal.maas.common.log;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.spi.AppenderAttachable;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<E> implements AppenderAttachable<E>{
 	public static Map<String,Object> producerConf;

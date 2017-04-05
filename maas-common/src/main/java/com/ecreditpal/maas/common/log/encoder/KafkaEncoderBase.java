@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.encoder;
+package com.ecreditpal.maas.common.log.encoder;
 
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.spi.LifeCycle;

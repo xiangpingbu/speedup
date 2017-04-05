@@ -1,11 +1,12 @@
-package cn.rmt.logback.kafka.producer;
+package com.ecreditpal.maas.common.log.producer;
 
 import java.util.Map;
 
+import com.ecreditpal.maas.common.log.KafkaAppenderConfig;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import cn.rmt.logback.kafka.KafkaAppenderConfig;
+
 
 public class KafkaProducerFactory {
 	private static KafkaTemplate<String, String> kafkaTemplate;

@@ -1,22 +1,22 @@
-package cn.rmt.logback.kafka.common;
+package com.ecreditpal.maas.common.log.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.alibaba.fastjson.JSON;
-
 import ch.qos.logback.core.pattern.parser.Node;
+import com.google.gson.Gson;
 
 public class AnalysisPattern {
+	private static Gson gson = new Gson();
 	
 	public static String convertKeyWords(Map<String,String> keyConverts, Map<String,Object> convertValues){
 		Map<String,Object> keyWords = new HashMap<String,Object>();
 		for(String key : keyConverts.keySet() ){
 			keyWords.put(key, convertValues.get(keyConverts.get(key)));
 		}
-		return JSON.toJSONString(keyWords);
+		return gson.toJson(keyWords);
 	}
 	
 	public static Map<String,String> getKeywordConvertMaps(Map<String,String> convertMaps,Node t){

@@ -49,6 +49,20 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.set('title', 'My Application');
+
+// 只用于开发环境
+if ('development' == app.get('env')) {
+    app.set('py_uri', 'http://localhost:8091');
+}
+
+// 只用于生产环境
+if ('production' == app.get('env')) {
+    app.set('py_uri', 'http://sun.ecreditpal.com:8091');
+
+}
+
+
 module.exports = app;
 
 // var server = app.listen(3000, function () {

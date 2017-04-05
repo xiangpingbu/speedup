@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.encoder;
+package com.ecreditpal.maas.common.log.encoder;
 
 import java.nio.charset.Charset;
 import ch.qos.logback.core.Layout;

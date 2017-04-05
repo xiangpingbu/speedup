@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.layout;
+package com.ecreditpal.maas.common.log.layout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,7 +150,7 @@ public class PatternLayout extends PatternLayoutBase<ILoggingEvent> {
 		if (!isStarted()) {
 			return CoreConstants.EMPTY_STRING;
 		}
-		return writeLoopOnConvertersMap(event);
+		return writeLoopOnConverters(event);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.layout;
+package com.ecreditpal.maas.common.log.layout;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

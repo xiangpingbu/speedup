@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.producer;
+package com.ecreditpal.maas.common.log.producer;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
@@ -11,7 +11,7 @@ public class KafkaProducerListener implements ProducerListener<String, String>{
 	@Override
 	public void onSuccess(String topic, Integer partition, String key, String value, RecordMetadata recordMetadata) {
 		//设置使用log  在kafkaAppender中过滤掉producer生产的消息
-//		log.info("kafka send succ");
+		log.info("kafka send succ");
 		//开启消费
 	}
 
@@ -28,7 +28,7 @@ public class KafkaProducerListener implements ProducerListener<String, String>{
 	@Override
 	public boolean isInterestedInSuccess() {
 		//设置使用log  在kafkaAppender中过滤掉producer生产的消息
-//		log.info("kafka 监听器启动...");
+		log.info("kafka 监听器启动...");
 		return true;
 	}
 

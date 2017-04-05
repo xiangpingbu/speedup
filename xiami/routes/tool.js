@@ -18,14 +18,15 @@ router.all("/init", function(req, res) {
 
 
     request(options, callback);
+
+    function callback(error, response, data) {
+        if (!error && response.statusCode == 200) {
+            console.log('------接口数据------',JSON.stringify(data));
+            return res.json(data)
+        }
+    }
 });
 
 module.exports = router;
 
 
-function callback(error, response, data) {
-    if (!error && response.statusCode == 200) {
-        console.log('------接口数据------',JSON.stringify(data));
-        return res.json(data)
-    }
-}

@@ -1,4 +1,4 @@
-package cn.rmt.logback.kafka.layout;
+package com.ecreditpal.maas.common.log.layout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +14,8 @@ import ch.qos.logback.core.pattern.parser.Parser;
 import ch.qos.logback.core.spi.ScanException;
 import ch.qos.logback.core.status.ErrorStatus;
 import ch.qos.logback.core.status.StatusManager;
-import cn.rmt.logback.kafka.KafkaAppender;
-import cn.rmt.logback.kafka.common.AnalysisPattern;
+import com.ecreditpal.maas.common.log.KafkaAppender;
+import com.ecreditpal.maas.common.log.common.AnalysisPattern;
 
 abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 
@@ -77,7 +77,7 @@ abstract public class PatternLayoutBase<E> extends LayoutBase<E> {
 			Map<String, String> effectiveConverterMap = getEffectiveConverterMap();
 			this.head = p.compile(t, effectiveConverterMap);
 			if (postCompileProcessor != null) {
-				postCompileProcessor.process(head);
+				postCompileProcessor.process(getContext(),head);
 			}
 			//返回key-value
 			keys = AnalysisPattern.getKeywordConvertMaps(effectiveConverterMap, t);
