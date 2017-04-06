@@ -5,19 +5,27 @@ package com.ecreditpal.maas.common.log;
  * @CreateTime 2017/4/5.
  */
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
+import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
+import com.ecreditpal.maas.common.kafka.KafkaProducerException;
+import com.ecreditpal.maas.common.kafka.MaasKafkaProducer;
 import com.ecreditpal.maas.common.log.encoder.IKafkaEncoder;
-import com.ecreditpal.maas.common.log.producer.KafkaProducerFactory;
+import com.ecreditpal.maas.common.log.producer.KafkaConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class KafkaAppender<E> extends KafkaAppenderConfig<E>{
+public class KafkaAppender<E> extends KafkaConfig<E> {
+    private final static Logger log = LoggerFactory.getLogger(KafkaAppender.class);
     private static ExecutorService exec = Executors.newFixedThreadPool(10);
     private final AppenderAttachableImpl<E> aai = new AppenderAttachableImpl<E>();
-    protected IKafkaEncoder<E> encoder = null;
+    private IKafkaEncoder<E> encoder = null;
+    private MaasKafkaProducer producer;
     //完整的一条logs数据  es的field名称
     public static String MSG_FULL_DATA_KEY = "DATA";
     public KafkaAppender(){
@@ -30,12 +38,12 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E>{
 
     @Override
     public void start() {
+        Map<String,Object> conf  =initParams();
         //加载初始化参数
-        if( !checkPrerequisites() ){
+        if( conf == null){
             addError("kafka appender 初始化参数加载失败...");
         }
-        //初始化 produce
-        new KafkaProducerFactory(producerConf).start();
+        producer = new MaasKafkaProducer(conf);
         super.start();
     }
 
@@ -77,16 +85,22 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E>{
 
     @Override
     protected void append(E e) {
-        final String payload = encoder.doEncode(e);
+         String payload = encoder.doEncode(e);
+
         //发送消息到kafka
         exec.execute( new Runnable() {
             @Override
             public void run() {
-                KafkaProducerFactory.getKafkaTemplate().sendDefault(payload);
+                try {
+                    ModelLog modelLog = new ModelLog();
+                    modelLog.setModelResult(payload);
+                    producer.produce(getTopic(),Long.toString(producer.getRandom().nextLong()), modelLog);
+                } catch (KafkaProducerException e1) {
+                    addError("error occured while produce log message");
+                }
             }
         });
     }
-
 
 
 }

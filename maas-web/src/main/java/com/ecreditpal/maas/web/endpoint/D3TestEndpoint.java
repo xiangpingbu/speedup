@@ -54,7 +54,6 @@ public class D3TestEndpoint {
             log.info(result);
             log.info(result);
         }
-
         return Result.wrapSuccessfulResult(list);
     }
 }

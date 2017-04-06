@@ -7,7 +7,7 @@
         <encoder>
             <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
-    </appender>
+    1</appender>
 
     <!--<appender name="FILE" class= "ch.qos.logback.core.rolling.RollingFileAppender">-->
     <!--<fileNamePattern>/opt/log/test.%d{yyyy-MM-dd}.log</fileNamePattern>-->
@@ -77,8 +77,6 @@
         <batch_size>16384</batch_size>
         <linger_ms>1</linger_ms>
         <buffer_memory>33554432</buffer_memory>
-        <autoFlush>true</autoFlush>
-        <error_producer_warn_num>5</error_producer_warn_num>
     </appender>
 
     <root>
