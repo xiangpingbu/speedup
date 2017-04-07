@@ -11,7 +11,7 @@ from Binning_Function import *
 # execfile('Binning_Function.py')
 
 
-def adjust(excel_obj,var_name,boundary_list):
+def adjust(excel_obj,type,var_name,boundary_list):
     ######################## read data ########################
     # df0 = pd.read_excel(file)
 
@@ -44,7 +44,7 @@ def adjust(excel_obj,var_name,boundary_list):
     # my_boundary_list =  [0.24981299212598429, 0.59972652468538235, 0.73281381634372367]
     # my_boundary_list =  [ 0.4013125,0.622375,0.8539396551724138,1.668584905660377,"nan"]
     # my_boundary_list =  []
-    [result,result_all] = single_numerical_no_html(df1, df1, var_name, my_target, boundary_list)
+    [result,result_all] = single_numerical_no_html(df1, type, var_name, my_target, boundary_list)
     return [result,result_all]
 #
 # adjust("df_train.xlsx",'credit_c_utilization',[ 0.4013125,0.622375,0.8539396551724138,1.668584905660377,"nan"])

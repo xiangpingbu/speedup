@@ -7,11 +7,11 @@ from sklearn import tree
 # from pylab import *
 
 
-def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeaf=200):
+def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3):
     '''
     porcess single variable
     '''
-
+    minLeaf=int(len(df) * 0.05)
     for nv in nullValue:
         df[var] = df[var].replace(nv, np.nan)
 
@@ -54,8 +54,8 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeaf=200)
         #df_mapping = df_group[org_var].agg({'max': np.max, 'min': np.min, 'total': np.size, 'bads': np.bad.sum()}).reset_index()
         df_mapping = pd.DataFrame(
             {'total': df_cur_grp.size(),
-             'max': df_cur_grp[org_var].max().apply('{:.15f}'.format),
-             'min': df_cur_grp[org_var].min().apply('{:.15f}'.format),
+             'max': df_cur_grp[org_var].max(),
+             'min': df_cur_grp[org_var].min(),
              'bads': df_cur_grp['bad'].sum(),
              'goods': df_cur_grp['good'].sum(),
              'bad_rate': (df_cur_grp['bad'].sum().astype(float) / df_cur_grp.size())
@@ -76,6 +76,8 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeaf=200)
         # df_mapping['max'] = df_mapping['max'].apply('{0:.15%}'.format())
         df_mapping.sort_values(['max'], ascending=[1], inplace=True)
         df_mapping['bin_num'] = range(len(df_mapping))
+        df_mapping['max'] = df_mapping['max'].apply('{:.15f}'.format)
+        df_mapping['min'] = df_mapping['min'].apply('{:.15f}'.format)
         df_mapping = df_mapping[['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'category_t']]
 
     df_mapping['index'] = range(len(df_mapping))
@@ -277,14 +279,14 @@ def cmp(x,y):
         return 1
     return 0
 
-def get_manual_bin_numeric(df, var, target, boundary_list):
+def get_manual_bin_numeric(df, var, target, boundary_list,pre):
     # process single variable
     # sort the boundary_list
     bl = sorted(boundary_list,cmp)
     df_cur = df[[var, target]].copy()
 
     bin_map = get_boundary_mapping(bl)
-    bin_map_reverse = get_boundary_mapping_reverse(bl)
+    bin_map_reverse = get_boundary_mapping_reverse(bl,pre)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
     df_woe = get_categorical_woe(df_cur, 'bin_num', target)
     df_woe['min'] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_min(bin_map_reverse, x)).apply('{:.15f}'.format)
@@ -482,7 +484,7 @@ def plot_woe_pic_single(new_df_map, variable, pic_path):
 def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_html_file = open('Adjust_Binning.html', 'w')
     my_var_type = str(df_train[my_var].dtype)
-    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list,0)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     new_name = my_var + '_woe'
@@ -509,7 +511,7 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     #
     #    my_html_file = open('single_var_test.html', 'w')
     my_var_type = str(df_test[my_var].dtype)
-    my_result_0 = get_manual_bin_numeric(df_test, my_var, my_target, my_boundary_list)
+    my_result_0 = get_manual_bin_numeric(df_test, my_var, my_target, my_boundary_list,0)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     new_name = my_var + '_woe'
@@ -534,8 +536,11 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
     return [df_train_woe, df_test_woe]
 
 
-def single_numerical_no_html(df_train, df_test, my_var, my_target, my_boundary_list):
-    my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list)
+def single_numerical_no_html(df_train, type, my_var, my_target, my_boundary_list):
+    if type is False:
+        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list,0)
+    else:
+        my_result_0 = get_manual_bin_categorical(df_train,my_var,my_target,my_boundary_list)
     my_result = my_result_0['df_woe']
     my_result_all = my_result_0['df_result']
     # new_name = my_var + '_woe'
