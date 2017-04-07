@@ -148,7 +148,7 @@
     "fields": [
       {
         "name": "variable_result",
-        "type": "string",
+        "type": ["null", {"type": "array", "items": "string"}],
         "default": ""
       },
       {

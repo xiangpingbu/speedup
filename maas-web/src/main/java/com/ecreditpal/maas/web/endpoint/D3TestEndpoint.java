@@ -47,13 +47,13 @@ public class D3TestEndpoint {
 
         Gson gson = new Gson();
         String result = gson.toJson(list);
-        for (int i = 0; i<1000;i++) {
+
             log.info(result);
             log.info(result);
             log.info(result);
             log.info(result);
             log.info(result);
-        }
+
         return Result.wrapSuccessfulResult(list);
     }
 }

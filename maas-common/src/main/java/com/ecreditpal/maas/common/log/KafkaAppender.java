@@ -94,7 +94,9 @@ public class KafkaAppender<E> extends KafkaConfig<E> {
                 try {
                     ModelLog modelLog = new ModelLog();
                     modelLog.setModelResult(payload);
-                    producer.produce(getTopic(),Long.toString(producer.getRandom().nextLong()), modelLog);
+                    modelLog.setVariableResult("");
+                    producer.produce(getTopic(),"", modelLog);
+//                    producer.produce(getTopic(),payload);
                 } catch (KafkaProducerException e1) {
                     addError("error occured while produce log message");
                 }

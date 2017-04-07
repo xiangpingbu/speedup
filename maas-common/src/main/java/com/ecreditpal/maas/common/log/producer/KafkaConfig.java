@@ -3,6 +3,8 @@ package com.ecreditpal.maas.common.log.producer;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import ch.qos.logback.core.spi.AppenderAttachable;
 import com.google.common.collect.Maps;
+import kafka.serializer.StringEncoder;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Map;
 import java.util.Properties;
@@ -47,7 +49,7 @@ public abstract class KafkaConfig<E> extends UnsynchronizedAppenderBase<E> imple
      * 如果数据产生速度大于向broker发送的速度，
      * producer会阻塞或者抛出异常，取决于“block.on.buffer.full”来表明。
      */
-    private Long buffer_memory =33554432L;
+    private Long buffer_memory = 33554432L;
     private final static String BUFFER_MEMORY = "buffer.memory";
 
     /**
@@ -57,7 +59,7 @@ public abstract class KafkaConfig<E> extends UnsynchronizedAppenderBase<E> imple
      * 则第一个消息失败第二个发送成功，则第二条消息会比第一条消息出现要早。
      */
     private Integer retries = 0;
-    private final static  String RETRIES = "retries";
+    private final static String RETRIES = "retries";
 
     /**
      * producer将试图批处理消息记录，以减少请求次数。
@@ -86,17 +88,15 @@ public abstract class KafkaConfig<E> extends UnsynchronizedAppenderBase<E> imple
      * 默认情况下，这个设置为真，然而某些阻塞可能不值得期待，因此立即抛出错误更好。
      * 设置为false则会这样：producer会抛出一个异常错误：BufferExhaustedException， 如果记录已经发送同时缓存已满
      */
-    private Boolean block_on_buffer_full  = false;
+    private Boolean block_on_buffer_full = false;
     private final static String BLOCK_ON_BUFFER_FULL = "block.on.buffer.full";
 
 
-
-    public Map<String,Object> initParams() {
-        Map<String,Object> configs = Maps.newHashMap();
+    public Map<String, Object> initParams() {
+        Map<String, Object> configs = Maps.newHashMap();
 
         //kafka的服务节点,以分号隔开
         configs.put(BOOTSTRAP_SEVERS_NAME, bootstrap_severs);
-
         configs.put(RETRY_BACKOFF_MS, retry_backoff_ms.toString());
         configs.put(RECONNECT_BACKOFF_MS, reconnect_backoff_ms.toString());
         configs.put(ACKS, acks.toString());
@@ -109,8 +109,12 @@ public abstract class KafkaConfig<E> extends UnsynchronizedAppenderBase<E> imple
                 "io.confluent.kafka.serializers.KafkaAvroSerializer");
         configs.put("value.serializer",
                 "io.confluent.kafka.serializers.KafkaAvroSerializer");
-        configs.put("schema.registry.url", "http://localhost:18081");
-        return  configs;
+        configs.put("schema.registry.url", "http://localhost:8081");
+
+
+//        configs.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+//        configs.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        return configs;
 
     }
 
@@ -160,5 +164,25 @@ public abstract class KafkaConfig<E> extends UnsynchronizedAppenderBase<E> imple
 
     public void setBlock_on_buffer_full(Boolean block_on_buffer_full) {
         this.block_on_buffer_full = block_on_buffer_full;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("{" +
+                "    \"type\": \"record\"," +
+                "    \"name\": \"ModelLog\"," +
+                "    \"fields\": [" +
+                "      {" +
+                "        \"name\": \"variable_result\"," +
+                "        \"type\": \"string\"," +
+                "        \"default\": \"\"" +
+                "      }," +
+                "" +
+                "      {" +
+                "        \"name\": \"model_result\"," +
+                "        \"type\": \"string\"," +
+                "        \"default\": \"\"" +
+                "      }" +
+                "    ]" +
+                "  }");
     }
 }

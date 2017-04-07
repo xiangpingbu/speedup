@@ -48,7 +48,6 @@ public class MaasKafkaProducer {
         this.produce(topic, key, message);
     }
 
-
     // produce avro message
     public void produce(String topic, String key, GenericRecord avroRecord)
             throws KafkaProducerException {
