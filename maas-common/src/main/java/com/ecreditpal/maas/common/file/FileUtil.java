@@ -12,11 +12,7 @@ public class FileUtil {
     public static String getFilePath(String fileName) {
         URL resource = classLoader.getResource(fileName);
         if (resource == null) {
-            try {
-                throw new FileNotFoundException("can not find file:"+fileName);
-            } catch (FileNotFoundException e) {
-                return null;
-            }
+            throw new RuntimeException("can not find file:" + fileName);
         }
         return resource.getPath();
     }

@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -58,21 +59,20 @@ public class Variable {
      */
     private String engine;
 
+    private Properties properties;
 
-    @XmlAttribute(name = "Name", required = true)
+    @XmlAttribute(name = "name", required = true)
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    @XmlElement(name = "Description", required = true)
+    @XmlElement(name = "description", required = true)
     public String getDescription() {
         return this.description;
     }
-
     public void setDescription(String Description) {
         this.description = Description;
     }
@@ -85,37 +85,32 @@ public class Variable {
         this.engine = engine;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
     @XmlElement(name = "type", required = true)
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-
-    public void execute(Map<String, String> inputMap, CountDownLatch cdl) {
-
-    }
-
-    public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
-
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public void setParam(VariableParam param) {
+        this.param = param;
     }
     @XmlElement(name = "param",required = false)
     public VariableParam getParam() {
         return param;
     }
 
-    public void setParam(VariableParam param) {
-        this.param = param;
+    public void execute(Map<String, String> inputMap, CountDownLatch cdl) {
     }
+    public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+    public String getValue() {
+        return value;
+    }
+
 }

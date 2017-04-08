@@ -41,7 +41,7 @@ public class RestService {
     public User getUserJson(@QueryParam("ip") String ip) {
         User user = new User();
         if (IPBasedRateLimiter.getInstance().tryAcquire(ip)) {
-            user.setName("snail");
+            user.setName("11");
             user.setAge("23");
             user.setSex("male");
         } else {

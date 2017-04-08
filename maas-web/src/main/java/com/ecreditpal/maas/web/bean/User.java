@@ -1,17 +1,38 @@
 package com.ecreditpal.maas.web.bean;
 
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author lifeng
  * @version 1.0 on 2017/2/16.
  */
-@Getter
-@Setter
+
 public class User {
     private String name;
     private String age;
     private String sex;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
 }
 
