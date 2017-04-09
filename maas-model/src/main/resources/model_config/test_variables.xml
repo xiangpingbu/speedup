@@ -3,16 +3,24 @@
     <Model>XYBM
         odel</Model>
     <Variables>
-        <Variable name="TestV
-        ariable">
-            <bean class="" >
-                <property name="type"
-                          value="numerical"/>
-                <property name="variableName" value="creditQueryTimes"/>
-                <property name="range" value="(0-max)"/>
-            </bean>
-            <description>a test variable</description>
-            <type>Integer</type>
+        <Variable name="TestVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="test"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="test"/>
+            <property name="returnType" value="Integer"/>
+            <property name="engine" value="com.ecreditpal.maas.model.variables.SectionVariable"/>
+        </Variable>
+
+
+        <Variable name="TestVariable2" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="test"/>
+            <property name="paramType" value="categorical"/>
+            <property name="paramValue" value="1|2|3|4"/>
+            <property name="paramMapping" value="masterOrAbove|undergraduate|junior|others"/>
+
+            <property name="returnType" value="Integer"/>
+            <property name="engine" value="com.ecreditpal.maas.model.variables.SectionVariable"/>
         </Variable>
     </Variables>
 </VariableConfiguration>

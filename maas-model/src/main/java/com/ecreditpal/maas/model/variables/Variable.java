@@ -34,6 +34,10 @@ public class Variable {
      * 值非法,默认也为"invalid"
      */
     protected static final String INVALID = CATEGORICAL_INVALID;
+
+    private String key;
+
+    private String className;
     /**
      * * 变量的名称
      */
@@ -45,26 +49,29 @@ public class Variable {
     /**
      * 变量计算完毕后返回值的类型
      */
-    private String type;
+    private String returnType;
+
+    private String paramType;
+
+    private String paramValue;
+
+    private String paramMapping;
     /**
      * 变量计算完毕后的返回值,默认为9999
      */
     private String value = "-9999";
-    /**
-     * 变量计算依赖的值,在xml中需要预先配置
-     */
-    private VariableParam param;
+
     /**
      * 表示variable是由某个通用的类来计算的
      */
     private String engine;
 
-    private Properties properties;
 
     @XmlAttribute(name = "name", required = true)
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -73,6 +80,7 @@ public class Variable {
     public String getDescription() {
         return this.description;
     }
+
     public void setDescription(String Description) {
         this.description = Description;
     }
@@ -81,36 +89,72 @@ public class Variable {
     public String getEngine() {
         return engine;
     }
+
     public void setEngine(String engine) {
         this.engine = engine;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-    @XmlElement(name = "type", required = true)
-    public String getType() {
-        return type;
-    }
-
-    public void setParam(VariableParam param) {
-        this.param = param;
-    }
-    @XmlElement(name = "param",required = false)
-    public VariableParam getParam() {
-        return param;
-    }
 
     public void execute(Map<String, String> inputMap, CountDownLatch cdl) {
     }
+
     public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
     }
 
     public void setValue(String value) {
         this.value = value;
     }
+
     public String getValue() {
         return value;
     }
 
+
+    public String getParamType() {
+        return paramType;
+    }
+
+    public void setParamType(String paramType) {
+        this.paramType = paramType;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setParamValue(String paramValue) {
+        this.paramValue = paramValue;
+    }
+
+    public String getParamValue() {
+        return paramValue;
+    }
+
+    public void setParamMapping(String paramMapping) {
+        this.paramMapping = paramMapping;
+    }
+
+    public String getParamMapping() {
+        return paramMapping;
+    }
 }
