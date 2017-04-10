@@ -8,4 +8,6 @@
     <bean class="com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON"/>
     <bean class="com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider"/>
     <bean class="com.wordnik.swagger.jaxrs.listing.ResourceListingProvider"/>
+
+    <bean class="com.ecreditpal.maas.common.utils.file.ConfigurationManager"/>
 </beans>

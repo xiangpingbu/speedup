@@ -1,6 +1,6 @@
 package com.ecreditpal.maas.model.variables;
 
-import com.ecreditpal.maas.common.file.FileUtil;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.google.common.collect.Lists;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

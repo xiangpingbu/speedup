@@ -1,7 +1,7 @@
 package com.ecreditpal.maas.model.model.minganci;
 
 
-import com.ecreditpal.maas.common.file.FileUtil;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.model.model.minganci.wordcut.JiebaSegmenter;
 import com.ecreditpal.maas.model.model.minganci.wordcut.SegToken;

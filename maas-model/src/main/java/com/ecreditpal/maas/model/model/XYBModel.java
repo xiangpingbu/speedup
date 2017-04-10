@@ -1,8 +1,7 @@
 package com.ecreditpal.maas.model.model;
 
 
-import com.ecreditpal.maas.common.file.FileUtil;
-import com.ecreditpal.maas.common.utils.BdUtil;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.ecreditpal.maas.common.utils.PMMLUtils;
 import com.ecreditpal.maas.model.variables.Variable;
 import com.ecreditpal.maas.model.variables.VariableContentHandler;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

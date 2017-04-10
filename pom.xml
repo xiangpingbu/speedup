@@ -267,14 +267,10 @@
     </dependencyManagement>
 
     <repositories>
-
         <repository>
             <id>confluent</id>
             <url>http://packages.confluent.io/maven/</url>
         </repository>
-
-        <!-- further repository entries here -->
-
     </repositories>
 
 
@@ -284,8 +280,18 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/*</include>
+                    <include>**/*.properties</include>
+                    <include>logback.xml</include>
                 </includes>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>logback.xml</exclude>
+                </excludes>
             </resource>
 
         </resources>

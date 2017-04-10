@@ -1,6 +1,5 @@
-package com.ecreditpal.maas.common.file;
+package com.ecreditpal.maas.common.utils.file;
 
-import java.io.FileNotFoundException;
 import java.net.URL;
 
 /**
