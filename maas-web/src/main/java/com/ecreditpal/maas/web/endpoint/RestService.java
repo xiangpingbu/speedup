@@ -117,8 +117,10 @@ public class RestService {
         map.put("birthday", birthday);
         map.put("loanDay", loanDay);
         map.put("clientGender", clientGender);
+        map.put("account", "xinyongbao");
+        map.put("password", "eHliMjAxNzA0MDc=");
 
-        String result = OkHttpUtil.getInstance().doPost("http://dolphin.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
+        String result = OkHttpUtil.getInstance().doPost("http://panda.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
 
         return Response.status(Response.Status.OK).entity(result).type(MediaType.TEXT_PLAIN_TYPE).build();
     }

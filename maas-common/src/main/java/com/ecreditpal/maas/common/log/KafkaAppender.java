@@ -94,7 +94,7 @@ public class KafkaAppender<E> extends KafkaConfig<E> {
                 try {
                     ModelLog modelLog = new ModelLog();
                     modelLog.setModelResult(payload);
-                    modelLog.setVariableResult("");
+//                    modelLog.setVariableResult("");
                     producer.produce(getTopic(),"", modelLog);
 //                    producer.produce(getTopic(),payload);
                 } catch (KafkaProducerException e1) {
