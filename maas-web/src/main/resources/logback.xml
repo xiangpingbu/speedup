@@ -116,7 +116,7 @@
 
     <logger name="model-log" additivity="false">
         <level value="info"/>
-        <appender-ref ref="kafkaAppender"/>
+        <!--<appender-ref ref="kafkaAppender"/>-->
         <appender-ref ref="rollingFileAppender"/>
         <appender-ref ref="fileAppender"/>
         <appender-ref ref="STDOUT"/>

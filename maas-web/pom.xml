@@ -123,6 +123,7 @@
                                 <excludes>
                                     <exclude>**/*.properties</exclude>
                                     <exclude>logback.xml</exclude>
+                                    <exclude>logback-test.xml</exclude>
                                 </excludes>
                             </resource>
                         </resources>
