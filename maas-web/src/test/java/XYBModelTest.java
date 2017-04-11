@@ -1,7 +1,6 @@
-import com.ecreditpal.maas.common.util2.ExcelReaderUtil;
-import com.ecreditpal.maas.common.util2.ExcelRowReader;
-import com.ecreditpal.maas.common.utils.ExcelContent;
-import com.ecreditpal.maas.common.utils.ExcelUtil2;
+import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
+import com.ecreditpal.maas.common.excel.ExcelRowReader;
+import com.ecreditpal.maas.common.excel.ExcelContent;
 import com.ecreditpal.maas.model.model.XYBModel;
 import com.ecreditpal.maas.model.variables.Variable;
 import com.google.common.collect.Lists;
@@ -15,6 +14,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.util.List;
@@ -115,7 +116,7 @@ public class XYBModelTest {
     public void excelHelp() throws Exception {
 
         ExcelRowReader rowReader = new ExcelRowReader();
-        ExcelReaderUtil.readExcel(rowReader, "/Users/lifeng/Desktop/all_data_selected.xlsx");
+        ExcelReaderUtil.readExcel(rowReader, "/Users/lifeng/Desktop/wo_pai/all_data_selected.xlsx");
         ExcelContent content = rowReader.getRows();
 
         Map<String, Integer> head = content.getHead();
@@ -170,6 +171,10 @@ public class XYBModelTest {
         FileOutputStream out = new FileOutputStream("/Users/lifeng/Desktop/all_data_selected3.xlsx");
         wb.write(out);
         out.close();
+
+    }
+
+    public static void main(String[] args) {
 
     }
 

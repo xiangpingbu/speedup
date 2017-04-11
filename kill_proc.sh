@@ -6,6 +6,7 @@ function kill_by_pid(){
 pid=`ps -ef | grep $Jetty_Home | grep -v grep | awk '{print $2}'`
 if [ ! $pid ] && [ ! -f $Jetty_Home/jetty.state ]; then
         echo "no server is running"
+        cd ${Jetty_Home}
         sh ${Jetty_Home}/bin/jetty.sh start
     else
 #            echo 'pid:'$pid
@@ -14,6 +15,7 @@ if [ ! $pid ] && [ ! -f $Jetty_Home/jetty.state ]; then
 #            echo "will restart server"
             sh ${Jetty_Home}/bin/jetty.sh stop
             sh ${Jetty_Home}/bin/jetty.sh start
+            #java -Dconfig.dir=resources/config-dir -jar start.jar
 fi
 }
 

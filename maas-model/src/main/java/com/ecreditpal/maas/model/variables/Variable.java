@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -33,6 +34,10 @@ public class Variable {
      * 值非法,默认也为"invalid"
      */
     protected static final String INVALID = CATEGORICAL_INVALID;
+
+    private String key;
+
+    private String className;
     /**
      * * 变量的名称
      */
@@ -44,22 +49,25 @@ public class Variable {
     /**
      * 变量计算完毕后返回值的类型
      */
-    private String type;
+    private String returnType;
+
+    private String paramType;
+
+    private String paramValue;
+
+    private String paramMapping;
     /**
      * 变量计算完毕后的返回值,默认为9999
      */
     private String value = "-9999";
-    /**
-     * 变量计算依赖的值,在xml中需要预先配置
-     */
-    private VariableParam param;
+
     /**
      * 表示variable是由某个通用的类来计算的
      */
     private String engine;
 
 
-    @XmlAttribute(name = "Name", required = true)
+    @XmlAttribute(name = "name", required = true)
     public String getName() {
         return name;
     }
@@ -68,7 +76,7 @@ public class Variable {
         this.name = name;
     }
 
-    @XmlElement(name = "Description", required = true)
+    @XmlElement(name = "description", required = true)
     public String getDescription() {
         return this.description;
     }
@@ -81,41 +89,72 @@ public class Variable {
     public String getEngine() {
         return engine;
     }
+
     public void setEngine(String engine) {
         this.engine = engine;
     }
 
-    @XmlElement(name = "type", required = true)
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
 
     public void execute(Map<String, String> inputMap, CountDownLatch cdl) {
-
     }
 
     public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
+    }
 
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-    @XmlElement(name = "param",required = false)
-    public VariableParam getParam() {
-        return param;
+
+    public String getParamType() {
+        return paramType;
     }
 
-    public void setParam(VariableParam param) {
-        this.param = param;
+    public void setParamType(String paramType) {
+        this.paramType = paramType;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setParamValue(String paramValue) {
+        this.paramValue = paramValue;
+    }
+
+    public String getParamValue() {
+        return paramValue;
+    }
+
+    public void setParamMapping(String paramMapping) {
+        this.paramMapping = paramMapping;
+    }
+
+    public String getParamMapping() {
+        return paramMapping;
     }
 }

@@ -319,6 +319,7 @@
                     </DiscretizeBin>
                 </Discretize>
             </DerivedField>
+            <!--
             <DerivedField name="RepaymentFrequencyVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="RepaymentFrequencyVariable" mapMissingTo="0.0214" defaultValue="0.0214" dataType="double">
                     <DiscretizeBin binValue="0.0214">
@@ -332,6 +333,22 @@
                     </DiscretizeBin>
                 </Discretize>
             </DerivedField>
+            -->
+
+            <DerivedField name="RepaymentFrequencyVariable_woe" optype="continuous" dataType="double">
+                            <Discretize field="RepaymentFrequencyVariable" mapMissingTo="0.0" defaultValue="0.0" dataType="double">
+                                <DiscretizeBin binValue="0.0">
+                                    <Interval closure="openOpen" rightMargin="-999998.0"/>
+                                </DiscretizeBin>
+                                <DiscretizeBin binValue="0.0">
+                                    <Interval closure="openClosed" leftMargin="-999998.0" rightMargin="0.9"/>
+                                </DiscretizeBin>
+                                <DiscretizeBin binValue="0.0">
+                                    <Interval closure="openClosed" leftMargin="0.9"/>
+                                </DiscretizeBin>
+                            </Discretize>
+                        </DerivedField>
+
             <DerivedField name="AgeVariable_woe" optype="continuous" dataType="double">
                 <Discretize field="AgeVariable" mapMissingTo="-0.0439" defaultValue="-0.0439" dataType="double">
                     <DiscretizeBin binValue="-0.0439">

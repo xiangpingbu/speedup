@@ -1,18 +1,20 @@
 package com.ecreditpal.maas.model.model;
 
 
-import com.ecreditpal.maas.common.file.FileUtil;
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.ecreditpal.maas.common.utils.PMMLUtils;
 import com.ecreditpal.maas.model.variables.Variable;
+import com.ecreditpal.maas.model.variables.VariableContentHandler;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.ModelEvaluator;
 import org.jpmml.evaluator.ModelEvaluatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +27,8 @@ import java.util.Map;
  */
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = FileUtil.getFilePath("model_config/xyb_model_variables.xml");
-    public static String localPmmlPath = FileUtil.getFilePath("model_config/xyb_model_pmml.pmml");
+    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("xyb_model_variables.xml");
+    public static String localPmmlPath = FileUtil.getFilePath("xyb_model_pmml.pmml");
     private static List<Variable> XYBModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
@@ -56,31 +58,25 @@ public class XYBModel extends ModelNew {
         if (XYBModelVariables == null) {
             synchronized (XYBModel.class) {
                 if (XYBModelVariables == null) {
-                    XYBModelVariables = loadVariableConfig();
+                    try {
+                        XYBModelVariables = VariableContentHandler.readXML(localVariablePath).getVariables();
+                    } catch (Exception e) {
+                        logger.error("parse model config error",e);
+                    }
                 }
             }
         }
         for (Variable v : XYBModelVariables) {
             try {
-                String className;
-                if (v.getEngine() != null) {
-                    className = packagePath + v.getEngine();
-                } else {
-                    className = packagePath + v.getName();
-                }
-                Class c = Class.forName(className);
+                Class c =  Class.forName(v.getClassName());
                 Variable requiredVariableClass = (Variable) c.newInstance();
-                requiredVariableClass.setName(v.getName());
-                requiredVariableClass.setDescription(v.getDescription());
-                requiredVariableClass.setParam(v.getParam());
-                requiredVariableClass.setType(v.getType());
+                BeanUtils.copyProperties(v, c.newInstance());
                 variableList.add(requiredVariableClass);
                 variableMap.put(v.getName(), requiredVariableClass);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
         register(this);
     }
 

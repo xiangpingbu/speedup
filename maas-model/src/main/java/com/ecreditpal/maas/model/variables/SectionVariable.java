@@ -23,9 +23,8 @@ public class SectionVariable extends Variable {
             @Override
             public void run() {
                 try {
-                    VariableParam param = getParam();
-                    String name = param.getParamName();
-                    Object val = inputMap.get(name);
+
+                    Object val = inputMap.get(getKey());
                     if (val == null) {
                         setValue(MISSING);
                         return;
@@ -35,14 +34,14 @@ public class SectionVariable extends Variable {
                         setValue(MISSING);
                         return;
                     }
-                    String setStr = param.getParamValue();
+                    String setStr = getParamValue();
                     //type为categorical的区间是独立的字符
-                    if ("categorical".equals(param.getParamType())) {
+                    if ("categorical".equals(getParamType())) {
                         try {
                             String[] rangeArray = setStr.split("\\|");
                             String[] mappings = null;
-                            if (param.getMapping() != null) {
-                                mappings = param.getMapping().split("\\|");
+                            if (getParamMapping() != null) {
+                                mappings = getParamMapping().split("\\|");
                             }
 //                    Set<String> set = Sets.newHashSetWithExpectedSize(rangeArray.length);
                             Map<String, String> map = Maps.newHashMap();
@@ -65,7 +64,7 @@ public class SectionVariable extends Variable {
                             logger.error("exception occurs while processing the val", e);
                             setValue(CATEGORICAL_INVALID);
                         }
-                    } else if ("numerical".equals(param.getParamType())) {
+                    } else if ("numerical".equals(getParamType())) {
                         try {
                             double dbVal = Double.valueOf(valStr);
                             String[] array = setStr.split("-");

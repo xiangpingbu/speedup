@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>排列科技 | 信贷模型</title>
+    <title>排列科技 | MDL</title>
 
     <link href="/static/lib/inspinia/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/lib/inspinia/font-awesome/css/font-awesome.css" rel="stylesheet">
@@ -24,7 +24,7 @@
     <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>信贷模型
+                <h5>MDL_XYB003_V1
                     <small>demo</small>
                 </h5>
                 <div class="ibox-tools">
@@ -56,10 +56,10 @@
                     <div class="form-group"><label class="col-sm-2 control-label">最高学历</label>
 
                         <div class="col-sm-2"><select class="form-control m-b" id="personalEducation">
-                            <option>硕士及以上</option>
-                            <option>本科</option>
-                            <option>专科</option>
-                            <option>其他</option>
+                            <option value="1">硕士及以上</option>
+                            <option value="2">本科</option>
+                            <option value="3">专科</option>
+                            <option value="4">其他</option>
                         </select>
                         </div>
                     </div>
@@ -67,8 +67,8 @@
                     <div class="form-group"><label class="col-sm-2 control-label">性别</label>
 
                         <div class="col-sm-2"><select class="form-control m-b" id="clientGender">
-                            <option>男</option>
-                            <option>女</option>
+                            <option value="1">男</option>
+                            <option value="2">女</option>
                         </select>
                         </div>
                     </div>
@@ -114,14 +114,14 @@
                     <div class="form-group"><label class="col-sm-2 control-label">居住情况</label>
 
                         <div class="col-sm-2"><select class="form-control m-b" id="personalLiveJoin">
-                            <option>父母</option>
-                            <option>配偶及子女</option>
-                            <option>父母,配偶及子女</option>
-                            <option>其他</option>
-                            <option>朋友</option>
-                            <option>配偶及子女,其他</option>
-                            <option>父母,其他</option>
-                            <option>父母,配偶及子女,其他</option>
+                            <option value="1,">父母</option>
+                            <option value="2,">配偶及子女</option>
+                            <option value="1,2,">父母,配偶及子女</option>
+                            <option value="4,">其他</option>
+                            <option value="3,">朋友</option>
+                            <option value="2,4,">配偶及子女,其他</option>
+                            <option value="1,4,">父母,其他</option>
+                            <option value="1,2,4,">父母,配偶及子女,其他</option>
                         </select>
                         </div>
                     </div>
@@ -129,14 +129,14 @@
                     <div class="form-group"><label class="col-sm-2 control-label">住房情况</label>
 
                         <div class="col-sm-2"><select class="form-control m-b" id="personalLiveCase">
-                            <option>自有商业按揭房</option>
-                            <option>自有无按揭购房</option>
-                            <option>自有公积金按揭购房</option>
-                            <option>自建房</option>
-                            <option>租房</option>
-                            <option>亲戚住房</option>
-                            <option>宿舍</option>
-                            <option>其他</option>
+                            <option value="1">自有商业按揭房</option>
+                            <option value="2">自有无按揭购房</option>
+                            <option value="3">自有公积金按揭购房</option>
+                            <option value="4">自建房</option>
+                            <option value="5">租房</option>
+                            <option value="6">亲戚住房</option>
+                            <option value="7">宿舍</option>
+                            <option value="8">其他</option>
                         </select>
                         </div>
                     </div>
