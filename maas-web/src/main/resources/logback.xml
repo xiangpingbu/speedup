@@ -47,14 +47,39 @@
     <!--</layout>-->
     <!--</appender>-->
 
-    <appender name="file"
+    <appender name="fileAppender" class="ch.qos.logback.core.FileAppender">
+        <file>${log.file.path}</file>
+        <encoder><!-- 必须指定，否则不会往文件输出内容 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+        <append>true</append>
+        <prudent>true</prudent>
+    </appender>
+
+    <appender name="errorFileAppender" class="ch.qos.logback.core.FileAppender">
+        <file>${log.file.error.path}</file>
+        <encoder><!-- 必须指定，否则不会往文件输出内容 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <append>true</append>
+        <prudent>true</prudent>
+    </appender>
+
+    <appender name="rollingFileAppender"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>/Users/lifeng/logs/logFile.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.file.rolling.path}/maas.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
             <maxFileSize>100MB</maxFileSize>
-            <maxHistory>60</maxHistory>
+            <maxHistory>30</maxHistory>
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
@@ -69,23 +94,33 @@
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
             </layout>
         </encoder>
-        <bootstrap_severs>localhost:9092</bootstrap_severs>
-        <topic>test</topic>
+        <bootstrap_severs>${log.kafka.bootstrap.severs}</bootstrap_severs>
+        <topic>${log.kafka.topic}</topic>
         <!--用来指示一组consumer所在的组-->
-        <group_id>0</group_id>
-        <retries>1</retries>
-        <batch_size>16384</batch_size>
-        <linger_ms>1</linger_ms>
-        <buffer_memory>33554432</buffer_memory>
+        <group_id>${log.kafka.groupId}</group_id>
+        <retries>${log.kafka.retries}</retries>
+        <batch_size>${log.kafka.batchSize}</batch_size>
+        <linger_ms>${log.kafka.lingerMs}</linger_ms>
+        <buffer_memory>${log.kafka.bufferMemory}</buffer_memory>
     </appender>
 
     <root>
-        <level value="error"/>
         <level value="info"/>
-        <appender-ref ref="file"/>
+        <appender-ref ref="rollingFileAppender"/>
+        <appender-ref ref="fileAppender"/>
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="kafkaAppender"/>
+        <appender-ref ref="errorFileAppender"/>
     </root>
+
+
+
+    <logger name="model-log" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="kafkaAppender"/>
+        <appender-ref ref="rollingFileAppender"/>
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
 </configuration>
 
 

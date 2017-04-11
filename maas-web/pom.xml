@@ -83,7 +83,56 @@
 
 
     </dependencies>
+
+
     <build>
         <finalName>maas-web</finalName>
+        <filters>
+            <filter>
+                ../config-${cur.env}.properties
+            </filter>
+        </filters>
+        <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>copy-resources</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <outputDirectory>
+                            ../config-dir
+                        </outputDirectory>   <!-- 表示把配置文件拷到和jar包同一个路径下 -->
+                        <resources>
+                            <resource>
+                                <directory>src/main/resources</directory>
+                                <filtering>true</filtering>
+                                <includes>
+                                    <include>**/*.properties</include>
+                                    <include>logback.xml</include>
+                                </includes>
+                            </resource>
+                            <resource>
+                                <directory>src/main/resources</directory>
+                                <filtering>false</filtering>
+                                <excludes>
+                                    <exclude>**/*.properties</exclude>
+                                    <exclude>logback.xml</exclude>
+                                </excludes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+</plugins>
     </build>
+
+
+
 </project>

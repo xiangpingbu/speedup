@@ -109,11 +109,6 @@ public class VariableContentHandler extends DefaultHandler {
         return v;
     }
 
-    public static void main(String[] args) throws Exception {
-        String filePath = FileUtil.getFilePath("model_config/test_variables.xml");
-        InputStream inputStream = new FileInputStream(filePath);
-        VariableConfiguration v = readXML(inputStream);
-    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.ecreditpal.maas.model.model;
 
 
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.ecreditpal.maas.common.utils.PMMLUtils;
 import com.ecreditpal.maas.model.variables.Variable;
@@ -26,8 +27,8 @@ import java.util.Map;
  */
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = FileUtil.getFilePath("model_config/xyb_model_variables.xml");
-    public static String localPmmlPath = FileUtil.getFilePath("model_config/xyb_model_pmml.pmml");
+    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("xyb_model_variables.xml");
+    public static String localPmmlPath = FileUtil.getFilePath("xyb_model_pmml.pmml");
     private static List<Variable> XYBModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
