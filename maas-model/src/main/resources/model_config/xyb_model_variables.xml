@@ -1,70 +1,89 @@
 <VariableConfiguration>
     <Model>XYBModel</Model>
     <Variables>
-        <Variable Name="CreditQueryTimes">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's credit query time in three month</Description>
-            <type>Integer</type>
-            <param type="numerical" name="creditQueryTimes" value="(0-max)"/>
+        <Variable name="CreditQueryTimes" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="creditQueryTimes"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's credit query time in three month"/>
+            <property name="returnType" value="Integer"/>
         </Variable>
-        <Variable Name="CreditAmountSumVariable">
-            <Description>return one's total credit limit</Description>想
-            <type>Double</type>
+
+        <Variable name="CreditAmountSumVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="creditLimit"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's total credit limit"/>
+            <property name="returnType" value="Double"/>
         </Variable>
-        <Variable Name="CreditUtilizationVariable">
-            <Description>return one's credit usage rate</Description>
-            <type>Double</type>
+
+        <Variable name="CreditUtilizationVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="creditUtilization"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's credit usage rate"/>
+            <property name="returnType" value="Double"/>
         </Variable>
-        <Variable Name="PersonalEducation">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's education</Description>
-            <type>Integer</type>
-            <!--value="硕士及以上|本科|专科|其他"-->
-            <param type="categorical" name="personalEducation"
-                   value="1|2|3|4"
-                   mapping="masterOrAbove|undergraduate|junior|others"/>
+
+        <Variable name="PersonalEducation" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="personalEducation"/>
+            <property name="paramType" value="categorical"/>
+            <property name="paramValue" value="1|2|3|4"/>
+            <property name="paramMapping" value="masterOrAbove|undergraduate|junior|others"/>
+            <property name="description" value="return one's education"/>
+            <property name="returnType" value="String"/>
         </Variable>
-        <Variable Name="PersonalLiveCase">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's credit query time in three month</Description>
-            <type>Integer</type>
-            <!--value="自有商业按揭房|自有无按揭购房|自有公积金按揭购房|自建房|租房|亲戚住房|宿舍|其他"-->
-            <param type="categorical" name="personalLiveCase"
-                   value="1|2|3|4|5|6|7|8"
-                   mapping="commercialMortgageRoom|noMortgageRoom|fundMortgageRoom|selfBuildingRoom|rentalRoom|Relatives|dormitory|others"/>
+
+        <Variable name="PersonalLiveCase" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="personalLiveCase"/>
+            <property name="paramType" value="categorical"/>
+            <property name="paramValue" value="1|2|3|4|5|6|7|8"/>
+            <property name="paramMapping" value="commercialMortgageRoom|noMortgageRoom|fundMortgageRoom|selfBuildingRoom|rentalRoom|Relatives|dormitory|others"/>
+            <property name="description" value="return one's credit query time in three month"/>
+            <property name="returnType" value="String"/>
         </Variable>
-        <Variable Name="ClientGender">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's gender</Description>
-            <type>Integer</type>
-            <!--value="男|女"-->
-            <param type="categorical" name="clientGender"
-                   value="1|2"
-                   mapping="male|female"/>
+
+        <Variable name="ClientGender" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="clientGender"/>
+            <property name="paramType" value="categorical"/>
+            <property name="paramValue" value="1|2"/>
+            <property name="paramMapping" value="male|female"/>
+            <property name="description" value="return one's gender"/>
+            <property name="returnType" value="String"/>
         </Variable>
-        <Variable Name="PersonalLiveJoin">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's personal live join</Description>
-            <type>Integer</type>
-            <!--value="父母|配偶及子女|父母,配偶及子女|其他|朋友|配偶及子女,其他|父母,其他|父母,配偶及子女,其他"-->
-            <param type="categorical" name="personalLiveJoin"
-                   value="1,|2,|1,2,|4,|3,|2,4,|1,4,|1,2,4,"
-                   mapping="parents|spouse&amp;child|parents&amp;spouse&amp;child|others|friend|spouse&amp;child&amp;others|parents&amp;others|parents&amp;spouse&amp;child&amp;others"/>
+
+
+        <Variable name="PersonalLiveJoin" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="personalLiveJoin"/>
+            <property name="paramType" value="categorical"/>
+            <property name="paramValue" value="1,|2,|1,2,|4,|3,|2,4,|1,4,|1,2,4,"/>
+            <property name="paramMapping" value="parents|spouse&amp;child|parents&amp;spouse&amp;child|others|friend|spouse&amp;child&amp;others|parents&amp;others|parents&amp;spouse&amp;child&amp;others"/>
+            <property name="description" value="return one's personal live join"/>
+            <property name="returnType" value="String"/>
         </Variable>
-        <Variable Name="PersonalYearIncome">
-            <Engine>SectionVariable</Engine>
-            <Description>return one's yearly income</Description>
-            <type>Integer</type>
-            <param type="numerical" name="personalYearIncome"
-                   value="(0-max)"/>
+
+        <Variable name="PersonalYearIncome" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="personalYearIncome"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's yearly income"/>
+            <property name="returnType" value="Double"/>
         </Variable>
-        <Variable Name="RepaymentFrequencyVariable">
-            <Description>return one's average repayment frequency</Description>
-            <type>Double</type>
+
+        <Variable name="RepaymentFrequencyVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="repaymentFrequency"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's average repayment frequency"/>
+            <property name="returnType" value="Double"/>
         </Variable>
-        <Variable Name="AgeVariable">
-            <Description>return one's age according to birthday and certain day</Description>
-            <type>Integer</type>
+
+        <Variable name="AgeVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="age"/>
+            <property name="paramType" value="numerical"/>
+            <property name="paramValue" value="(0-max)"/>
+            <property name="description" value="return one's average repayment frequency"/>
+            <property name="returnType" value="Double"/>
         </Variable>
     </Variables>
 </VariableConfiguration>

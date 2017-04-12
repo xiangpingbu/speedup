@@ -13,7 +13,7 @@
         <module>maas-web</module>
         <module>maas-service</module>
         <module>maas-common</module>
-        <module>mass-schedule</module>
+        <module>maas-schedule</module>
     </modules>
 
     <properties>
@@ -266,35 +266,16 @@
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
 
+    <repositories>
         <repository>
             <id>confluent</id>
             <url>http://packages.confluent.io/maven/</url>
         </repository>
-
-        <!-- further repository entries here -->
-
     </repositories>
 
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-
-        </resources>
-
-        <filters>
-            <filter>
-                ../config-${cur.env}.properties
-            </filter>
-        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -305,7 +286,27 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>logback.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>logback.xml</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
+
     <profiles>
         <profile>
             <id>local</id>
@@ -341,4 +342,5 @@
             </properties>
         </profile>
     </profiles>
+
 </project>

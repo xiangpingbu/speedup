@@ -3,6 +3,8 @@ package com.ecreditpal.maas.web.bean;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.File;
+
 /**
  * @author lifeng
  * @version 1.0 on 2017/2/27.
@@ -12,4 +14,5 @@ import lombok.Setter;
 public class FileContent {
     private String ip;
     private String content;
+
 }

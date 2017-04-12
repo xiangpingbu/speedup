@@ -12,6 +12,13 @@
     <artifactId>maas-common</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.8</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -87,6 +94,8 @@
 
     </dependencies>
 
+
+
     <build>
         <plugins>
             <plugin>
@@ -103,11 +112,11 @@
                             <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
                             <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
                         </configuration>
-
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
 
 </project>

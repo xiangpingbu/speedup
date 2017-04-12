@@ -40,15 +40,15 @@ public class RestService {
     @Produces(MediaType.APPLICATION_JSON)
     public User getUserJson(@QueryParam("ip") String ip) {
         User user = new User();
-        if (IPBasedRateLimiter.getInstance().tryAcquire(ip)) {
-            user.setName("snail");
-            user.setAge("23");
-            user.setSex("male");
-        } else {
-            user.setName("sona");
-            user.setAge("23");
-            user.setSex("female");
-        }
+//        if (IPBasedRateLimiter.getInstance().tryAcquire(ip)) {
+//            user.setName("snail");
+//            user.setAge("23");
+//            user.setSex("male");
+//        } else {
+//            user.setName("sona");
+//            user.setAge("23");
+//            user.setSex("female");
+//        }
         return user;
     }
 
@@ -64,9 +64,9 @@ public class RestService {
     )
     public User getUser(@ApiParam(name = "userName", value = "Alphanumeric login to the application", required = true) @PathParam("userName") String userName) {
         User user = new User();
-        user.setName("snail");
-        user.setAge("22");
-        user.setSex("male");
+//        user.setName("snail");
+//        user.setAge("22");
+//        user.setSex("male");
         return user;
     }
 
@@ -117,9 +117,12 @@ public class RestService {
         map.put("birthday", birthday);
         map.put("loanDay", loanDay);
         map.put("clientGender", clientGender);
+        map.put("account", "xinyongbao");
+        map.put("password", "eHliMjAxNzA0MDc=");
 
-        String result = OkHttpUtil.getInstance().doPost("http://dolphin.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
+        String result = OkHttpUtil.getInstance().doPost("http://panda.mycreditpal.com:8888/ecreditpal/rest/model/xyb", map, null);
 
         return Response.status(Response.Status.OK).entity(result).type(MediaType.TEXT_PLAIN_TYPE).build();
     }
+
 }

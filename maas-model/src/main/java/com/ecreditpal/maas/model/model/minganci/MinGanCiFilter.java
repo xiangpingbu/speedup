@@ -1,7 +1,7 @@
 package com.ecreditpal.maas.model.model.minganci;
 
 
-import com.ecreditpal.maas.common.file.FileUtil;
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.model.model.minganci.wordcut.JiebaSegmenter;
 import com.ecreditpal.maas.model.model.minganci.wordcut.SegToken;
@@ -27,9 +27,8 @@ import java.util.regex.PatternSyntaxException;
 public class MinGanCiFilter implements Register {
 
     private final static Logger logger = LoggerFactory.getLogger(MinGanCiFilter.class);
-//    private final static String BASE_PATH = "maas-model/src/main/resources";
-    private static final String MGC_DICT = FileUtil.getFilePath("minganci/mgcDict/mgc.txt");
-    private static final String MGZ_DICT = FileUtil.getFilePath("minganci/mgcDict/mgz.txt");
+    private static final String MGC_DICT = ConfigurationManager.getConfiguration().getString("mgc.txt");
+    private static final String MGZ_DICT = ConfigurationManager.getConfiguration().getString("mgz.txt");
     private static MinGanCiFilter instance = null;
     private String post;
     private Set<String> mgzDict;
