@@ -144,12 +144,29 @@
   {
     "namespace": "com.ecreditpal.maas.common.avro.LookupEventMessage",
     "type": "record",
+    "name": "VariableResult",
+    "fields": [
+      {
+        "name": "variable_name",
+        "type": "string",
+        "default": ""
+      },
+      {
+        "name": "variable_value",
+        "type": "string",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "namespace": "com.ecreditpal.maas.common.avro.LookupEventMessage",
+    "type": "record",
     "name": "ModelLog",
     "fields": [
       {
         "name": "variable_result",
-        "type": ["null", {"type": "array", "items": "string"}],
-        "default": ""
+        "type": ["null", {"type": "array", "items": "com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult"}],
+        "default": null
       },
       {
         "name": "model_result",

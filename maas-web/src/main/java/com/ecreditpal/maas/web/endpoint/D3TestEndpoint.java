@@ -50,8 +50,8 @@ public class D3TestEndpoint {
         data.setNumber(24);
         list.add(data);
 
-        Gson gson =null;
-        String result = gson.toJson(list);
+//        Gson gson =null;
+//        String result = gson.toJson(list);
 
         log.error("222");
         log.warn("222");

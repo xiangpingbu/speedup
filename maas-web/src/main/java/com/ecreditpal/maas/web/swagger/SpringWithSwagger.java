@@ -1,7 +1,14 @@
 package com.ecreditpal.maas.web.swagger;
 
+import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
+import com.ecreditpal.maas.web.endpoint.filter.InjectLookupEventMessageFactory;
+import com.ecreditpal.maas.web.endpoint.filter.ModelLogCommitFilter;
+import com.ecreditpal.maas.web.endpoint.filter.ModelLogFilter;
+import com.ecreditpal.maas.web.endpoint.filter.ModelLogResponseFilter;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -23,7 +30,17 @@ public class SpringWithSwagger extends ResourceConfig {
                 myRestPackage);
 
         register(MultiPartFeature.class);
-        register(JacksonJsonProvider.class);
+//        register(JacksonJsonProvider.class);
+        register(ModelLogFilter.class);
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(InjectLookupEventMessageFactory.class)
+                        .to(LookupEventMessage.class).in(RequestScoped.class);
+            }
+        });
+        register(ModelLogResponseFilter.class);
+        register(ModelLogCommitFilter.class);
     }
 
 

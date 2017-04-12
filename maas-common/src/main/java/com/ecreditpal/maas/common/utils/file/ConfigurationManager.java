@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.common.utils.file;
 
+import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
 import org.apache.commons.configuration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class ConfigurationManager {
                     listFile(file,conf);
                 }
             }
+
+            conf.addProperty("defaultKafkaConfig",new MaasKafkaConfig());
 
             cc.addConfiguration(conf);
         } catch (Exception e) {

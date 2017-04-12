@@ -94,14 +94,14 @@
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
             </layout>
         </encoder>
-        <bootstrap_severs>${log.kafka.bootstrap.severs}</bootstrap_severs>
+        <bootstrapSevers>${log.kafka.bootstrap.severs}</bootstrapSevers>
         <topic>${log.kafka.topic}</topic>
         <!--用来指示一组consumer所在的组-->
-        <group_id>${log.kafka.groupId}</group_id>
+        <groupId>${log.kafka.groupId}</groupId>
         <retries>${log.kafka.retries}</retries>
-        <batch_size>${log.kafka.batchSize}</batch_size>
-        <linger_ms>${log.kafka.lingerMs}</linger_ms>
-        <buffer_memory>${log.kafka.bufferMemory}</buffer_memory>
+        <batchSize>${log.kafka.batchSize}</batchSize>
+        <lingerMs>${log.kafka.lingerMs}</lingerMs>
+        <bufferMemory>${log.kafka.bufferMemory}</bufferMemory>
     </appender>
 
     <root>
