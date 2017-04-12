@@ -1,4 +1,4 @@
-package com.ecreditpal.mass.service.v1;
+package com.ecreditpal.maas.service.v1;
 
 /**
  * @author lifeng

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VariableConfiguration>
-    <Model>XYBM
-        odel</Model>
+    <Model>XYBModel</Model>
     <Variables>
         <Variable name="TestVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
             <property name="key" value="test"/>

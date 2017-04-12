@@ -27,8 +27,8 @@ import java.util.Map;
  */
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("xyb_model_variables.xml");
-    public static String localPmmlPath = FileUtil.getFilePath("xyb_model_pmml.pmml");
+    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("test_variables.xml");
+    public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_model_pmml.pmml");
     private static List<Variable> XYBModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
