@@ -20,7 +20,7 @@ public class WebServer {
 
 
         server.setHandler(context);
-        IPBasedRateLimiter.getInstance();
+//        IPBasedRateLimiter.getInstance();
 
         try {
             server.start();

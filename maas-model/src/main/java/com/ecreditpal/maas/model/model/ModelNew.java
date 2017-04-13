@@ -105,7 +105,7 @@ public class ModelNew {
      * 如果入参包含复杂对象,可以使用该方法传入参数
      * @param map 外部构造的map对象
      */
-    public Object run(Map<String,Object> map) {
+    public Object run(Map<String,?> map) {
         inputMapParse(map);
         try {
             invokeVariable();
@@ -139,7 +139,7 @@ public class ModelNew {
      * 如果入参包含复杂对象,可以使用该方法传入参数
      * @param map 外部构造的map对象
      */
-    private void inputMapParse(Map<String,Object> map) {
+    private void inputMapParse(Map<String,?> map) {
         for (String s : map.keySet()) {
             inputObjMap.put(s,map.get(s));
         }
@@ -243,7 +243,12 @@ public class ModelNew {
         return fieldValueRows;
     }
 
-
+    /**
+     * 将模型计算过程中变量产生的结果,和总的结果加入
+     * @param variables 包含计算结果的变量
+     * @param result 模型输出的结果
+     * @return ModelLog
+     */
     public ModelLog ParseVariables( List<Variable> variables,String result) {
         List<VariableResult> variableResults = Lists.newArrayListWithCapacity(variables.size());
         variables.forEach(variable -> variableResults.add(new VariableResult(variable.getName(),variable.getValue())));
@@ -251,6 +256,7 @@ public class ModelNew {
         ModelLog modelLog = new ModelLog();
         modelLog.setModelResult(result);
         modelLog.setVariableResult(variableResults);
+        modelLog.setModelName(getModelName());
        return modelLog;
     }
 

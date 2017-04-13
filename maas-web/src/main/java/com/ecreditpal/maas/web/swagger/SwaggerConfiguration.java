@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
  * @author lifeng
  * @version 1.0 on 2017/2/16.
  */
-    @Component
+//    @Component
     public class SwaggerConfiguration {
 
         @Value("${swagger.resourcePackage}")

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Priority;
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -55,7 +56,7 @@ public class ModelLogFilter implements ContainerRequestFilter {
         }
 
         LookupEventMessage.Builder eventBuilder = LookupEventMessage.newBuilder();
-        MultivaluedMap<String, String> form = getRequestForm(requestContext);
+        MultivaluedMap<String, String> form = FilterUtil.getRequestForm(requestContext,providers);
 
         eventBuilder.setEventId(buildEventIds(requestContext));
         eventBuilder.setRequestInfo(buildRequestInfo(requestContext, form));
@@ -66,46 +67,6 @@ public class ModelLogFilter implements ContainerRequestFilter {
     }
 
 
-    private MultivaluedMap<String, String> getRequestForm(
-            ContainerRequestContext requestContext) {
-        if (!requestContext.hasEntity() || !MediaTypes.typeEqual(
-                MediaType.APPLICATION_FORM_URLENCODED_TYPE,
-                requestContext.getMediaType())) {
-            // Make sure all api user info are passed in through the Form
-            // params.
-            log.debug("No form param found.");
-            return new MultivaluedHashMap<String, String>();
-        }
-
-        ByteArrayInputStream resettableIS;
-        try {
-            resettableIS = toResettableStream(requestContext.getEntityStream());
-        } catch (IOException e1) {
-            log.error("Failed to load the request form data.", e1);
-            return new MultivaluedHashMap<String, String>();
-        }
-
-        MultivaluedMap<String, String> res = null;
-        try {
-            Form form = providers
-                    .getMessageBodyReader(Form.class, Form.class,
-                            new Annotation[0],
-                            MediaType.APPLICATION_FORM_URLENCODED_TYPE)
-                    .readFrom(Form.class, Form.class, new Annotation[0],
-                            MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
-                            resettableIS);
-            res = form.asMap();
-        } catch (WebApplicationException | IOException e) {
-            log.error("Failed to load the request form data..", e);
-            return new MultivaluedHashMap<String, String>();
-        }
-
-        // Must call this reset. The form will not close the inputstream.
-        resettableIS.reset();
-        requestContext.setEntityStream(resettableIS);
-
-        return res;
-    }
 
 
     private EventIds buildEventIds(ContainerRequestContext requestContext) {
@@ -118,18 +79,7 @@ public class ModelLogFilter implements ContainerRequestFilter {
         return eventIdBuilder.build();
     }
 
-    @Nonnull
-    private ByteArrayInputStream toResettableStream(InputStream entityStream)
-            throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = entityStream.read(buffer)) > -1) {
-            baos.write(buffer, 0, len);
-        }
-        baos.flush();
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
+
 
 
     private RequestInfo buildRequestInfo(ContainerRequestContext requestContext,

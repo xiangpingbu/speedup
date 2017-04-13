@@ -1,3 +1,5 @@
+package model;
+
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.excel.ExcelContent;

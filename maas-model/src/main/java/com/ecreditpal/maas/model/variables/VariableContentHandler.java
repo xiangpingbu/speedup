@@ -41,26 +41,27 @@ public class VariableContentHandler extends DefaultHandler {
             variableList = Lists.newArrayList();
             v.setVariables(variableList);
         } else if ("Variable".equals(name)) {
-            String className = attributes.getValue(1);
+            String className = attributes.getValue(1); //Variable的子类的全限定名
             try {
                 variable = (Variable) Class.forName(className).newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            variable.setName(attributes.getValue(0));
+            variable.setName(attributes.getValue(0)); //指定的variable的名称
             variableList.add(variable);
         } else if ("property".equals(name)) {
-            String nameType = attributes.getValue(0);
-            String value = attributes.getValue(1);
-            Field[] allFields = Variable.class.getDeclaredFields();
+            String fieldName = attributes.getValue(0); //variable的值域
+            String value = attributes.getValue(1);  //值域的值
+            /*通过反射的方式注入对应的值*/
+            Field[] allFields = variable.getClass().getDeclaredFields();
             for (Field field : allFields) {
-                if (field.getName().equals(nameType)) {
+                if (field.getName().equals(fieldName)) {
                     String firstLetter = field.getName().substring(0, 1)
                             .toUpperCase();
                     String setter = "set" + firstLetter
                             + field.getName().substring(1);
                     try {
-                        Method method = Variable.class.getMethod(setter,field.getType());
+                        Method method = variable.getClass().getMethod(setter,field.getType());
                         method.invoke(variable, value);
                     } catch (Exception e){
                         e.printStackTrace();
