@@ -1,0 +1,4 @@
+---
+
+rpm_base: "maas.rpm"
+rpm_name: "{{ rpm|quote|basename }}"

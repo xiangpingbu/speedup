@@ -1,0 +1,20 @@
+- name: copy {{ rpm }} to {{ ansible_default_ipv4.address }}
+  synchronize:
+      src: "{{ rpm }}"
+      dest: "{{ ansible_env.HOME }}/{{ rpm_name }}"
+
+- name: remove maas
+  become: yes
+  yum: name=maas state=absent
+
+- name: install {{ rpm_name }}
+  become: yes
+  yum: name={{ rpm_name }} state=present
+
+- name: restart service
+  become: yes
+  shell: systemctl restart maas
+
+- name: save {{ rpm_name }}
+  shell: cp "{{ rpm_name }}" "{{ rpm_base }}"
+
