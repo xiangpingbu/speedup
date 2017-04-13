@@ -1,6 +1,8 @@
 package com.ecreditpal.maas.model.variables;
 
 import com.ecreditpal.maas.common.utils.OkHttpUtil;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -14,7 +16,9 @@ import java.util.concurrent.CountDownLatch;
  */
 
 @XmlRootElement(name = "Variable")
-public class Variable {
+@Getter
+@Setter
+public class Variable implements Cloneable {
     //protected static String domain = ConfigurationManager.getConfiguration().getString("api.domain");
     protected static String domain = "http://panda.mycreditpal.com:8888";
     protected static OkHttpUtil httpClient = OkHttpUtil.getInstance();
@@ -67,94 +71,15 @@ public class Variable {
     private String engine;
 
 
-    @XmlAttribute(name = "name", required = true)
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @XmlElement(name = "description", required = true)
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String Description) {
-        this.description = Description;
-    }
-
-    @XmlElement(name = "Engine")
-    public String getEngine() {
-        return engine;
-    }
-
-    public void setEngine(String engine) {
-        this.engine = engine;
-    }
-
-
     public void execute(Map<String, String> inputMap, CountDownLatch cdl) {
     }
 
     public void execute(CountDownLatch cdl, Map<String, Object> inputMap) {
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
 
-    public String getValue() {
-        return value;
-    }
-
-
-    public String getParamType() {
-        return paramType;
-    }
-
-    public void setParamType(String paramType) {
-        this.paramType = paramType;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getReturnType() {
-        return returnType;
-    }
-
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
-    }
-
-    public void setParamValue(String paramValue) {
-        this.paramValue = paramValue;
-    }
-
-    public String getParamValue() {
-        return paramValue;
-    }
-
-    public void setParamMapping(String paramMapping) {
-        this.paramMapping = paramMapping;
-    }
-
-    public String getParamMapping() {
-        return paramMapping;
     }
 }

@@ -41,9 +41,13 @@ public class VariableContentHandler extends DefaultHandler {
             variableList = Lists.newArrayList();
             v.setVariables(variableList);
         } else if ("Variable".equals(name)) {
-            variable = new Variable();
+            String className = attributes.getValue(1);
+            try {
+                variable = (Variable) Class.forName(className).newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             variable.setName(attributes.getValue(0));
-            variable.setClassName(attributes.getValue(1));
             variableList.add(variable);
         } else if ("property".equals(name)) {
             String nameType = attributes.getValue(0);
