@@ -78,9 +78,9 @@
             <!-- rollover daily -->
             <fileNamePattern>${log.file.rolling.path}/maas.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>20GB</totalSizeCap>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
@@ -108,7 +108,6 @@
         <level value="info"/>
         <appender-ref ref="rollingFileAppender"/>
         <appender-ref ref="fileAppender"/>
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="errorFileAppender"/>
     </root>
 
@@ -119,7 +118,6 @@
         <!--<appender-ref ref="kafkaAppender"/>-->
         <appender-ref ref="rollingFileAppender"/>
         <appender-ref ref="fileAppender"/>
-        <appender-ref ref="STDOUT"/>
     </logger>
 </configuration>
 
