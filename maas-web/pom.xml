@@ -181,6 +181,89 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <license>eCreditPal@2017</license>
+                    <targetOS>linux</targetOS>
+                    <group>Development</group>
+                    <name>maas</name>
+                    <version>${build.version}</version>
+                    <description>MAAS package</description>
+                    <mappings>
+                        <mapping>
+                            <directory>${app.home}/lib/</directory>
+                            <sources>
+                                <source>
+                                    <location>${project.build.directory}/${project.artifactId}.jar</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${app.home}/conf</directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <sources>
+                                <source>
+                                    <location>${user.dir}/target/conf</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>/var/log/maas</directory>
+                            <username>ecreditpal</username>
+                            <groupname>ecreditpal</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>/var/run/maas</directory>
+                            <username>ecreditpal</username>
+                            <groupname>ecreditpal</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>/usr/lib/systemd/system</directory>
+                            <sources>
+                                <source>
+                                    <location>${user.dir}/rpm/maas.service</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>/etc/sysconfig</directory>
+                            <sources>
+                                <source>
+                                    <location>${user.dir}/rpm/maas.sysconfig</location>
+                                    <destination>maas</destination>
+                                </source>
+                            </sources>
+                        </mapping>
+                    </mappings>
+                    <preinstallScriptlet>
+                        <scriptFile>${user.dir}/rpm/preinstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </preinstallScriptlet>
+                    <postinstallScriptlet>
+                        <scriptFile>${user.dir}/rpm/postinstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <scriptFile>${user.dir}/rpm/preuninstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </preremoveScriptlet>
+                    <postremoveScriptlet>
+                        <scriptFile>${user.dir}/rpm/postuninstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </postremoveScriptlet>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
