@@ -1,6 +1,8 @@
 package com.ecreditpal.maas.web.swagger;
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import org.apache.commons.configuration.Configuration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -10,12 +12,13 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class WebServer {
     public static void main(String[] args) {
+        Configuration configuration = ConfigurationManager.getConfiguration();
         Server server = new Server(8082);
 
         WebAppContext context = new WebAppContext();
         context.setContextPath("/");
-        context.setDescriptor("./maas-web/src/main/webapp/WEB-INF/web.xml");
-        context.setResourceBase("./maas-web/src/main/webapp");
+        context.setDescriptor(configuration.getString("maas.web","./maas-web/src/main/webapp/WEB-INF/web.xml"));
+        context.setResourceBase(configuration.getString("maas.webapp","./maas-web/src/main/webapp"));
         context.setParentLoaderPriority(true);
 
 
