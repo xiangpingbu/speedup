@@ -3,7 +3,7 @@
 . ./config
 
 
-
+sh mvn clean package -Dmaven.test.skip=true
 tmp_kill_proc_sh="_killprocess.sh"
 scp ./kill_proc.sh $SERVER_IP:"~/$tmp_kill_proc_sh"
 

@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.web.swagger;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -10,7 +11,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class SpringWithSwagger extends ResourceConfig {
 
     public SpringWithSwagger() {
-        final String myRestPackage = "com.ecreditpal.maas.web.action";
+        final String myRestPackage = "com.ecreditpal.maas.web.endpoint";
         final String jacksonPackage = "org.codehaus.jackson.jaxrs";
 
         final String swaggerJaxrsJsonPackage = "com.wordnik.swagger.jaxrs.json";
@@ -22,6 +23,7 @@ public class SpringWithSwagger extends ResourceConfig {
                 myRestPackage);
 
         register(MultiPartFeature.class);
+        register(JacksonJsonProvider.class);
     }
 
 
