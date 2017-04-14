@@ -13,7 +13,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class WebServer {
     public static void main(String[] args) {
         Configuration configuration = ConfigurationManager.getConfiguration();
-        Server server = new Server(8082);
+        Server server = new Server(configuration.getInt("http.port", 9080));
 
         WebAppContext context = new WebAppContext();
         context.setContextPath("/");

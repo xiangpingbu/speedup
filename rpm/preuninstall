@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ $1 -eq 0 ]; then
+    systemctl --no-reload disable maas.service >/dev/null 2>&1 || :
+    systemctl stop maas.service >/dev/null 2>&1 || :
+fi

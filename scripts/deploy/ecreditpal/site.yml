@@ -1,0 +1,5 @@
+---
+
+- hosts: "{{ hosts | default('nowhere') }}"
+  roles:
+      - role: maas
