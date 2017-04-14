@@ -1,5 +1,7 @@
 package com.ecreditpal.maas.common.utils.http;
 
+import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
+import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,6 +13,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
@@ -23,6 +26,7 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 
 /**
@@ -101,6 +105,13 @@ public class ApacheHttpClient {
         }
 
         return sendPostRequest(post);
+    }
+
+    public String sendPostRequest(String url, Map<String,Object> params) throws UnsupportedEncodingException, URISyntaxException {
+        List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
+        //lamba 表达式构造http请求所需的参数
+        params.forEach((k,v) -> nameValuePair.add(new BasicNameValuePair(k,v.toString())));
+        return sendPostRequest(url,nameValuePair);
     }
 
     public String sendPostRequest(String url, String jsonBody) throws URISyntaxException, UnsupportedEncodingException {

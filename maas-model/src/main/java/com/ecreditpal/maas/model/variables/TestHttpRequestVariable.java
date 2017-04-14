@@ -2,7 +2,11 @@ package com.ecreditpal.maas.model.variables;
 
 /**
  * @author lifeng
- * @CreateTime 2017/4/13.
+ * @version 2017/4/13.
  */
-public class TestHttpRequestVariable {
+public class TestHttpRequestVariable extends Variable{
+
+
+
+
 }
