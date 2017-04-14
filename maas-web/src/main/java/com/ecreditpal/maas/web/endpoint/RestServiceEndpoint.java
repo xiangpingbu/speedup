@@ -2,17 +2,27 @@ package com.ecreditpal.maas.web.endpoint;
 
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
+import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.utils.OkHttpUtil;
+import com.ecreditpal.maas.model.bean.Result;
 import com.ecreditpal.maas.model.bean.XYBModelBean;
+import com.ecreditpal.maas.service.ModelService;
+import com.ecreditpal.maas.service.ServiceContainer;
 import com.ecreditpal.maas.web.bean.User;
+import com.ecreditpal.maas.web.endpoint.filter.FilterUtil;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import org.glassfish.jersey.message.internal.MediaTypes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.*;
+import javax.ws.rs.ext.Providers;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,12 +30,36 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "users", description = "Endpoint for rest test")
-@Path("/restService")
-public class RestService {
+@Api(value = "users", description = "Endpoint for rest service")
+@Path("/")
+public class RestServiceEndpoint {
 
     @Context
     HttpServletRequest request;
+
+    @Context
+    private Providers providers;
+
+    @POST
+    @Path("/{apiCode}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Returns model result by apiCode", notes = "Returns a model result by json", response = Result.class)
+    public Result<Object> getModelResult(
+            @ApiParam(name = "apiCode", value = "ecreditpal api code", required = true) @PathParam("apiCode") String apiCode,
+            @Context LookupEventMessage lookupEventMessage) {
+        //得到请求参数
+        Map<String, String> map = FilterUtil.getRequestForm(request,providers);
+        //获得apiCode对应的模型
+        ModelService service = ServiceContainer.getModelService(apiCode);
+
+        return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
+    }
+
+
+
+
+
+
 
     @GET
     @Path("/getUserText")
@@ -52,23 +86,6 @@ public class RestService {
         return user;
     }
 
-
-    @GET
-    @Path("/{userName}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returns user details", notes = "Returns a user detail by json", response = User.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of user detail", response = User.class),
-            @ApiResponse(code = 404, message = "User with given username does not exist"),
-            @ApiResponse(code = 500, message = "Internal server error")}
-    )
-    public User getUser(@ApiParam(name = "userName", value = "Alphanumeric login to the application", required = true) @PathParam("userName") String userName) {
-        User user = new User();
-//        user.setName("snail");
-//        user.setAge("22");
-//        user.setSex("male");
-        return user;
-    }
 
     @POST
     @Path("/user")

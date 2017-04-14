@@ -1,6 +1,7 @@
 package com.ecreditpal.maas.common.kafka;
 
 import com.google.common.collect.Maps;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,8 +11,8 @@ import java.util.Map;
  * @author lifeng
  * @CreateTime 2017/4/6.
  */
-@Getter
 @Setter
+@Getter
 public class MaasKafkaConfig {
     private String bootstrapSevers = "localhost:9092";
     private final static String BOOTSTRAP_SEVERS_NAME = "bootstrap.servers";

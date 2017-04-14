@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("xyb_model_variables.xml");
+    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("test_variables.xml");
     public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_model_pmml.pmml");
     private static List<Variable> XYBModelVariables;
     private static String resultFieldName = "RawResult";
@@ -48,9 +48,8 @@ public class XYBModel extends ModelNew {
      * init required data structures
      * init variables and put variable into variable list
      * and variable map
-     * @throws JAXBException
      */
-    public XYBModel() throws JAXBException {
+    public XYBModel(){
         setConfigPath(localVariablePath);
         variableList = new ArrayList<Variable>();
         variableMap = new HashMap<String, Variable>();
@@ -68,9 +67,7 @@ public class XYBModel extends ModelNew {
         }
         for (Variable v : XYBModelVariables) {
             try {
-                Class c =  Class.forName(v.getClassName());
-                Variable requiredVariableClass = (Variable) c.newInstance();
-                BeanUtils.copyProperties(v, requiredVariableClass);
+                Variable requiredVariableClass = (Variable) v.clone();
                 variableList.add(requiredVariableClass);
                 variableMap.put(v.getName(), requiredVariableClass);
             } catch (Exception e) {

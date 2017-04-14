@@ -172,6 +172,11 @@
         "name": "model_result",
         "type": "string",
         "default": ""
+      },
+      {
+        "name": "model_name",
+        "type": "string",
+        "default": ""
       }
     ]
   },

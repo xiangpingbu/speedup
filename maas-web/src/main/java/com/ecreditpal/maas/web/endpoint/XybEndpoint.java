@@ -2,7 +2,6 @@ package com.ecreditpal.maas.web.endpoint;
 
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
-import com.ecreditpal.maas.common.utils.OkHttpUtil;
 import com.ecreditpal.maas.model.bean.Result;
 import com.ecreditpal.maas.model.model.XYBModel;
 import com.wordnik.swagger.annotations.*;
@@ -62,8 +61,9 @@ public class XybEndpoint {
         XYBModel xybModel = new XYBModel();
         String score = xybModel.run(map).toString();
 
-       ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(),score);
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(),score);
         lookupEventMessage.setModelLog(modelLog);
+
 
 
         return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();

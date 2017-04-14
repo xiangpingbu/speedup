@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
  * @author lifeng
  * @version 1.0 on 2017/2/27.
  */
+@Deprecated
 public class OkHttpUtil {
     private final okhttp3.OkHttpClient okHttpClient = getOkHttpClient();
 

@@ -36,8 +36,7 @@ public class ConfigurationManager {
                 applicationProp = productConfigDir + "/application.properties";
             }
 
-            logger.info("loading  property in directory {}.",
-                    applicationProp);
+            logger.info("loading  property in directory {}.", applicationProp);
             PropertiesConfiguration conf = new PropertiesConfiguration(
                     applicationProp);
 
