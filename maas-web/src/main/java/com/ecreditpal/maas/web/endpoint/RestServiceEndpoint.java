@@ -30,7 +30,7 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "users", description = "Endpoint for rest test")
+@Api(value = "users", description = "Endpoint for rest service")
 @Path("/")
 public class RestServiceEndpoint {
 
@@ -44,15 +44,12 @@ public class RestServiceEndpoint {
     @Path("/{apiCode}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Returns model result by apiCode", notes = "Returns a model result by json", response = Result.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful retrieval of user detail", response = User.class),
-            @ApiResponse(code = 404, message = "User with given username does not exist"),
-            @ApiResponse(code = 500, message = "Internal server error")}
-    )
     public Result<Object> getModelResult(
             @ApiParam(name = "apiCode", value = "ecreditpal api code", required = true) @PathParam("apiCode") String apiCode,
             @Context LookupEventMessage lookupEventMessage) {
+        //得到请求参数
         Map<String, String> map = FilterUtil.getRequestForm(request,providers);
+        //获得apiCode对应的模型
         ModelService service = ServiceContainer.getModelService(apiCode);
 
         return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
