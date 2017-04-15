@@ -15,12 +15,12 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.kafka.KafkaProducerException;
 import com.ecreditpal.maas.common.kafka.MaasKafkaProducer;
 import com.ecreditpal.maas.common.log.encoder.IKafkaEncoder;
-import com.ecreditpal.maas.common.log.producer.KafkaConfig;
+import com.ecreditpal.maas.common.log.producer.KafkaForLogConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class KafkaAppender<E> extends KafkaConfig<E> {
+public class KafkaAppender<E> extends KafkaForLogConfig<E> {
     private final static Logger log = LoggerFactory.getLogger(KafkaAppender.class);
     private static ExecutorService exec = Executors.newFixedThreadPool(10);
     private final AppenderAttachableImpl<E> aai = new AppenderAttachableImpl<E>();
@@ -94,7 +94,7 @@ public class KafkaAppender<E> extends KafkaConfig<E> {
                 try {
                     ModelLog modelLog = new ModelLog();
                     modelLog.setModelResult(payload);
-                    modelLog.setVariableResult("");
+//                    modelLog.setVariableResult("");
                     producer.produce(getTopic(),"", modelLog);
 //                    producer.produce(getTopic(),payload);
                 } catch (KafkaProducerException e1) {

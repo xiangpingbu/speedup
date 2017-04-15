@@ -1,8 +1,4 @@
 *.iml
 .idea
 *.out
-.gitignore.swp
-maas-model/target/classes/com/ecreditpal/maas/model/python/XYBModelBean.class
-maas-model/target/generated-sources/
-maas-model/target/surefire/
-maas-web/target/generated-sources/
+node_modules

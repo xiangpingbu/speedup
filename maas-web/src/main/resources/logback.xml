@@ -7,7 +7,7 @@
         <encoder>
             <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
-    1</appender>
+    </appender>
 
     <!--<appender name="FILE" class= "ch.qos.logback.core.rolling.RollingFileAppender">-->
     <!--<fileNamePattern>/opt/log/test.%d{yyyy-MM-dd}.log</fileNamePattern>-->
@@ -47,15 +47,40 @@
     <!--</layout>-->
     <!--</appender>-->
 
-    <appender name="file"
+    <appender name="fileAppender" class="ch.qos.logback.core.FileAppender">
+        <file>${log.file.path}</file>
+        <encoder><!-- 必须指定，否则不会往文件输出内容 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+        <append>true</append>
+        <prudent>true</prudent>
+    </appender>
+
+    <appender name="errorFileAppender" class="ch.qos.logback.core.FileAppender">
+        <file>${log.file.error.path}</file>
+        <encoder><!-- 必须指定，否则不会往文件输出内容 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <append>true</append>
+        <prudent>true</prudent>
+    </appender>
+
+    <appender name="rollingFileAppender"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>/Users/lifeng/logs/logFile.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.file.rolling.path}/maas.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>60</maxHistory>
-            <totalSizeCap>20GB</totalSizeCap>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
@@ -69,23 +94,31 @@
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
             </layout>
         </encoder>
-        <bootstrap_severs>localhost:9092</bootstrap_severs>
-        <topic>test</topic>
+        <bootstrapSevers>${log.kafka.bootstrap.severs}</bootstrapSevers>
+        <topic>${log.kafka.topic}</topic>
         <!--用来指示一组consumer所在的组-->
-        <group_id>0</group_id>
-        <retries>1</retries>
-        <batch_size>16384</batch_size>
-        <linger_ms>1</linger_ms>
-        <buffer_memory>33554432</buffer_memory>
+        <groupId>${log.kafka.groupId}</groupId>
+        <retries>${log.kafka.retries}</retries>
+        <batchSize>${log.kafka.batchSize}</batchSize>
+        <lingerMs>${log.kafka.lingerMs}</lingerMs>
+        <bufferMemory>${log.kafka.bufferMemory}</bufferMemory>
     </appender>
 
     <root>
-        <level value="error"/>
         <level value="info"/>
-        <appender-ref ref="file"/>
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="kafkaAppender"/>
+        <appender-ref ref="rollingFileAppender"/>
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="errorFileAppender"/>
     </root>
+
+
+
+    <logger name="model-log" additivity="false">
+        <level value="info"/>
+        <!--<appender-ref ref="kafkaAppender"/>-->
+        <appender-ref ref="rollingFileAppender"/>
+        <appender-ref ref="fileAppender"/>
+    </logger>
 </configuration>
 
 

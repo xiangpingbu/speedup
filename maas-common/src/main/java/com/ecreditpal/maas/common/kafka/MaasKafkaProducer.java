@@ -1,6 +1,9 @@
 package com.ecreditpal.maas.common.kafka;
 
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.google.common.collect.Maps;
+import kafka.Kafka;
+import kafka.server.KafkaConfig;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -10,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 
 /**
@@ -22,13 +24,35 @@ public class MaasKafkaProducer {
     private Producer<Object, Object> producer;
     private Random random = new SecureRandom();
     private Map<String, String> map = Maps.newHashMap();
+    private static Map<String, MaasKafkaProducer> producers = Maps.newHashMap();
 
-    public MaasKafkaProducer(Map<String,Object> conf) {
+    private static final Object lock = new Object();
+
+    public static MaasKafkaProducer getInstance(String topic, String configName) {
+        MaasKafkaProducer maasKafkaProducer = producers.get(topic);
+        if (maasKafkaProducer == null) {
+            synchronized (lock) {
+                if ((maasKafkaProducer = producers.get(topic)) == null) {
+                    MaasKafkaConfig maasKafkaConfig =
+                            (MaasKafkaConfig) ConfigurationManager.getConfiguration().getProperty(configName);
+                    maasKafkaProducer = new MaasKafkaProducer(maasKafkaConfig.initParams());
+                    producers.put(topic, maasKafkaProducer);
+                }
+            }
+        }
+        return maasKafkaProducer;
+    }
+
+    public static MaasKafkaProducer getInstance(String topic) {
+        return getInstance(topic,"defaultKafkaConfig");
+    }
+
+    public MaasKafkaProducer(Map<String, Object> conf) {
         init(conf);
     }
 
 
-    public void init(Map<String,Object> conf) {
+    public void init(Map<String, Object> conf) {
         log.info("Initializing MaasKafkaProducer.");
         producer = new KafkaProducer<Object, Object>(conf);
     }

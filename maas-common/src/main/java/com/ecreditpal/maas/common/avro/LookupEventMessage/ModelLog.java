@@ -10,11 +10,12 @@ import org.apache.avro.specific.SpecificData;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 6032171786231814103L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ModelLog\",\"namespace\":\"com.ecreditpal.maas.common.avro.LookupEventMessage\",\"fields\":[{\"name\":\"variable_result\",\"type\":\"string\",\"default\":\"\"},{\"name\":\"model_result\",\"type\":\"string\",\"default\":\"\"}]}");
+  private static final long serialVersionUID = -1348568102345144314L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ModelLog\",\"namespace\":\"com.ecreditpal.maas.common.avro.LookupEventMessage\",\"fields\":[{\"name\":\"variable_result\",\"type\":[\"null\",{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"VariableResult\",\"fields\":[{\"name\":\"variable_name\",\"type\":\"string\",\"default\":\"\"},{\"name\":\"variable_value\",\"type\":\"string\",\"default\":\"\"}]}}],\"default\":null},{\"name\":\"model_result\",\"type\":\"string\",\"default\":\"\"},{\"name\":\"model_name\",\"type\":\"string\",\"default\":\"\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
-  @Deprecated public java.lang.CharSequence variable_result;
+  @Deprecated public java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> variable_result;
   @Deprecated public java.lang.CharSequence model_result;
+  @Deprecated public java.lang.CharSequence model_name;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -27,10 +28,12 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
    * All-args constructor.
    * @param variable_result The new value for variable_result
    * @param model_result The new value for model_result
+   * @param model_name The new value for model_name
    */
-  public ModelLog(java.lang.CharSequence variable_result, java.lang.CharSequence model_result) {
+  public ModelLog(java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> variable_result, java.lang.CharSequence model_result, java.lang.CharSequence model_name) {
     this.variable_result = variable_result;
     this.model_result = model_result;
+    this.model_name = model_name;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -39,6 +42,7 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
     switch (field$) {
     case 0: return variable_result;
     case 1: return model_result;
+    case 2: return model_name;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -47,8 +51,9 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: variable_result = (java.lang.CharSequence)value$; break;
+    case 0: variable_result = (java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult>)value$; break;
     case 1: model_result = (java.lang.CharSequence)value$; break;
+    case 2: model_name = (java.lang.CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -57,7 +62,7 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'variable_result' field.
    * @return The value of the 'variable_result' field.
    */
-  public java.lang.CharSequence getVariableResult() {
+  public java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> getVariableResult() {
     return variable_result;
   }
 
@@ -65,7 +70,7 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'variable_result' field.
    * @param value the value to set.
    */
-  public void setVariableResult(java.lang.CharSequence value) {
+  public void setVariableResult(java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> value) {
     this.variable_result = value;
   }
 
@@ -83,6 +88,22 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
    */
   public void setModelResult(java.lang.CharSequence value) {
     this.model_result = value;
+  }
+
+  /**
+   * Gets the value of the 'model_name' field.
+   * @return The value of the 'model_name' field.
+   */
+  public java.lang.CharSequence getModelName() {
+    return model_name;
+  }
+
+  /**
+   * Sets the value of the 'model_name' field.
+   * @param value the value to set.
+   */
+  public void setModelName(java.lang.CharSequence value) {
+    this.model_name = value;
   }
 
   /**
@@ -117,8 +138,9 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<ModelLog>
     implements org.apache.avro.data.RecordBuilder<ModelLog> {
 
-    private java.lang.CharSequence variable_result;
+    private java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> variable_result;
     private java.lang.CharSequence model_result;
+    private java.lang.CharSequence model_name;
 
     /** Creates a new Builder */
     private Builder() {
@@ -139,6 +161,10 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
         this.model_result = data().deepCopy(fields()[1].schema(), other.model_result);
         fieldSetFlags()[1] = true;
       }
+      if (isValidValue(fields()[2], other.model_name)) {
+        this.model_name = data().deepCopy(fields()[2].schema(), other.model_name);
+        fieldSetFlags()[2] = true;
+      }
     }
 
     /**
@@ -155,13 +181,17 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
         this.model_result = data().deepCopy(fields()[1].schema(), other.model_result);
         fieldSetFlags()[1] = true;
       }
+      if (isValidValue(fields()[2], other.model_name)) {
+        this.model_name = data().deepCopy(fields()[2].schema(), other.model_name);
+        fieldSetFlags()[2] = true;
+      }
     }
 
     /**
       * Gets the value of the 'variable_result' field.
       * @return The value.
       */
-    public java.lang.CharSequence getVariableResult() {
+    public java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> getVariableResult() {
       return variable_result;
     }
 
@@ -170,7 +200,7 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'variable_result'.
       * @return This builder.
       */
-    public com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog.Builder setVariableResult(java.lang.CharSequence value) {
+    public com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog.Builder setVariableResult(java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult> value) {
       validate(fields()[0], value);
       this.variable_result = value;
       fieldSetFlags()[0] = true;
@@ -235,12 +265,52 @@ public class ModelLog extends org.apache.avro.specific.SpecificRecordBase implem
       return this;
     }
 
+    /**
+      * Gets the value of the 'model_name' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getModelName() {
+      return model_name;
+    }
+
+    /**
+      * Sets the value of the 'model_name' field.
+      * @param value The value of 'model_name'.
+      * @return This builder.
+      */
+    public com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog.Builder setModelName(java.lang.CharSequence value) {
+      validate(fields()[2], value);
+      this.model_name = value;
+      fieldSetFlags()[2] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'model_name' field has been set.
+      * @return True if the 'model_name' field has been set, false otherwise.
+      */
+    public boolean hasModelName() {
+      return fieldSetFlags()[2];
+    }
+
+
+    /**
+      * Clears the value of the 'model_name' field.
+      * @return This builder.
+      */
+    public com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog.Builder clearModelName() {
+      model_name = null;
+      fieldSetFlags()[2] = false;
+      return this;
+    }
+
     @Override
     public ModelLog build() {
       try {
         ModelLog record = new ModelLog();
-        record.variable_result = fieldSetFlags()[0] ? this.variable_result : (java.lang.CharSequence) defaultValue(fields()[0]);
+        record.variable_result = fieldSetFlags()[0] ? this.variable_result : (java.util.List<com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult>) defaultValue(fields()[0]);
         record.model_result = fieldSetFlags()[1] ? this.model_result : (java.lang.CharSequence) defaultValue(fields()[1]);
+        record.model_name = fieldSetFlags()[2] ? this.model_name : (java.lang.CharSequence) defaultValue(fields()[2]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

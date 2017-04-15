@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd"
+       >
+    <!--default-autowire="byName"-->
+    <!--&lt;!&ndash; 商家信息task 5分钟执行一次&ndash;&gt;-->
+    <!--<bean id="shopTask" class="com.tqmall.dandelion.schedule.ShopTask"/>-->
+    <!--<task:scheduled-tasks>-->
+    <!--<task:scheduled ref="shopTask" method="execute" cron="0 0/5 * * * ?"/>-->
+    <!--</task:scheduled-tasks>-->
+
+    <!--&lt;!&ndash; 商家信息1.2版task 5分钟执行一次&ndash;&gt;-->
+    <!--<bean id="shopTaskV1_2" class="com.tqmall.dandelion.schedule.ShopTaskV1_2"/>-->
+    <!--<task:scheduled-tasks>-->
+    <!--<task:scheduled ref="shopTaskV1_2" method="execute" cron="0 0/5 * * * ?"/>-->
+    <!--</task:scheduled-tasks>-->
+
+    <!-- 工单评价task-->
+    <bean id="modelResReloadTask" class="com.ecreditpal.maas.schedule.ModelResReloadSchedule"/>
+    <task:scheduled-tasks>
+        <task:scheduled ref="modelResReloadTask" method="execute" cron="0/30 * * * * ?"/>
+    </task:scheduled-tasks>
+</beans>
