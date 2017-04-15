@@ -60,7 +60,7 @@ public class ModelLogFilter implements ContainerRequestFilter {
 
         eventBuilder.setEventId(buildEventIds(requestContext));
         eventBuilder.setRequestInfo(buildRequestInfo(requestContext, form));
-        eventBuilder.setUserInfo(buildUserInfo(form));
+//        eventBuilder.setUserInfo(buildUserInfo(form));
         requestContext.setProperty(
                 PROPERTY_NAME_LOOKUP_EVENT_MESSAGE,
                 eventBuilder.build());

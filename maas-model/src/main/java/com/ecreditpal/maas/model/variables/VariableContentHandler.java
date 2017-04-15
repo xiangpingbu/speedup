@@ -110,6 +110,8 @@ public class VariableContentHandler extends DefaultHandler {
         }
         if (s.contains("\n")) {
             sb.append(s.replace("\n", "").replace(" ", ""));
+        } else {
+            sb.append(s);
         }
     }
 
