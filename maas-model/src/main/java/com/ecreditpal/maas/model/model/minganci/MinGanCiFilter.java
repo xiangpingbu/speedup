@@ -127,15 +127,10 @@ public class MinGanCiFilter implements Register {
     }
 
     public void loadDict() {
-        long total = Runtime.getRuntime().totalMemory(); // byte
-        long m1 = Runtime.getRuntime().freeMemory();
         loadMgc(new File( MGC_DICT));
         loadMgz(new File( MGZ_DICT));
-        logger.info("before:{}", total - m1);
 
-        long total1 = Runtime.getRuntime().totalMemory();
-        long m2 = Runtime.getRuntime().freeMemory();
-        System.out.println("after:" + (total1 - m2));
+        logger.info("loac mingganci dict complete");
     }
 
     public void loadMgc(File file) {

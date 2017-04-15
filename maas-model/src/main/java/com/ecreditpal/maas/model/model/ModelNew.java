@@ -5,6 +5,7 @@ import avro.shaded.com.google.common.collect.Lists;
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
+import com.ecreditpal.maas.common.schedule.Register;
 import com.ecreditpal.maas.common.schedule.impl.ResReload;
 import com.ecreditpal.maas.model.variables.Variable;
 
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
-public class ModelNew {
+public class ModelNew implements Register{
     private final static Logger log = LoggerFactory.getLogger(ModelNew.class);
 
     public String configPath;
