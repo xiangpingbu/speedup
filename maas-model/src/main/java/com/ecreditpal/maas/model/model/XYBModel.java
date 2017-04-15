@@ -5,7 +5,10 @@ import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.common.utils.file.FileUtil;
 import com.ecreditpal.maas.common.utils.PMMLUtils;
 import com.ecreditpal.maas.model.variables.Variable;
+import com.ecreditpal.maas.model.variables.VariableConfiguration;
 import com.ecreditpal.maas.model.variables.VariableContentHandler;
+import lombok.Getter;
+import lombok.Setter;
 import org.dmg.pmml.FieldName;
 import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.ModelEvaluator;
@@ -25,11 +28,13 @@ import java.util.Map;
  * @author lifeng
  * @version 1.0 on 2017/3/1.
  */
+@Getter
+@Setter
 public class XYBModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(XYBModel.class);
-    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("test_variables.xml");
+    public static String localVariablePath = ConfigurationManager.getConfiguration().getString("xyb_model_variables.xml");
     public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_model_pmml.pmml");
-    private static List<Variable> XYBModelVariables;
+    public static  VariableConfiguration XYBModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
@@ -58,14 +63,14 @@ public class XYBModel extends ModelNew {
             synchronized (XYBModel.class) {
                 if (XYBModelVariables == null) {
                     try {
-                        XYBModelVariables = VariableContentHandler.readXML(localVariablePath).getVariables();
+                        XYBModelVariables = VariableContentHandler.readXML(localVariablePath);
                     } catch (Exception e) {
                         logger.error("parse model config error",e);
                     }
                 }
             }
         }
-        for (Variable v : XYBModelVariables) {
+        for (Variable v : XYBModelVariables.getVariables()) {
             try {
                 Variable requiredVariableClass = (Variable) v.clone();
                 variableList.add(requiredVariableClass);
@@ -134,8 +139,4 @@ public class XYBModel extends ModelNew {
         return "XinYongBao";
     }
 
-
-    public static void main(String[] args) throws JAXBException {
-        XYBModel xybModel = new XYBModel();
-    }
 }

@@ -38,12 +38,7 @@ public class KafkaAppender<E> extends KafkaForLogConfig<E> {
 
     @Override
     public void start() {
-        Map<String,Object> conf  =initParams();
-        //加载初始化参数
-        if( conf == null){
-            addError("kafka appender 初始化参数加载失败...");
-        }
-        producer = new MaasKafkaProducer(conf);
+        producer = new MaasKafkaProducer(getMaasKafkaConfig());
         super.start();
     }
 

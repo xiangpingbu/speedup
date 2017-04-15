@@ -17,11 +17,13 @@ public class ServiceContainer {
     private static Map<String, ModelService> map = Maps.newHashMap();
 
     static {
+        /*找到com.ecreditpal.maas.service下所有的类*/
         List<Class<?>> list = ClassUtil.getClasses("com.ecreditpal.maas.service");
         for (Class<?> clz : list) {
             Model model = clz.getAnnotation(Model.class);
             if (model != null) {
                 try {
+                    //如果
                     map.put(model.apiCode(), (ModelService) clz.newInstance());
                     log.info("init modelService,apiCode:{}",model.apiCode());
                 } catch (Exception e) {
