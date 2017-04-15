@@ -24,7 +24,7 @@ public class XybService implements ModelService {
         String score = xybModel.run(map).toString();
 
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
-        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score);
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
 
         return score;

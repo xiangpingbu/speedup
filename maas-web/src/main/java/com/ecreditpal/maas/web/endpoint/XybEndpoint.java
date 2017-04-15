@@ -61,7 +61,7 @@ public class XybEndpoint {
         XYBModel xybModel = new XYBModel();
         String score = xybModel.run(map).toString();
 
-        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(),score);
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(),score,XYBModel.XYBModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
 
 

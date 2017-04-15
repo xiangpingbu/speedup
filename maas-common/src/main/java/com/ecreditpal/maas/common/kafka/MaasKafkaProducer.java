@@ -35,7 +35,7 @@ public class MaasKafkaProducer {
                 if ((maasKafkaProducer = producers.get(topic)) == null) {
                     MaasKafkaConfig maasKafkaConfig =
                             (MaasKafkaConfig) ConfigurationManager.getConfiguration().getProperty(configName);
-                    maasKafkaProducer = new MaasKafkaProducer(maasKafkaConfig.initParams());
+                    maasKafkaProducer = new MaasKafkaProducer(maasKafkaConfig);
                     producers.put(topic, maasKafkaProducer);
                 }
             }
@@ -47,8 +47,8 @@ public class MaasKafkaProducer {
         return getInstance(topic,"defaultKafkaConfig");
     }
 
-    public MaasKafkaProducer(Map<String, Object> conf) {
-        init(conf);
+    public MaasKafkaProducer(MaasKafkaConfig maasKafkaConfig) {
+        init(maasKafkaConfig.initParams());
     }
 
 

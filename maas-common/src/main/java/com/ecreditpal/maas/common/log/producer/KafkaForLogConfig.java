@@ -6,6 +6,8 @@ import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
 import com.google.common.collect.Maps;
 import kafka.serializer.StringEncoder;
 import kafka.server.KafkaConfig;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Properties;
  * @author lifeng
  * @CreateTime 2017/4/6.
  */
+@Getter
 public abstract class KafkaForLogConfig<E> extends UnsynchronizedAppenderBase<E> implements AppenderAttachable<E> {
     private MaasKafkaConfig maasKafkaConfig = new MaasKafkaConfig();
 

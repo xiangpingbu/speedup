@@ -9,6 +9,8 @@ import com.ecreditpal.maas.common.schedule.impl.ResReload;
 import com.ecreditpal.maas.model.variables.Variable;
 
 import com.ecreditpal.maas.model.variables.VariableConfiguration;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.avro.generic.GenericRecord;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
@@ -33,6 +35,8 @@ import java.util.concurrent.TimeUnit;
  * Created by xibu on 9/28/16.
  */
 
+@Getter
+@Setter
 public class ModelNew {
     private final static Logger log = LoggerFactory.getLogger(ModelNew.class);
 
@@ -92,7 +96,7 @@ public class ModelNew {
 
     //input is always JSONString passed from EndPoint
     public Object run(String input) throws JAXBException {
-        setInputJson(input);
+        setInputJsonString(input);
         inputParse();
         try {
             invokeVariable();
@@ -116,7 +120,7 @@ public class ModelNew {
 
     private void inputParse() {
         //overwrite in specific model class if special input treatment required
-        inputJsonParse(getInputJson());
+        inputJsonParse(getInputJsonString());
     }
 
     private void inputJsonParse(String inputJsonString) {
@@ -249,65 +253,18 @@ public class ModelNew {
      * @param result 模型输出的结果
      * @return ModelLog
      */
-    public ModelLog ParseVariables( List<Variable> variables,String result) {
+    public ModelLog ParseVariables( List<Variable> variables,String result,String name) {
         List<VariableResult> variableResults = Lists.newArrayListWithCapacity(variables.size());
         variables.forEach(variable -> variableResults.add(new VariableResult(variable.getName(),variable.getValue())));
 
         ModelLog modelLog = new ModelLog();
         modelLog.setModelResult(result);
         modelLog.setVariableResult(variableResults);
-        modelLog.setModelName(getModelName());
+        modelLog.setModelName(name);
        return modelLog;
     }
 
 
-    public String getModelName() {
-        return modelName;
-    }
-
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    public String getConfigPath() {
-        return configPath;
-    }
-
-    public void setConfigPath(String configPath) {
-        this.configPath = configPath;
-    }
-
-    public List<Variable> getVariableList() {
-        return variableList;
-    }
-
-    public void setVariableList(List<Variable> variableList) {
-        this.variableList = variableList;
-    }
-
-    public String getInputJson() {
-        return inputJsonString;
-    }
-
-    public void setInputJson(String inputJson) {
-        this.inputJsonString = inputJson;
-    }
-
-    public Map<String, String> getInputMap() {
-        return inputMap;
-    }
-
-    public void setInputMap(Map<String, String> inputMap) {
-        this.inputMap = inputMap;
-    }
-
-    public Map<String, Object> getInputObjMap() {
-        return inputObjMap;
-    }
-
-    public void setInputObjMap(Map<String, Object> inputObjMap) {
-        this.inputObjMap = inputObjMap;
-    }
 
 
 }
