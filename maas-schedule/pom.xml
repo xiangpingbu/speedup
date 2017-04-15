@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ecreditpal</groupId>
-            <artifactId>maas-model</artifactId>
+            <artifactId>maas-common</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>

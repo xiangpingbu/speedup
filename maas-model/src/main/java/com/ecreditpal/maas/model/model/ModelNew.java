@@ -5,8 +5,8 @@ import avro.shaded.com.google.common.collect.Lists;
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
-import com.ecreditpal.maas.common.schedule.Register;
-import com.ecreditpal.maas.common.schedule.impl.ResReload;
+import com.ecreditpal.maas.schedule.Register;
+import com.ecreditpal.maas.schedule.ResReload;
 import com.ecreditpal.maas.model.variables.Variable;
 
 import com.ecreditpal.maas.model.variables.VariableConfiguration;
@@ -87,7 +87,7 @@ public class ModelNew implements Register{
 
 
     public void register(ModelNew modelNew) {
-        modelInstances.put(modelNew.toString(), modelNew);
+        ResReload.getRegister().put(modelNew.toString(), modelNew);
     }
 
 

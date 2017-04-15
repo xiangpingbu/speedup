@@ -1,6 +1,6 @@
-package com.ecreditpal.maas.common.schedule.drive;
+package com.ecreditpal.maas.schedule.drive;
 
-import com.ecreditpal.maas.common.schedule.impl.ResReload;
+import com.ecreditpal.maas.schedule.ResReload;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

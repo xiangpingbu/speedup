@@ -17,7 +17,7 @@
     <!--</task:scheduled-tasks>-->
 
     <!-- 工单评价task-->
-    <bean id="modelResReloadTask" class="com.ecreditpal.maas.schedule.ModelResReloadSchedule"/>
+    <bean id="modelResReloadTask" class="com.ecreditpal.maas.schedule.ResReload"/>
     <task:scheduled-tasks>
         <task:scheduled ref="modelResReloadTask" method="execute" cron="0/30 * * * * ?"/>
     </task:scheduled-tasks>

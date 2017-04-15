@@ -2,7 +2,7 @@ package com.ecreditpal.maas.model.model.minganci;
 
 
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
-import com.ecreditpal.maas.common.schedule.Register;
+import com.ecreditpal.maas.schedule.Register;
 import com.ecreditpal.maas.model.model.minganci.wordcut.JiebaSegmenter;
 import com.ecreditpal.maas.model.model.minganci.wordcut.SegToken;
 import org.apache.lucene.index.Term;
