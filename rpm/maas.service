@@ -8,7 +8,7 @@ Group=ecreditpal
 Type=simple
 EnvironmentFile=/etc/sysconfig/maas
 ExecStart=/usr/bin/java $CONFIG $JAVA_OPTS $JMX_OPTS -jar $JAR
-ExecStartPost=/bin/sh -c "echo $MAINPID > /var/run/maas.pid"
+ExecStartPost=/bin/sh -c "echo $MAINPID > /var/ecreditpal/maas.pid"
 
 [Install]
 WantedBy=multi-user.target
