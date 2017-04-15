@@ -223,11 +223,6 @@
                             <groupname>ecreditpal</groupname>
                         </mapping>
                         <mapping>
-                            <directory>/var/run/maas</directory>
-                            <username>ecreditpal</username>
-                            <groupname>ecreditpal</groupname>
-                        </mapping>
-                        <mapping>
                             <directory>/usr/lib/systemd/system</directory>
                             <sources>
                                 <source>
