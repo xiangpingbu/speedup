@@ -3,7 +3,7 @@ package com.ecreditpal.maas.web.endpoint;
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
-import com.ecreditpal.maas.common.utils.OkHttpUtil;
+import com.ecreditpal.maas.common.utils.http.OkHttpUtil;
 import com.ecreditpal.maas.model.bean.Result;
 import com.ecreditpal.maas.model.bean.XYBModelBean;
 import com.ecreditpal.maas.service.ModelService;

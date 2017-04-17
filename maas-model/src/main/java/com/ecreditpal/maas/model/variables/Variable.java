@@ -1,15 +1,12 @@
 package com.ecreditpal.maas.model.variables;
 
-import com.ecreditpal.maas.common.utils.OkHttpUtil;
+import com.ecreditpal.maas.common.utils.http.OkHttpUtil;
 import com.ecreditpal.maas.model.handler.RequestHandler;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
