@@ -1,9 +1,17 @@
 package com.ecreditpal.maas.common.utils.http;
 
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
@@ -21,9 +29,13 @@ import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultDnsResolver;
 import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -31,6 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @author lifeng
  * @version 1.0 on 2017/4/16.
  */
+@Slf4j
 public class MyHttpClient {
     //应该以后可以复用吧...
     private static PoolingHttpClientConnectionManager manager = null;
@@ -61,14 +74,18 @@ public class MyHttpClient {
             SocketConfig defaultSocketConfig = SocketConfig.custom().setTcpNoDelay(true).build();
             manager.setDefaultSocketConfig(defaultSocketConfig);
             //设置连接池的最大连接数
-            manager.setMaxTotal(300);
+            manager.setMaxTotal(64);
             //每个路由的默认最大链接,每个路由实际最大连接数默认为DefaultMaxPerRoute控制,
             //而MaxTotal是控制整个池子的最大数
             //设置过小无法支持大并发(ConnectionPoolTimeoutException: Timeout waiting for connection from pool)
             //路由是对maxTotal的细分
-            manager.setDefaultMaxPerRoute(200);
+            manager.setDefaultMaxPerRoute(32);
             //在连接池获取连接时,链接不活跃多长时间后需要进行一次验证,默认为2s
             manager.setValidateAfterInactivity(5*1000);
+
+            String target = ConfigurationManager.getConfiguration().getString("maas.headstream","dolphin.myecreditpal.com");
+            int port = ConfigurationManager.getConfiguration().getInt("maas.headstream.port",8888);
+            manager.setMaxPerRoute(new HttpRoute(new HttpHost(target,port)),64);
 
             //默认请求配置
             RequestConfig defaultRequestConfig = RequestConfig.custom()
@@ -120,20 +137,43 @@ public class MyHttpClient {
                 return EntityUtils.toString(response.getEntity());
             }
         } catch (Exception e) {
+            log.error("error sending get request",e);
             if (response != null) {
                 try {
                     EntityUtils.consume(response.getEntity());
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    log.error("error getting the entity",e);
                 }
             }
         }
         return null;
     }
 
-    public static void main(String[] args) {
-      String response =  MyHttpClient.getInstance().get("http://www.baidu.com");
-        System.out.println(response);
-
+    public String post(String url, Map<String,Object> params) {
+        HttpResponse response = null;
+        HttpPost post = new HttpPost(url);
+        List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
+        //lamba 表达式构造http请求所需的参数
+        params.forEach((k,v) -> nameValuePair.add(new BasicNameValuePair(k,v.toString())));
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nameValuePair));
+            response = getHttpClient().execute(post);
+            if (response.getStatusLine().getStatusCode() !=HttpStatus.SC_OK) {
+                EntityUtils.consume(response.getEntity());
+            } else {
+                return EntityUtils.toString(response.getEntity());
+            }
+        } catch (Exception e) {
+            log.error("error sending post request the request", e);
+            if (response != null) {
+                try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException e1) {
+                    log.error("error getting the entity",e);
+                }
+            }
+        }
+        return null;
     }
+
 }
