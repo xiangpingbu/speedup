@@ -57,7 +57,8 @@ public class AgeVariable extends Variable {
                 }
             }
         };
-        WorkDispatcher.getInstance().modelExecute(t);
+//        WorkDispatcher.getInstance().modelExecute(t);
+        t.start();
     }
 
 
@@ -71,5 +72,6 @@ public class AgeVariable extends Variable {
         }
         return dateTime;
     }
+
 
 }

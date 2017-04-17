@@ -20,6 +20,8 @@ import javax.ws.rs.ext.Providers;
 import java.util.HashMap;
 import java.util.Map;
 
+import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
+
 /**
  * @author lifeng
  */

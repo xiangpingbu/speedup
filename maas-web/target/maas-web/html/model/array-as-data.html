@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Array as Data</title>
+    <link href="/static/js/d3/style.css" rel="stylesheet"/>
+    <script src="/static/js/d3/d3.min.js"></script>
+</head>
+
+<body>
+
+<script type="text/javascript">
+    var data = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    var data2 = [10, 21, 22, 23, 24, 25, 16, 17, 18, 19, 30, 21];
+
+
+    function render() {
+        d3.select("body") //找到body标签
+            .selectAll("div.h-bar")//得到包含所有拥有h-bar的div的选集,组成了一个图形领域
+            .data(data).enter() //组成了数据领域,enter方法可以返回没有与与图形领域绑定的数据,可以后续进行绑定
+            .append("div")//向选集中加入一个div
+            .attr("class", "h-bar")//向div中加入一个样式,名为h-bar
+            .append("span"); //往div中加入span,至此数据和图形绑定在了一起.可以在浏览器中观察h-bar的dom信息,其中_data_代表绑定的数据
+
+//        //下面将通过api根据数据调整图形的样式,
+        d3.select("body").selectAll("div.h-bar")
+            .data(data) //可以执行这个方法重新绑定数据,绑定的数组长度不会超过data的长度
+            .style("width", function (d) {
+                return (d * 3) + "px";
+            })
+            .select("span")
+            .text(function (d) {
+                return d;
+            });
+
+        //将未被绑定的数据丢弃,之后的数据都是和图形相匹配的
+        d3.select("body")
+            .selectAll("div.h-bar")
+            .data(data)
+            .exit()
+            .remove()
+    }
+
+    //    render(data);
+
+    setInterval(function () {
+        data.shift(); //移除数组头部的元素
+        data.push(Math.round(Math.random() * 100)); //尾部追加一个随机数
+        render(data);
+    }, 1500);
+
+    render(data);
+</script>
+
+</body>
+
+</html>
