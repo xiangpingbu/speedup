@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var tool = require('./routes/tool');
+var monitor = require('./routes/monitor');
 
 
 var app = express();
@@ -28,6 +29,7 @@ app.use('/static',express.static(path.join(__dirname, 'views')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/tool', tool);
+app.use('/monitor',monitor);
 // app.use('/tool', users);
 
 // catch 404 and forward to error handler
@@ -51,15 +53,11 @@ app.use(function(err, req, res, next) {
 
 app.set('title', 'My Application');
 
-// 只用于开发环境
-if ('development' == app.get('env')) {
-    app.set('py_uri', 'http://localhost:8091');
-}
-
 // 只用于生产环境
-if ('production' == app.get('env')) {
+if ('production' === app.get('env')) {
     app.set('py_uri', 'http://sun.ecreditpal.com:8091');
-
+} else {
+    app.set('py_uri', 'http://localhost:8091');
 }
 
 
