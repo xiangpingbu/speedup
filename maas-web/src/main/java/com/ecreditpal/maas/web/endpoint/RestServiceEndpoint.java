@@ -12,17 +12,11 @@ import com.ecreditpal.maas.web.bean.User;
 import com.ecreditpal.maas.web.endpoint.filter.FilterUtil;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
-import org.glassfish.jersey.message.internal.MediaTypes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Providers;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,12 +50,6 @@ public class RestServiceEndpoint {
 
         return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
     }
-
-
-
-
-
-
 
     @GET
     @Path("/getUserText")
