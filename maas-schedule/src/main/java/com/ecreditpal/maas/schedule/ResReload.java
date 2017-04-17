@@ -1,7 +1,7 @@
-package com.ecreditpal.maas.common.schedule.impl;
+package com.ecreditpal.maas.schedule;
 
-import com.ecreditpal.maas.common.schedule.Register;
-import com.ecreditpal.maas.common.schedule.Subject;
+import com.ecreditpal.maas.schedule.Register;
+import com.ecreditpal.maas.schedule.Subject;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

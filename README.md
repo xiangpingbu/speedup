@@ -142,15 +142,79 @@ filtering = false的一项,指定除了.properties和logback.xml文件外的所�
 
 ## web模块部分
 web模块由下面几部分组成
-#### jersey
-jersey是一个web框架.在它的帮助下,可以使用注解和java方法描述一次Http请求接收和响应的过程.jersey自己维护一个容器,利用扫描包中的注解信息,将URL Mapping加入容器管理.
+### maas对ecreditpal的接口
+```
+这是一个模型服务,实现了ModelService接口,通过@Model标签注册
 
-#### swagger
-将Rest接口图形界面化,方便调试接口.配置和初始化过程和jersey相似.
+```
+@Model(apiCode = "M111")
+public class XybService implements ModelService {
 
-#### spring
-spring也有一个容器,用于维护项目内部的对象,可以方便整合其他工具,例如Redis,mysql等.
+    @Override
+    public Object getResult(Map<String, String> map, GenericRecord record) {
+        XYBModel xybModel = new XYBModel();
+        String score = xybModel.run(map).toString();
 
+        LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
+        lookupEventMessage.setModelLog(modelLog);
+
+        return score;
+    }
+}
+```
+ServiceContainer会搜索com.ecreditpal.maas.service目录下所有的class,观察该class有没有被@Model标记,如果被标记了,那么将它的apicode和这个modelService关联在一起.并纳入ServiceContainer的管理.
+
+```
+public class ServiceContainer {
+    private static Map<String, ModelService> map = Maps.newHashMap();
+
+    static {
+        List<Class<?>> list = ClassUtil.getClasses("com.ecreditpal.maas.service");
+        for (Class<?> clz : list) {
+            Model model = clz.getAnnotation(Model.class);
+            if (model != null) {
+                try {
+                    map.put(model.apiCode(), (ModelService) clz.newInstance());
+                    log.info("init modelService,apiCode:{}",model.apiCode());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        log.info("init {} modelService",map.size());
+    }
+
+    /**
+     * 根据apiCode获得模型的Service
+     * @param apiCode ecreditpal apicode
+     * @return ModelService
+     */
+    public static ModelService getModelService(String apiCode) {
+        return map.get(apiCode);
+    }
+}
+```
+
+只要调用方提供apiCode,就能够通过该code得到指定的模型服务,并提供结果
+
+
+```
+@POST
+    @Path("/{apiCode}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Returns model result by apiCode", notes = "Returns a model result by json", response = Result.class)
+    public Result<Object> getModelResult(
+            @ApiParam(name = "apiCode", value = "ecreditpal api code", required = true) @PathParam("apiCode") String apiCode,
+            @Context LookupEventMessage lookupEventMessage) {
+        //得到请求参数
+        Map<String, String> map = FilterUtil.getRequestForm(request,providers);
+        //获得apiCode对应的模型
+        ModelService service = ServiceContainer.getModelService(apiCode);
+
+        return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
+    }
+```
 
 #### 图示
 ![maas](http://oagjvfn8h.bkt.clouddn.com/maas.png)
@@ -315,7 +379,7 @@ public void startElement(String uri, String localName, String name, Attributes a
 4. 这个List每次在Model启动的时候将会被复用,产生一套相同的variable list,并交由线程池来执行这一组variable,运行依赖的参数来自于inputMap.
 5. 执行完毕后,model会通过回调的方式获得variable中的计算值,最后根据该值输出结果
 
-###模型结果记录
+### 模型结果记录
 在模型的运作过程中,有三部分的数据非常重要,外部传入的原始变量、variable计算产生的衍生变量、模型根据衍生变量计算得出的最终结果.将这部分数据记录下来后,日后就可以很方便地针对这些数据进行分析  
 
 maas一次web请求的前和后都加入了filter,前置的filter可以生成LookUpEventMassage对象,该对象包含了以下对象:

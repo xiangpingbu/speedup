@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.common.schedule;
+package com.ecreditpal.maas.schedule;
 
 /**
  * @author lifeng

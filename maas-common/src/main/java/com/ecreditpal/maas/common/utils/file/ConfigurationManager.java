@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * maas 配置管理
@@ -28,9 +29,11 @@ public class ConfigurationManager {
             //判断是否为本地
             String productConfigDir = cc.getString("config.dir");
             String applicationProp;
+            String rootPath = null;
             if (productConfigDir == null) {
                 //从本地获取配置文件
-                applicationProp = "maas-web/target/classes/application.properties";
+                rootPath = new File(System.getProperty("user.dir")).getParent();
+                applicationProp = rootPath + "/maas-web/target/classes/application.properties";
             } else {
                 //从服务器的目录获取配置文件
                 applicationProp = productConfigDir + "/application.properties";
@@ -46,21 +49,22 @@ public class ConfigurationManager {
             if (productConfigDir != null) {
                 File file = new File(productConfigDir);
                 listFile(file, conf);
-            } else{
+            } else {
                 List subModels = conf.getList("maven.submodel");
                 for (Object subModel : subModels) {
-                    File file = new File(subModel.toString()+"/src/main/resources");
-                    listFile(file,conf);
+                    File file = new File(rootPath+"/"+subModel.toString() + "/src/main/resources");
+                    listFile(file, conf);
                 }
             }
 
-            conf.addProperty("defaultKafkaConfig",new MaasKafkaConfig());
+            conf.addProperty("defaultKafkaConfig", new MaasKafkaConfig());
 
             cc.addConfiguration(conf);
         } catch (Exception e) {
             logger.error("Failed to load configuration files", e);
         }
     }
+
     private ConfigurationManager() {
     }
 

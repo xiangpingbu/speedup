@@ -19,6 +19,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.ecreditpal</groupId>
+            <artifactId>mass-schedule</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.ecreditpal</groupId>-->
+            <!--<artifactId>maas</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
