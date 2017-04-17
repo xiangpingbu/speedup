@@ -39,82 +39,38 @@ public class XYBModelTest {
     public void testModel() throws Exception {
         XYBModel model = new XYBModel();
         Map<String, Object> map = Maps.newHashMap();
-        map.put("creditQueryTimes", 1);  //信用卡过去三个月查询次数
+        map.put("creditLimit", 1);  //信用卡过去三个月查询次数
+        map.put("creditQueryTimes", 1);
 
-        List<Double> list = Lists.newArrayList(1000.0, 5100.0);
-        map.put("creditLimitList", list);//信用卡的总额度
 
-        map.put("totalUsedLimit", 0); //已经使用的总额度
-        map.put("totalCreditLimit", 10000);//信用卡的总额度
+        map.put("creditUtilization", 0); //已经使用的总额度
         map.put("personalEducation", 1);//个人学历,2为本科
         map.put("personalLiveCase", "5");//居住情况,预期的值中并不存在9
         map.put("clientGender", "1");//客户的性别 1为男
         map.put("personalLiveJoin", "1,"); //共同居住者,1为父母
         map.put("personalYearIncome", 50);//年收入
 
-        List<Double> list2 = Lists.newArrayList(2.0, 3.0);
-        map.put("repaymentFrequencyList", list2);//平均贷款的还款频率,前两个是不合格数据
-        map.put("birthday", null);//客户的生日
-        map.put("loanDay", "2016/6/13 16:19");//申请时间
+        map.put("age", 32);//客户的年龄
 
-        int modelTestScore = 609;
+        int modelTestScore = 624;
         List<Variable> variableList = model.getVariableList();
 //        model.run(map);
 //        model.run(map);
         Assert.assertEquals("模型结果不符合预期",modelTestScore, model.run(map));
 
         Assert.assertEquals("信用卡过去三个月查询次数不符合预期", "1", variableList.get(0).getValue());
-        Assert.assertEquals("信用卡的总额度不符合预期", "6100.0", variableList.get(1).getValue());
-        Assert.assertEquals("信用卡的使用率不符合预期", "0.0", variableList.get(2).getValue());
+        Assert.assertEquals("信用卡的总额度不符合预期", "1", variableList.get(1).getValue());
+        Assert.assertEquals("信用卡的使用率不符合预期", "0", variableList.get(2).getValue());
         Assert.assertEquals("用户的学历不符合预期", "masterOrAbove", variableList.get(3).getValue());
         Assert.assertEquals("用户的居住情况不符合预期", "rentalRoom", variableList.get(4).getValue());
         Assert.assertEquals("用户的性别不符合预期", "male", variableList.get(5).getValue());
         Assert.assertEquals("共同居住者不符合预期", "parents", variableList.get(6).getValue());
         Assert.assertEquals("年收入不符合预期", "50", variableList.get(7).getValue());
-        Assert.assertEquals("平均贷款的还款频率不符合预期", "2.5", variableList.get(8).getValue());
-        Assert.assertEquals("年龄不符合预期", "missing", variableList.get(9).getValue());
+        Assert.assertEquals("平均贷款的还款频率不符合预期", "missing", variableList.get(8).getValue());
+        Assert.assertEquals("年龄不符合预期", "32", variableList.get(9).getValue());
     }
 
-    public void testModel2() throws Exception {
-        XYBModel model = new XYBModel();
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("creditQueryTimes", 1);  //信用卡过去三个月查询次数
 
-        List<Double> list = Lists.newArrayList(1000.0, 5100.0);
-        map.put("creditLimitList", list);//信用卡的总额度
-
-        map.put("totalUsedLimit", 0); //已经使用的总额度
-        map.put("totalCreditLimit", 10000);//信用卡的总额度
-        map.put("personalEducation", 1);//个人学历,2为本科
-        map.put("personalLiveCase", "5");//居住情况,预期的值中并不存在9
-        map.put("clientGender", "1");//客户的性别 1为男
-        map.put("personalLiveJoin", "1,"); //共同居住者,1为父母
-        map.put("personalYearIncome", 50);//年收入
-
-        List<Double> list2 = Lists.newArrayList(2.0, 3.0);
-        map.put("repaymentFrequencyList", list2);//平均贷款的还款频率,前两个是不合格数据
-        map.put("birthday", null);//客户的生日
-        map.put("loanDay", "2016/6/13 16:19");//申请时间
-
-        int modelTestScore = 609;
-        List<Variable> variableList = model.getVariableList();
-//        model.run(map);
-//        model.run(map);
-        Assert.assertEquals("模型结果不符合预期",modelTestScore, model.run(map));
-
-        Assert.assertEquals("信用卡过去三个月查询次数不符合预期", "1", variableList.get(0).getValue());
-        Assert.assertEquals("信用卡的总额度不符合预期", "6100.0", variableList.get(1).getValue());
-        Assert.assertEquals("信用卡的使用率不符合预期", "0.0", variableList.get(2).getValue());
-        Assert.assertEquals("用户的学历不符合预期", "masterOrAbove", variableList.get(3).getValue());
-        Assert.assertEquals("用户的居住情况不符合预期", "rentalRoom", variableList.get(4).getValue());
-        Assert.assertEquals("用户的性别不符合预期", "male", variableList.get(5).getValue());
-        Assert.assertEquals("共同居住者不符合预期", "parents", variableList.get(6).getValue());
-        Assert.assertEquals("年收入不符合预期", "50", variableList.get(7).getValue());
-        Assert.assertEquals("平均贷款的还款频率不符合预期", "2.5", variableList.get(8).getValue());
-        Assert.assertEquals("年龄不符合预期", "missing", variableList.get(9).getValue());
-    }
-
-    @Test
     public void excelHelp() throws Exception {
 
         ExcelRowReader rowReader = new ExcelRowReader();
