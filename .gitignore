@@ -5,3 +5,4 @@ node_modules
 *.pyc
 config-dir
 logback-test.xml
+*/target
