@@ -2,6 +2,6 @@
 .idea
 *.out
 node_modules
-.pyc
+*.pyc
 config-dir
 logback-test.xml
