@@ -90,7 +90,7 @@ personal_live_case = '{"columnType": "C",' \
                      '"columnName": "PersonalLiveCase", ' \
                      '"columnBinning": {' \
                      '"binCategory":["commercialMortgageRoom","noMortgageRoom","fundMortgageRoom","selfBuildingRoom","rentalRoom","Relatives","dormitory","others","missing","invalid"],' \
-                     '"binCountWoe": [0.0297,0.1522,0.3626,-0.2545,-0.0559,-0.1686,-0.1686,-0.0559,0,0],' \
+                     '"binCountWoe": [0.0297,0.1522,0.3626,-0.2545,-0.0559,-0.0559,-0.1686,-0.1686,0,0],' \
                      '"binBoundary": null}, ' \
                      '"version": "", ' \
                      '"columnStats":{"max":3.0,"min":1.0,"mean":2.1363636363636362,"median":2.0,' \
@@ -138,7 +138,7 @@ personal_year_income = '{"columnType": "N",' \
                        '"columnName": "PersonalYearIncome", ' \
                        '"columnBinning": {' \
                        '"binCategory":null,' \
-                       '"binCountWoe": [0,0.1063,-0.0362,-0.0853,0.4706,-0.6784],' \
+                       '"binCountWoe": [0,0.1063,-0.0362,-0.0853,0.4706,0.6784],' \
                        '"binBoundary": ["-Infinity",-999998,11.68,18,50]}, ' \
                        '"version": "", ' \
                        '"columnStats":{"max":3.0,"min":1.0,"mean":2.1363636363636362,"median":2.0,' \

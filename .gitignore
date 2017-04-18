@@ -1,4 +1,4 @@
 *.iml
 .idea
 *.out
-mass-schedule/
+node_modules

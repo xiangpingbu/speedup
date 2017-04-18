@@ -29,8 +29,7 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
-#df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
-df_train = None
+df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
