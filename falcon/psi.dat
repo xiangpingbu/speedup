@@ -4,6 +4,7 @@ creditQueryTimes$missing;0;1;5;6;9$0.3132;0.1149;0.1233;0.3110;0.0392;0.065;0.03
 personalYearIncome$missing;11.68;18;50$0.01;0.2924;0.2866;0.3783;0.0399$number
 creditUtilization$missing;6100;48598;156500;23200$0.1489;0.0386;0.2557;0.3088;0.0959;0.1521$number
 clientGender$missing;1;2$0.0175;0.6832;0.2994$category
-personalLiveJoin$missing;1,|2,|1,2,;4,;3,|2,4,|1,4,|1,2,4,$0;0.8698;0.1197;0.0105;category
-personalLiveCase$missing;1;2;3;4;5|8;6|7$0;0.1298;0.3753;0.0765;0.1652;0.0655;0.1877;category
+personalLiveJoin$missing;1,|2,|1,2,;4,;3,|2,4,|1,4,|1,2,4,$0;0.8698;0.1197;0.0105$category
+personalLiveCase$missing;1;2;3;4;5|8;6|7$0;0.1298;0.3753;0.0765;0.1652;0.0655;0.1877$category
+personalEducation$missing;1;2;3;4$0;0.0093;0.3742;0.5093;0.1072$category
 techangtest$missing;28;30;45;50;54$0.0175;0.0866;0.0575;0.5381;0.1616;0.1006;0.0382$number

@@ -1,3 +1,5 @@
+约定
+----------------------------------------------
 解析form_params
 addmissing 为1
 	number: 如果参数为空，填-1
@@ -6,13 +8,15 @@ admissing 为0
 	number: 如果参数为空，填none
 	category: 如果参数为空，填none
 
------------------
 
+variable相关
+----------------------------------------------
 category: personalLiveJoin, clientGender, personalEducation, personalLiveCase
 number: creditQueryTimes, personalYearIncome, creditLimit, age, creditUtilization
 
-----------------
+
 监控psi相关
+----------------------------------------------
 number:
 pig -p year=2017 -p month=04 -p day=11 -p variable=age -p isnumber=1 modelxyb_psi_variable.pig
 
@@ -38,8 +42,10 @@ pig -p year=2017 -p month=04 -p day=11 modelxyb_count_api.pig
 
 
 测试用例 
-------------
+----------------------------------------------
+
 pencentile:
+-----------------------
 pig  percentile_test.pig
 input 
 1
@@ -63,9 +69,10 @@ order
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 15 17
 output (2.0,4.0,6.0,7.0,9.0,11.0,12.0,14.0,15.0,17.0,17.0)
 
---------------
+
 
 psi:
+-----------------------
 pig  -p variable=techangtest psi_test.pig
 
 input
