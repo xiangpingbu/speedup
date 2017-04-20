@@ -4,7 +4,7 @@ IMPORT 'utils/percentile.pig';
 /*
     
     执行命令：pig -p year=2017 -p month=04 -p day=11 -p variable=age  modelxyb_percentile_variable.pig
-    variable为request的form_params里的是number的参数名,creditQueryTimes,personalYearIncome,creditLimit,age,creditUtilization
+    variable为request的form_params里的是number的参数名,creditQueryTimes, personalYearIncome, creditLimit, age, creditUtilization
     
     "form_params":"creditQueryTimes:{2};clientGender:{2};personalEducation:{4};personalLiveJoin:{2,};
     personalYearIncome:{7.00};creditLimit:{0.00};creditUtilization:{0.00000};age:{47};

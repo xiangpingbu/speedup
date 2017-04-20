@@ -1,13 +1,13 @@
 IMPORT 'utils/include.pig';
 /*
 	执行命令：pig -p year=2017 -p month=04 -p day=11 -p variable=personalLiveJoin  modelxyb_count_variable.pig
-    variable为request的form_params里的是number的参数名,personalLiveJoin,clientGender,personalEducation,personalLiveCase
+    variable为request的form_params里的是category的参数名 personalLiveJoin, clientGender, personalEducation, personalLiveCase
     
     "form_params":"creditQueryTimes:{2};clientGender:{2};personalEducation:{4};personalLiveJoin:{2,};
     personalYearIncome:{7.00};creditLimit:{0.00};creditUtilization:{0.00000};age:{47};
 */
 
-	-----计算 personalLiveJoin, clientGender, personalEducation, personalLiveCase
+	-----计算 personalLiveJoin, clientGender, personalEducation, personalLiveCase 引用次数
 
 data = LOAD '/topics/kafka_lookup_event_v1/year=$year/month=$month/day=$day/api_path=model_xyb' USING AvroStorage();
 data = filter data by response_info.response_code == 200;

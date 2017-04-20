@@ -6,11 +6,12 @@ admissing 为0
 	number: 如果参数为空，填none
 	category: 如果参数为空，填none
 
-
+-----------------
 
 category: personalLiveJoin, clientGender, personalEducation, personalLiveCase
 number: creditQueryTimes, personalYearIncome, creditLimit, age, creditUtilization
 
+----------------
 监控psi相关
 number:
 pig -p year=2017 -p month=04 -p day=11 -p variable=age -p isnumber=1 modelxyb_psi_variable.pig
@@ -37,14 +38,58 @@ pig -p year=2017 -p month=04 -p day=11 modelxyb_count_api.pig
 
 
 测试用例 
+------------
 pencentile:
 pig  percentile_test.pig
-output(2.0,4.0,6.0,7.0,9.0,11.0,12.0,14.0,15.0,17.0,17.0)
+input 
+1
+2
+14
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+3
+15
+15
+17
+order
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 15 17
+output (2.0,4.0,6.0,7.0,9.0,11.0,12.0,14.0,15.0,17.0,17.0)
+
+--------------
 
 psi:
 pig  -p variable=techangtest psi_test.pig
-techangtest$missing;28;30;45;50;54$0.0175;0.0866;0.0575;0.5381;0.1616;0.1006;0.0382$number
+
+input
+1
+1
+22
+22
+33
+33
+44
+44
+55
+55
+66
+66
+77
+77
+88
+88
+99
+base:techangtest$missing;28;30;45;50;54$0.0175;0.0866;0.0575;0.5381;0.1616;0.1006;0.0382$number
+
 output
+value <-> group
 ((1,1))
 ((1,1))
 ((22,1))
@@ -63,6 +108,7 @@ output
 ((88,6))
 ((99,6))
 
+group <-> percent
 (1,0.23529411764705882)
 (3,0.23529411764705882)
 (6,0.5294117647058824)
