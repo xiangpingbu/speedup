@@ -1,6 +1,6 @@
 IMPORT 'utils/include.pig';
 IMPORT 'utils/psi.pig';
-%declare psi_base_file '/users/techang/psi_test.dat';
+%declare psi_base_file '/users/techang/psi.dat';
  /*  
     执行命令：pig -p year=2017 -p month=04 -p day=11 -p variable=age -p isnumber=1 modelxyb_psi_variable.pig
     isnumber=1 =>number variable; isnumber=0 =>category

@@ -1,7 +1,7 @@
 IMPORT 'utils/include.pig';
 IMPORT 'utils/psi.pig';
 
-%declare psi_base_file '/users/techang/psi_test.dat';
+%declare psi_base_file '/users/techang/psi.dat';
 test_data = LOAD '/users/techang/psi_test.dat' USING PigStorage() as (val:chararray);
 dump test_data;
 v = psi(test_data, '$variable', 1, '$psi_base_file');
