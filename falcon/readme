@@ -1,0 +1,68 @@
+解析form_params
+addmissing 为1
+	number: 如果参数为空，填-1
+	category: 如果参数为空，填missing
+admissing 为0
+	number: 如果参数为空，填none
+	category: 如果参数为空，填none
+
+
+
+监控psi相关
+number:
+pig -p year=2017 -p month=04 -p day=11 -p variable=age -p isnumber=1 modelxyb_psi_variable.pig
+
+category:
+pig -p year=2017 -p month=04 -p day=11 -p variable=personalLiveJoin isnumber=0 -p isnumber=0 modelxyb_psi_variable.pig
+
+score:
+pig -p year=2017 -p month=04 -p day=11 -p variable=score -p isnumber=1 modelxyb_psi_variable.pig
+
+
+监控percentile相关
+number:
+pig -p year=2017 -p month=04 -p day=11 -p variable=age  modelxyb_percentile_variable.pig
+
+score:
+pig -p year=2017 -p month=04 -p day=11 -p variable=score modelxyb_percentile_variable.pig
+
+监控非number的variable出现次数
+pig -p year=2017 -p month=04 -p day=11 -p variable=personalLiveJoin  modelxyb_count_variable.pig
+
+监控每个用户api请求数
+pig -p year=2017 -p month=04 -p day=11 modelxyb_count_api.pig
+
+
+测试用例 
+pencentile:
+pig  percentile_test.pig
+output(2.0,4.0,6.0,7.0,9.0,11.0,12.0,14.0,15.0,17.0,17.0)
+
+psi:
+pig  -p variable=techangtest psi_test.pig
+techangtest$missing;28;30;45;50;54$0.0175;0.0866;0.0575;0.5381;0.1616;0.1006;0.0382$number
+output
+((1,1))
+((1,1))
+((22,1))
+((22,1))
+((33,3))
+((33,3))
+((44,3))
+((44,3))
+((55,6))
+((55,6))
+((66,6))
+((66,6))
+((77,6))
+((77,6))
+((88,6))
+((88,6))
+((99,6))
+
+(1,0.23529411764705882)
+(3,0.23529411764705882)
+(6,0.5294117647058824)
+
+output
+1.690470513977134
