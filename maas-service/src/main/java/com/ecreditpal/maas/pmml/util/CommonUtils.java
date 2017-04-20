@@ -331,7 +331,6 @@ public final class CommonUtils {
         }
         // I need cast operation because of common-collections dosen't support generic.
         ColumnConfig cc = (ColumnConfig) CollectionUtils.find(columnConfigList, new Predicate() {
-            @Override
             public boolean evaluate(Object object) {
                 return ((ColumnConfig) object).isTarget();
             }
@@ -366,7 +365,7 @@ public final class CommonUtils {
         File modelsPathDir = new File(modelsPath);
 
         File[] modelFiles = modelsPathDir.listFiles(new FilenameFilter() {
-            @Override
+
             public boolean accept(File dir, String name) {
                 return name.endsWith("." + alg.name().toLowerCase());
             }
@@ -375,7 +374,6 @@ public final class CommonUtils {
         if (modelFiles != null) {
             // sort file names
             Arrays.sort(modelFiles, new Comparator<File>() {
-                @Override
                 public int compare(File from, File to) {
                     return from.getName().compareTo(to.getName());
                 }
@@ -466,7 +464,6 @@ public final class CommonUtils {
         List<Entry<K, V>> entries = new LinkedList<Entry<K, V>>(map.entrySet());
 
         Collections.sort(entries, new Comparator<Entry<K, V>>() {
-            @Override
             public int compare(Entry<K, V> o1, Entry<K, V> o2) {
                 return o1.getValue().compareTo(o2.getValue());
             }
