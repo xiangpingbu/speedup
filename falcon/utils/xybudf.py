@@ -51,10 +51,10 @@ def number_group(input, urange):
 	if input == 'missing':
 		return 0
 	else:
-		input = int(input)
+		input = float(input)
 
 	for i in range(1, len(urange)):
-		if input <= int(urange[i]):
+		if input <= float(urange[i]):
 			return i 
 	#input 大于最大值
 	return len(urange)  	

@@ -8,6 +8,9 @@ admissing 为0
 
 
 
+category: personalLiveJoin, clientGender, personalEducation, personalLiveCase
+number: creditQueryTimes, personalYearIncome, creditLimit, age, creditUtilization
+
 监控psi相关
 number:
 pig -p year=2017 -p month=04 -p day=11 -p variable=age -p isnumber=1 modelxyb_psi_variable.pig
