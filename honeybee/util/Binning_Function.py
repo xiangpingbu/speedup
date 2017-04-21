@@ -333,7 +333,7 @@ def get_manual_bin_categorical(df, var, target, bin_list):
 def bin_assign_categorical(bin_list, v):
     for index, bin in enumerate(bin_list):
         # null value assign -1 bin number
-        if v in bin:
+        if str(v) in bin:
             return index
     return -1
 

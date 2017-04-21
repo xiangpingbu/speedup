@@ -12,6 +12,8 @@ from collections import OrderedDict
 import numpy as np
 import collections
 from util import A99_Functions as a99
+from io import BytesIO
+from flask import send_file
 
 base = '/tool'
 base_path = "./util/"
@@ -40,7 +42,7 @@ def init():
     # min = request.form.get("min")
     min_val = 0
     df = df_train
-    out = get_init(df)
+    out = get_init(df, target="bad_4w", vars=["province"])
 
     out = get_boundary(out, min_val)
     # for
@@ -61,10 +63,10 @@ def merge():
     boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
     # 总的范围
     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
-    #获得target
-   # target = request.form.get('allBoundary').encode('utf-8');
+    # 获得target
+    # target = request.form.get('allBoundary').encode('utf-8');
     target = "bad_4w"
-    excepted_column={"province"}
+    excepted_column = {"province"}
 
     min_val = 0
 
@@ -101,7 +103,8 @@ def merge():
         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
 
-    result = ab.adjust(df_train, type_bool, var_name, selected_list,target=target,expected_column=excepted_column)  # 获得合并的结果
+    result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
+                       expected_column=excepted_column)  # 获得合并的结果
     df = pd.DataFrame(result[0],
                       columns=columns)
 
@@ -193,16 +196,20 @@ def divide():
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
     data = request.form.get('data')
+    target = request.form.get('target')
+    if target is None:
+        target = "bad_4w"
     dict = json.loads(data)
-
-    test = df_test.drop('bad_7mon_60', 1)
-    vars = df_test.columns
+    df_test.append(df_train)
+    test = df_test.drop(target, 1)
+    # vars = df_test.columns
+    keys = dict.keys()
     test_copy = test.copy()
     # 初始化列
-    for v in vars:
+    for v in keys:
         test[v + "_woe"] = ""
     for index, row in test_copy.iterrows():
-        for column in test_copy.columns:
+        for column in dict:
             bins = dict[column]
             if bins is not None:
                 for obj in bins:
@@ -221,16 +228,29 @@ def apply():
                         elif obj["max"] == 'nan' and str(row[column]) == 'nan':
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-                        elif obj['min'] == 'nan' and  bin_val < bin_max:
+                        elif obj['min'] == 'nan' and bin_val < bin_max:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
                     else:
                         # categorical,直接进行匹配
-                        if row[column] in obj[column]:
+                        if str(row[column]) in obj[column]:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-    test.to_excel("df_iv.xlsx", ",", header=True, index=False)
-    return responseto(data=test)
+    # test.to_excel("df_iv.xlsx", ",", header=True, index=False)
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+
+    test.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
+    workbook = writer.book
+    worksheet = writer.sheets["Sheet_1"]
+    format = workbook.add_format()
+    format.set_bg_color('#eeeeee')
+    worksheet.set_column(0, 9, 28)
+    writer.close()
+
+    output.seek(0)
+    response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
+    return responseFile(response)
 
 
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
@@ -251,15 +271,15 @@ def upload():
                 df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
-@app.route(base+"/parse",methods=['GET'])
+
+@app.route(base + "/parse", methods=['GET'])
 def parse():
     df = a99.GetDFSummary(df_train)
     data_map = cmm.df_for_html(df)
-    return responseto(data = data_map)
+    return responseto(data=data_map)
 
 
-
-@app.route(base + "/column-config",methods=['POST'])
+@app.route(base + "/column-config", methods=['POST'])
 def column_config():
     """
     将配置完成的variable数据转化一定格式的json数据
@@ -280,11 +300,11 @@ def column_config():
 
         columnBinning = {"binCountNeg": [],
                          "binCountPos": [],
-                         "binWeightedPos":[],
-                         "binWeightedWoe":[],
-                         "binAvgScore":[],
-                         "binWeightedNeg":[],
-                         "binPosRate":[]}
+                         "binWeightedPos": [],
+                         "binWeightedWoe": [],
+                         "binAvgScore": [],
+                         "binWeightedNeg": [],
+                         "binPosRate": []}
         pmml.columnFlag = None
         pmml.finalSelect = True
         pmml.columnName = key
@@ -309,30 +329,30 @@ def column_config():
             columnBinning["binCountPos"].append(2)
 
             if type:
-                if index != len(list)-1:
+                if index != len(list) - 1:
                     columnBinning["binBoundary"].append(float(val["min_bound"]))
 
                 columnBinning["binCountWoe"].append(float(val["woe"]))
 
             else:
                 # categorical的woe值
-                for cate in val[key] :
-                    columnBinning["binCategory"].insert(0,cate)
-                    columnBinning["binCountWoe"].insert(0,float(val["woe"]))
-            index+=1
+                for cate in val[key]:
+                    columnBinning["binCategory"].insert(0, cate)
+                    columnBinning["binCountWoe"].insert(0, float(val["woe"]))
+            index += 1
 
         if type:
             columnBinning["length"] = len(columnBinning['binBoundary'])
         else:
             columnBinning["length"] = len(columnBinning["binCategory"])
         result.append(pmml.__dict__)
-        columnNum +=1
+        columnNum += 1
     print json.dumps(result)
     return ""
 
 
-def get_init(df=df_train):
-    data_map = ib.cal(df)
+def get_init(df=df_train, target=None, vars=None):
+    data_map = ib.cal(df, target, vars)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
@@ -469,3 +489,6 @@ def get_merged(var_name, df, min_val):
 
         data = get_boundary(data, min_val)
     return data
+
+s = u"nan"
+print s

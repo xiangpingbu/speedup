@@ -3,7 +3,7 @@ import os
 from Binning_Function import *
 
 
-def cal(df_train,target='bad_7mon_60'):
+def cal(df_train,target='bad_7mon_60',vars = None):
     ########################## dev vs val ##############################
     # df_train = pd.read_excel(train)
     # df_test = pd.read_excel(test)
@@ -14,12 +14,12 @@ def cal(df_train,target='bad_7mon_60'):
 
     ######################## get initial binning ########################
     df = df_train
-    vars = df.columns
+    if vars is None:
+        vars = df.columns
     print 'target is: ' + target
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
-    vars = ["province"]
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)
