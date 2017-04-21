@@ -3,19 +3,21 @@ import os
 from Binning_Function import *
 
 
-def cal(df_train,target='bad_7mon_60',vars = None):
+def cal(df_train,target,invalid = None):
     ########################## dev vs val ##############################
     # df_train = pd.read_excel(train)
     # df_test = pd.read_excel(test)
-    invalid_vars_list = [target]
+    invalid_vars_list = invalid
+    if invalid_vars_list is None:
+        invalid_vars_list=[]
+    invalid_vars_list.append(target)
     # from sklearn.cross_validation import train_test_split
     # target = df[['bad_7mon_60']]
     # df_train, df_test, y_train, y_test= train_test_split(df, target,test_size = 0.5,random_state = 40, stratify=target)
 
     ######################## get initial binning ########################
     df = df_train
-    if vars is None:
-        vars = df.columns
+    vars = df.columns
     print 'target is: ' + target
     df_iv = pd.DataFrame()
     iv_rank_map = {}

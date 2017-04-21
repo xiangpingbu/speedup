@@ -600,3 +600,6 @@ def single_categorical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_html_file.write("<img src='%s' width='450px' height='300px' />" % pic_path)
     my_html_file.write('<hr>')
     return [df_train_woe, df_test_woe]
+
+# print '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.encode("utf8")
+a =  '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.decode('utf8')

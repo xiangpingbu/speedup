@@ -31,18 +31,30 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
-# df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
-df_train = None
+df_train = pd.read_excel("/Users/lifeng/Downloads/py/df_train.xlsx")
+# df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
 
 
 @app.route(base + "/init")
 def init():
+    target =  request.form.get('target')
+    # invalid = request.form.get('invalid')
+    remove_list = ['name','idcard',u'进件id',u'进件时间',u'进件机构',u'借款用途',u'最高月还',u'还款期限',u'销售人员名称',u'申请产品',u'审批意见',
+        u'处理状态',u'审核报告',u'审批额度',u'建议审批金额',u'合同编号',u'协议生效日期',u'协议失效日期',u'开始还款日期',
+        u'每周还款日', u'已还款总期数',u'当前期数',u'是否新增M1',u'是否首逾',u'总逾期期数',u'是否逾期',
+        u'罚息总额',u'滞纳金总额',u'应还总额',u'合同结清状态',u'最大逾期天数',u'芝麻信用评分','id','max_wob','cell_phone_num',
+        'city','phone_silent','region',u'客户姓名',u'身份证号',u'信用评分',u'违约概率']
+    if target is None:
+        target = "bad_4w"
+    remove_list.append(target)
+
+    # invalid = invalid.split(",")
     # min = request.form.get("min")
     min_val = 0
     df = df_train
-    out = get_init(df, target="bad_4w", vars=["province"])
+    out = get_init(df, target="bad_4w", invalid=remove_list)
 
     out = get_boundary(out, min_val)
     # for
@@ -56,7 +68,7 @@ def init():
 def merge():
     """归并操作"""
     # 要执行合并的variable
-    var_name = request.form.get('varName').encode('utf-8')
+    var_name = request.form.get('varName')
     # 变量的类型
     type = request.form.get('type').encode('utf-8')
     # 选定的范围
@@ -65,8 +77,10 @@ def merge():
     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
     # 获得target
     # target = request.form.get('allBoundary').encode('utf-8');
-    target = "bad_4w"
-    excepted_column = {"province"}
+    target = request.form.get('target')
+    if target is None:
+        target ='bad_4w'
+    excepted_column = {var_name}
 
     min_val = 0
 
@@ -116,7 +130,7 @@ def merge():
 def divide():
     """
     分裂操作
-    先将根据从data中得到的范围,从excel中筛选相应的数据
+    先将从data中得到的范围,从excel中筛选相应的数据
     筛选完成后,调用init方法对数据进行初始化,得到一定数据的范围区间
     将该范围区间与原来的区间合并.
     调用adjust方法获得的结果即为分裂后的结果
@@ -129,7 +143,7 @@ def divide():
     # 解析json
     data_map = json.loads(data, object_pairs_hook=OrderedDict)
     name = data_map["name"]
-    target = "bad_7mon_60"
+    target = "bad_4w"
     # 将excel转化为dataframe,只读取target和name两列
     df = pd.DataFrame(df_train, columns={target, name})
 
@@ -144,7 +158,7 @@ def divide():
             else:
                 df.drop(index, inplace=True)
 
-        out = get_init(df)
+        out = get_init(df,target=target,invalid=[])
         bound_list = get_divide_max_bound(out)
 
         list = data_map["table"]
@@ -155,7 +169,8 @@ def divide():
             bound_list.append(float(v["max"]))
         bound_list.append(np.nan)
 
-        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
+        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
+                           ,target=target,expected_column={name})
         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
         df = pd.DataFrame(result[0],
@@ -176,14 +191,15 @@ def divide():
         # 删除要被分裂的项
         del list[data_map["selectedIndex"]]
 
-        out = get_init(df)
+        out = get_init(df,target=target,invalid=[])
         bound_list = get_divide_caterotical_bound(out, name)
         # 被分裂的项的下标
         index = data_map["selectedIndex"]
         # 将分裂的结果加入原有的列表中
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
-        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list)
+        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
+                           ,target=target,expected_column={name})
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
         df = pd.DataFrame(result[0],
@@ -216,8 +232,8 @@ def apply():
                     # 根据category_t的布尔值区分类别,如果为false为numerical
                     if obj["category_t"] == "False":
                         # 比对区间,获得woe的值
-                        bin_min = float(obj["min"])
-                        bin_max = float(obj["max"])
+                        bin_min = float(obj["min_bound"])
+                        bin_max = float(obj["max_bound"])
                         bin_val = float(row[column])
                         if bin_max == bin_min and bin_val == bin_min:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
@@ -225,10 +241,10 @@ def apply():
                         elif bin_min <= bin_val < bin_max:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-                        elif obj["max"] == 'nan' and str(row[column]) == 'nan':
+                        elif obj["max_bound"] == 'nan' and str(row[column]) == 'nan':
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
-                        elif obj['min'] == 'nan' and bin_val < bin_max:
+                        elif obj['min_bound'] == 'nan' and bin_val < bin_max:
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
                     else:
@@ -265,10 +281,10 @@ def upload():
             filename = secure_filename(file.filename)
             print filename
             if filename == 'df_test.xlsx':
-                df_test = pd.read_excel(file)
+                df_test = pd.read_excel(file,encoding="utf-8")
             elif filename == 'df_train.xlsx':
-                df_train = pd.read_excel(file)
-                df_train['bad_7mon_60'] = df_train['bad_4w']
+                df_train = pd.read_excel(file,encoding="utf-8")
+                # df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
 
@@ -351,8 +367,8 @@ def column_config():
     return ""
 
 
-def get_init(df=df_train, target=None, vars=None):
-    data_map = ib.cal(df, target, vars)
+def get_init(df=df_train, target=None, invalid=None):
+    data_map = ib.cal(df, target, invalid)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
