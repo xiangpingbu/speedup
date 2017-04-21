@@ -19,6 +19,7 @@ def cal(df_train,target='bad_7mon_60'):
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
+    vars = ["province"]
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)

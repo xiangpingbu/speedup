@@ -30,7 +30,7 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 # df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
-# df_train = None
+df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
 
@@ -61,6 +61,10 @@ def merge():
     boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
     # 总的范围
     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
+    #获得target
+   # target = request.form.get('allBoundary').encode('utf-8');
+    target = "bad_4w"
+    excepted_column={"province"}
 
     min_val = 0
 
@@ -86,7 +90,6 @@ def merge():
                    'category_t']
     else:
         type_bool = True
-        selected_list = []
         temp = []
         for s in boundary.split("&"):
             temp.extend(map(cmm.transfer, s.split("|")))
@@ -98,7 +101,7 @@ def merge():
         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
 
-    result = ab.adjust(df_train, type_bool, var_name, selected_list)  # 获得合并的结果
+    result = ab.adjust(df_train, type_bool, var_name, selected_list,target=target,expected_column=excepted_column)  # 获得合并的结果
     df = pd.DataFrame(result[0],
                       columns=columns)
 
@@ -245,6 +248,7 @@ def upload():
                 df_test = pd.read_excel(file)
             elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file)
+                df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
 @app.route(base+"/parse",methods=['GET'])

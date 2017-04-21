@@ -1,4 +1,7 @@
 # coding=utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 def transfer(str):
     """将字符串转化为utf8"""
     return str.encode('utf-8')
