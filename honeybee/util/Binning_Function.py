@@ -286,7 +286,7 @@ def get_manual_bin_numeric(df, var, target, boundary_list,pre):
     df_cur = df[[var, target]].copy()
 
     bin_map = get_boundary_mapping(bl)
-    bin_map_reverse = get_boundary_mapping_reverse(bl,pre)
+    bin_map_reverse = get_boundary_mapping_reverse(bl, pre)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
     df_woe = get_categorical_woe(df_cur, 'bin_num', target)
     df_woe['min'] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_min(bin_map_reverse, x)).apply('{:.15f}'.format)
