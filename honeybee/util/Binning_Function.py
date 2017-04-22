@@ -333,7 +333,7 @@ def get_manual_bin_categorical(df, var, target, bin_list):
 def bin_assign_categorical(bin_list, v):
     for index, bin in enumerate(bin_list):
         # null value assign -1 bin number
-        if v in bin:
+        if str(v) in bin:
             return index
     return -1
 
@@ -354,6 +354,17 @@ def get_boundary_mapping_reverse(max_boundary_list,pre=0):
     #    max inclusive, min exclusive
     return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
 
+def get_min_boundary_mapping_reverse(min_boundary_list,pre=0):
+    max_min_boundary = []
+    # pre = np.nan
+
+    for index,mb in enumerate(min_boundary_list):
+        if index < len(min_boundary_list)-1:
+            max_min_boundary.append((min_boundary_list[index], min_boundary_list[index+1]))
+    max_min_boundary.append((pre, np.nan))
+
+    #    max inclusive, min exclusive
+    return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
 
 def bin_assign(bin_map, v):
     for key, value in bin_map:
@@ -600,3 +611,6 @@ def single_categorical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_html_file.write("<img src='%s' width='450px' height='300px' />" % pic_path)
     my_html_file.write('<hr>')
     return [df_train_woe, df_test_woe]
+
+# print '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.encode("utf8")
+a =  '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.decode('utf8')

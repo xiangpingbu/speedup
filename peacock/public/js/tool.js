@@ -2,7 +2,7 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://localhost:8091";
+var host = "http://192.168.31.42:8091";
 
 var controlMap = {};
 
@@ -41,7 +41,7 @@ var cate_columnMap =
 //描绘一个画布
 var xScale, yScale;
 
-define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
+define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     function init() {
         tool_button.output();
         $(".spinner").css('display', 'block');
@@ -122,6 +122,7 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
 
         return svg
     }
+
     /**
      * 描绘x轴
      * 需要指定画布(svg),variable的下标,variable的相关数据
@@ -217,6 +218,12 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
             var rects = $('#svg_' + a).find('.MyRect').click(function () {
                 //id和a的值是一致的,因此可以通过这个值从map中得到数据
                 var id = $(this).parent().parent().attr("id").split("_")[1];
+                var childTrs = $('#tbody_' + id).children("tr");
+                var tds = $(childTrs.get(0)).children("td");
+                //判断是否为categorical还是numerical
+                var type = tds.get(tds.length - 1).innerHTML;
+                var isNum = type.indexOf("F") >= 0;
+
                 //觉得应该可以用队列来实现
                 var array = controlMap[id].array;
                 var start = controlMap[id].start;
@@ -234,11 +241,20 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                     if (!$.isEmptyObject(start) && !$.isEmptyObject(end)) {
                         var si = parseInt(start.index);
                         var ei = parseInt(end.index);
-                        for (var i = Math.min(si, ei); i <= Math.max(si, ei); i++) {
-
-                            var bar = $("#index_" + id + "_" + i);
-                            array.push(bar);
+                        var bar;
+                        if (isNum) {
+                            for (var i = Math.min(si, ei); i <= Math.max(si, ei); i++) {
+                                bar = $("#index_" + id + "_" + i);
+                                array.push(bar);
+                                bar.attr("fill", "brown");
+                            }
+                        } else {
+                            bar = $("#index_" + id + "_" + si);
                             bar.attr("fill", "brown");
+                            array.push(bar);
+                            bar = $("#index_" + id + "_" + ei);
+                            bar.attr("fill", "brown");
+                            array.push(bar);
                         }
                     }
                 } else {
@@ -334,7 +350,7 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 var start = controlMap[id].start;
                 var end = controlMap[id].end;
                 var list = '';
-                var wholeList = [];
+                var wholeList = '';
                 var childTrs = $('#tbody_' + id).children("tr");
 
                 var tds = $(childTrs.get(0)).children("td");
@@ -346,48 +362,57 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 var isNum = type.indexOf("F") >= 0;
                 //判断应该从哪一列获取相应的值
                 var valIndex;
-                if (isNum) valIndex = maxIndex;
+                if (isNum) valIndex = minBoundIndex;
                 else valIndex = categoricalIndex;
-
-                for (var i = min; i <= max; i++) {
-                    if (i == max) {
+                debugger;
+                var iterList = [];
+                if (!isNum) iterList = [min, max];
+                else {
+                    for (var i = min; i <= max; i++) {
+                        iterList.push(i);
+                    }
+                }
+                for (var n in iterList) {
+                    if (iterList[n] == min) {
                         //如果存在'F',代表type为false,variable为numerical,
                         if (isNum) {
                             //此时该max的值可以被丢弃
                             continue;
                         }
                     }
-
-
                     if (isNum) {
 //                        valIndex = maxIndex;
-                        valIndex = maxBoundIndex;
+                        valIndex = minBoundIndex;
                     }
                     else valIndex = categoricalIndex;
-                    list = list + ($(childTrs.get(i)).children("td").get(valIndex).innerHTML) + ("&");
+                    list = list + ($(childTrs.get(iterList[n])).children("td").get(valIndex).innerHTML) + ("&");
                 }
-
+                //去除末尾的&符号
                 list = list.substring(0, list.length - 1);
 
-                for (var index = 0; index < childTrs.length; index++) {
+
                     var tdVal;
+                    //numerical按照区间筛选
                     if (isNum) {
-                        //整个区间的大部分从max_bound列中得到,除了inf一列
-                        if (index == childTrs.length - 2) {
-                            tdVal = $(childTrs.get(index)).children("td").get(maxIndex).innerHTML;
-                        } else {
-                            tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML
+                        for (var index = 0; index < childTrs.length; index++) {
+                            //整个区间的大部分从mix_bound列中得到,除了inf一列
+                            // if (index == childTrs.length - 2) {
+                            //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
+                            // } else {
+                                tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
+                            // }
+                            wholeList = wholeList + (tdVal) + ("&");
                         }
-                        wholeList = wholeList + (tdVal) + ("&");
-                    } else {
-                        //获取categorical的除选中以外的值
-                        if (index < min || index > max) {
-                            wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
-                        } else {
-                            wholeList = "&"
+                    }else {
+                        for (var b = 0;  b< childTrs.length; b++) {
+                            //获取categorical的除选中以外的值
+                            debugger;
+                            if (b != min && b != max) {
+                                wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
+                            }
                         }
                     }
-                }
+
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');
                 $.ajax({
@@ -528,6 +553,7 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 });
         }
     }
+
     return {
         init: init
     };

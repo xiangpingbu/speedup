@@ -1,13 +1,17 @@
+# coding=utf-8
 import os
 
 from Binning_Function import *
 
 
-def cal(df_train,target='bad_7mon_60'):
+def cal(df_train,target,invalid = None):
     ########################## dev vs val ##############################
     # df_train = pd.read_excel(train)
     # df_test = pd.read_excel(test)
-    invalid_vars_list = [target]
+    invalid_vars_list = invalid
+    if invalid_vars_list is None:
+        invalid_vars_list=[]
+    invalid_vars_list.append(target)
     # from sklearn.cross_validation import train_test_split
     # target = df[['bad_7mon_60']]
     # df_train, df_test, y_train, y_test= train_test_split(df, target,test_size = 0.5,random_state = 40, stratify=target)
@@ -19,6 +23,7 @@ def cal(df_train,target='bad_7mon_60'):
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
+    vars =[u'工作年限']
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)

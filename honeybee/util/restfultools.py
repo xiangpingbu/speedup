@@ -1,9 +1,7 @@
-#-*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 from flask import jsonify
 from flask import make_response
 import json
-
-
 
 # define statu_dics here
 R200_OK = {'code': 200, 'message': 'OK all right.'}
@@ -22,7 +20,7 @@ def statusResponse(statu_dic):
     return jsonify({'status': statu_dic})
 
 
-def responseto(data=None,message=None, error=None,**kwargs):
+def responseto(data=None, message=None, error=None, **kwargs):
     """ 封装 json 响应"""
     result = kwargs
     result['success'] = True
@@ -51,7 +49,16 @@ def responseto(data=None,message=None, error=None,**kwargs):
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Content-Type'] = 'application/json'
     resp.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
-    resp.headers["Access-Control-Allow-Headers"]= "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
+    resp.headers[
+        "Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
     return resp
 
 
+def responseFile(response):
+    # 跨域设置
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    # response.headers["Content-Disposition"] = "attachment; filename=" + file_name
+    response.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
+    response.headers[
+        "Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
+    return response
