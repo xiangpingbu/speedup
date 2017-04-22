@@ -24,7 +24,7 @@ def adjust(excel_obj,type,var_name,boundary_list,target = None,expected_column=N
     #                      'credit_c_last_repayment_date_max','job_comp_join_date','loan_last_repayment_loan_date_max', \
     #                      'loan_loan_status_endmonth_max','app_agree_time_limit']
 
-    expected_column.add(target);
+    expected_column.add(target)
     df1 = pd.DataFrame(excel_obj,columns = expected_column)
     # df = df1.head(4000)
 

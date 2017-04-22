@@ -4,8 +4,20 @@ require.config({
         "d3": "../d3",
         // "dropzone": "../inspinia/js/plugins/dropzone/dropzone-amd-module.js",
         "tool": "/public/js/tool",
-        "tool_button": "/public/js/tool_button"
+        "tool_button": "/public/js/tool_button",
+        "i-checks":"../inspinia/js/plugins/iCheck/icheck.min"
         // "upload_init": "/public/js/upload_init"
+    },
+
+    shim: {
+
+        'i-checks': {
+
+            deps: ['jquery'],
+
+            exports: 'i-checks'
+        }
+
     }
 });
 

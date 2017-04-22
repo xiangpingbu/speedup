@@ -8,29 +8,29 @@ cateIndex = 11;
 
 categoricalIndex = 1;
 
-define(['jquery', 'd3'],function ($,d3){
+define(['jquery', 'd3','i-checks'], function ($, d3) {
     function outputDateMap() {
         $("#output").click(function () {
-            $("#downloadform").remove();
-            var form = $("<form>");//定义一个form表单
-            form.attr("id", "downloadform");
-            form.attr("style", "display:none");
-            form.attr("target", "");
-            form.attr("method", "post");
-            form.attr("action", "http://localhost:8091/tool/apply");
-            var input1 = $("<input>");
-            input1.attr("type", "hidden");
-            input1.attr("name", "data");
+                $("#downloadform").remove();
+                var form = $("<form>");//定义一个form表单
+                form.attr("id", "downloadform");
+                form.attr("style", "display:none");
+                form.attr("target", "");
+                form.attr("method", "post");
+                form.attr("action", "http://localhost:8091/tool/apply");
+                var input1 = $("<input>");
+                input1.attr("type", "hidden");
+                input1.attr("name", "data");
 
-            // var data ={
-            //     "data": JSON.stringify(exportData())
-            // };
+                // var data ={
+                //     "data": JSON.stringify(exportData())
+                // };
 
-            input1.attr("value", JSON.stringify(exportData()));
-            form.append(input1);
-            $("body").append(form);//将表单放置在web中
+                input1.attr("value", JSON.stringify(exportData()));
+                form.append(input1);
+                $("body").append(form);//将表单放置在web中
 
-            form.submit();//表单提交
+                form.submit();//表单提交
 
                 // $.ajax({
                 //     url: "http://localhost:8091/tool/apply",
@@ -79,7 +79,7 @@ define(['jquery', 'd3'],function ($,d3){
         });
     }
 
-    $("#prev").click(function(){
+    $("#prev").click(function () {
         $('#upload').html("");
         $('#analyze').html("");
         $('#dataframe').html("");
@@ -105,14 +105,26 @@ define(['jquery', 'd3'],function ($,d3){
                 }
                 for (var b of data.body) {
                     tr = tbody.append("tr");
+                    var select = tr.append("td");
+
+                    var div = select.append("div").attr("class", "icheckbox_square-green").style("position", "relative");
+
+                    var input = div.append("input")
+                        .attr("type", "checkbox")
+                        .attr("class","i-checks")
+                        .attr("name","input[]");
+
                     for (var item of b) {
                         tr.append("td").text(item)
                     }
                 }
+                $('.i-checks').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    radioClass: 'iradio_square-green',
+                });
             }
         });
     }
-
 
 
     $("#init").click(function () {
@@ -135,13 +147,13 @@ define(['jquery', 'd3'],function ($,d3){
         });
     });
 
-    $("#getBar").click(function() {
-        window.location.href = window.location.href.substr(0,window.location.href.indexOf("#")) + "#bar";
+    $("#getBar").click(function () {
+        window.location.href = window.location.href.substr(0, window.location.href.indexOf("#")) + "#bar";
         window.location.reload()
     });
 
 
-    function  exportData() {
+    function exportData() {
         var row = $("#rowNum").val();
         var data = {};
         for (var i = 0; i < row; i++) {
@@ -154,7 +166,7 @@ define(['jquery', 'd3'],function ($,d3){
                 var innerDate = {};
                 innerList.push(innerDate);
                 var tds = $(childTrs.get(innerRow)).children("td");
-                var category_t = tds.get(tds.length-1).innerHTML;
+                var category_t = tds.get(tds.length - 1).innerHTML;
                 if (category_t.indexOf("F") >= 0) {
                     var max = tds.get(maxIndex).innerHTML;
                     var min = tds.get(minIndex).innerHTML;
@@ -170,7 +182,7 @@ define(['jquery', 'd3'],function ($,d3){
                     innerDate[name] = ca.split('|');
                 }
                 var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
-                innerDate["woe"] = tds.get(tds.length-2).innerHTML;
+                innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
                 innerDate["binNum"] = binNum;
                 innerDate["category_t"] = category_t;
             }
@@ -179,11 +191,11 @@ define(['jquery', 'd3'],function ($,d3){
         return data
     }
 
- return {
-     output:outputDateMap,
-     changeTd:changeTd,
-     getTable:getTable
- }
+    return {
+        output: outputDateMap,
+        changeTd: changeTd,
+        getTable: getTable
+    }
 });
 
 
