@@ -405,7 +405,8 @@ def get_boundary(out, min_val=0):
         last_bin = None
         for bin_row in val[1]:
             if bin_row["category_t"] == "False":
-                if index == 0:
+                index += 1
+                if index == 1:
                     # if float(bin_row["min"]) >= min_val:
                     last_bin = bin_row
                     if float(bin_row["min"]) > min_val:
@@ -413,10 +414,13 @@ def get_boundary(out, min_val=0):
                 else:
                     if bin_row["min"] != 'nan':
                         last_bin["max_bound"] = bin_row["min_bound"]
+
+                        if  len(val[1]) ==index :
+                            bin_row["max_bound"] = 'inf'
                         last_bin = bin_row
+
                     else:
                         last_bin["max_bound"] = 'inf'
-                index = index + 1
             else:
                 break
 

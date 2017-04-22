@@ -354,6 +354,17 @@ def get_boundary_mapping_reverse(max_boundary_list,pre=0):
     #    max inclusive, min exclusive
     return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
 
+def get_min_boundary_mapping_reverse(min_boundary_list,pre=0):
+    max_min_boundary = []
+    # pre = np.nan
+
+    for index,mb in enumerate(min_boundary_list):
+        if index < len(min_boundary_list)-1:
+            max_min_boundary.append((min_boundary_list[index], min_boundary_list[index+1]))
+    max_min_boundary.append((pre, np.nan))
+
+    #    max inclusive, min exclusive
+    return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
 
 def bin_assign(bin_map, v):
     for key, value in bin_map:

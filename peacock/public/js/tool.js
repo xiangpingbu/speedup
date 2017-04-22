@@ -362,9 +362,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var isNum = type.indexOf("F") >= 0;
                 //判断应该从哪一列获取相应的值
                 var valIndex;
-                if (isNum) valIndex = maxIndex;
+                if (isNum) valIndex = minBoundIndex;
                 else valIndex = categoricalIndex;
-
+                debugger;
                 var iterList = [];
                 if (!isNum) iterList = [min, max];
                 else {
@@ -373,7 +373,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     }
                 }
                 for (var n in iterList) {
-                    if (iterList[n] == max) {
+                    if (iterList[n] == min) {
                         //如果存在'F',代表type为false,variable为numerical,
                         if (isNum) {
                             //此时该max的值可以被丢弃
@@ -382,7 +382,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     }
                     if (isNum) {
 //                        valIndex = maxIndex;
-                        valIndex = maxBoundIndex;
+                        valIndex = minBoundIndex;
                     }
                     else valIndex = categoricalIndex;
                     list = list + ($(childTrs.get(iterList[n])).children("td").get(valIndex).innerHTML) + ("&");
@@ -395,12 +395,12 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     //numerical按照区间筛选
                     if (isNum) {
                         for (var index = 0; index < childTrs.length; index++) {
-                            //整个区间的大部分从max_bound列中得到,除了inf一列
-                            if (index == childTrs.length - 2) {
-                                tdVal = $(childTrs.get(index)).children("td").get(maxIndex).innerHTML;
-                            } else {
-                                tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML
-                            }
+                            //整个区间的大部分从mix_bound列中得到,除了inf一列
+                            // if (index == childTrs.length - 2) {
+                            //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
+                            // } else {
+                                tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
+                            // }
                             wholeList = wholeList + (tdVal) + ("&");
                         }
                     }else {

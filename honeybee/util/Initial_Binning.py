@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 
 from Binning_Function import *
@@ -22,6 +23,7 @@ def cal(df_train,target,invalid = None):
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
+    vars =[u'工作年限']
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)
