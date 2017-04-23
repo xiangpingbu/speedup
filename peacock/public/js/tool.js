@@ -43,29 +43,54 @@ var xScale, yScale;
 
 define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     function init() {
+        //注册右下方按钮的点击事件
         tool_button.output();
         $(".spinner").css('display', 'block');
-        d3.json("/tool/init", function (error, result) {
-            var num = 0;
+        $("#analyze").html("");
+        // $("#dataframe").find("tbody").children(".checked").each(function (i, n) {
+        //     var obj = $(n);
+        //     alert(obj.html());//弹出子元素标签
+        // });
 
-            var initList = [];
-            for (var key in result.data) {
-                var table_head = [];
-                for (var subKey in result.data[key][0]) {
-                    table_head.push(subKey);
+        var data = {};
+        var remove_list = [];
+        data["remove_list"] = remove_list;
+        data["target"] = $('#target').val();
+        // console.log($("#dataframe").find("tbody .checked").length);
+        $("#dataframe").find("tbody .checked").each(function (i,n) {
+            remove_list.push($(n).parents("tr").children().eq(1).html());
+        });
+
+
+        $.ajax({
+            url: host + "/tool/init",
+            type: 'post',
+            data: {
+                data:JSON.stringify(data)
+            },
+            async: true,
+            success: function (result) {
+                var num = 0;
+                var initList = [];
+                for (var key in result.data) {
+                    var table_head = [];
+                    for (var subKey in result.data[key][0]) {
+                        table_head.push(subKey);
+                    }
+                    var svg = initPanel(key, num, table_head);
+                    renderXAxis(svg, num, result.data[key]);
+                    renderYAxis(svg, num, result.data[key]);
+                    renderBody(svg, result.data[key], num);
+                    initList.push(num);
+                    num++;
                 }
-                var svg = initPanel(key, num, table_head);
-                renderXAxis(svg, num, result.data[key]);
-                renderYAxis(svg, num, result.data[key]);
-                renderBody(svg, result.data[key], num);
-                initList.push(num);
-                num++;
+                //记录行数
+                $("#rowNum").val(num);
+                tool_button.changeTd();
+                buttonInit(initList);
+                $(".spinner").css('display', 'none');
+
             }
-            //记录行数
-            $("#rowNum").val(num);
-            tool_button.changeTd();
-            buttonInit(initList);
-            $(".spinner").css('display', 'none');
         });
     }
 
@@ -391,27 +416,27 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 list = list.substring(0, list.length - 1);
 
 
-                    var tdVal;
-                    //numerical按照区间筛选
-                    if (isNum) {
-                        for (var index = 0; index < childTrs.length; index++) {
-                            //整个区间的大部分从mix_bound列中得到,除了inf一列
-                            // if (index == childTrs.length - 2) {
-                            //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
-                            // } else {
-                                tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
-                            // }
-                            wholeList = wholeList + (tdVal) + ("&");
-                        }
-                    }else {
-                        for (var b = 0;  b< childTrs.length; b++) {
-                            //获取categorical的除选中以外的值
-                            debugger;
-                            if (b != min && b != max) {
-                                wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
-                            }
+                var tdVal;
+                //numerical按照区间筛选
+                if (isNum) {
+                    for (var index = 0; index < childTrs.length; index++) {
+                        //整个区间的大部分从mix_bound列中得到,除了inf一列
+                        // if (index == childTrs.length - 2) {
+                        //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
+                        // } else {
+                        tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
+                        // }
+                        wholeList = wholeList + (tdVal) + ("&");
+                    }
+                } else {
+                    for (var b = 0; b < childTrs.length; b++) {
+                        //获取categorical的除选中以外的值
+                        debugger;
+                        if (b != min && b != max) {
+                            wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
                         }
                     }
+                }
 
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');

@@ -8,7 +8,7 @@ cateIndex = 11;
 
 categoricalIndex = 1;
 
-define(['jquery', 'd3','i-checks'], function ($, d3) {
+define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
     function outputDateMap() {
         $("#output").click(function () {
                 $("#downloadform").remove();
@@ -80,47 +80,95 @@ define(['jquery', 'd3','i-checks'], function ($, d3) {
     }
 
     $("#prev").click(function () {
-        $('#upload').html("");
-        $('#analyze').html("");
-        $('#dataframe').html("");
         getTable();
     });
 
+    /**
+     * 预处理数据并获取表格
+     */
     function getTable() {
-
-
-        var table = d3.select("#dataframe").append("table").attr("class", "table table-bordered");
-
+        $("#dataframe").html("");
         $.ajax({
             url: "http://localhost:8091/tool/parse",
             type: 'get',
             async: true,
             success: function (result) {
+                var varSelect = d3.select("#dataframe")
+                    .append("div").attr("class","form-group");
+                varSelect.append("span").attr("class","col-sm-1")
+                    .text("target");
+                varSelect
+                    .append("div").
+                    attr("class","col-sm-2").
+                append("select").attr("class","form-control").attr("id","target");
+
+
+                var table = d3.select("#dataframe").append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
+
                 var data = result.data;
                 var thead = table.append("thead");
                 var tbody = table.append("tbody");
                 var tr = thead.append("tr");
+
+                //head处加入一列,用于控制标签的全选
+                var headTd = tr.append("td").append("div");
+                headTd.append("input")
+                    .attr("type", "checkbox")
+                    .attr("id", "head-checks")
+                    .attr("name", "input[]");
+
                 for (var a of data.head) {
                     tr.append("td").text(a);
                 }
                 for (var b of data.body) {
                     tr = tbody.append("tr");
                     var select = tr.append("td");
-
-                    var div = select.append("div").attr("class", "icheckbox_square-green").style("position", "relative");
-
-                    var input = div.append("input")
+                    var div = select.append("div");
+                    div.append("input")
                         .attr("type", "checkbox")
-                        .attr("class","i-checks")
-                        .attr("name","input[]");
+                        .attr("class", "i-checks")
+                        .attr("name", "input[]");
 
                     for (var item of b) {
                         tr.append("td").text(item)
                     }
+
+                    $("#target").select2();
+                    d3.select("#target").append("option").text(b[0]);
+
                 }
                 $('.i-checks').iCheck({
                     checkboxClass: 'icheckbox_square-green',
                     radioClass: 'iradio_square-green',
+                });
+
+                /**
+                 * 点击头部按钮可以全选或者反选.
+                 */
+                $('#head-checks')
+                    .iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        radioClass: 'iradio_square-green',
+                    })
+                    .on('ifChecked', function (event) {
+                        $(".icheckbox_square-green").iCheck('check');
+                    })
+                    .on('ifUnchecked', function (event) {
+                        $(".icheckbox_square-green").iCheck('uncheck');
+                    });
+
+                /**
+                 * dataframe行点击事件
+                 * 点击一行可以触发radio的勾选和反选
+                 */
+                $("#dataframe").find("tr").click(function () {
+                    //.icheckbox_square-green负责按钮的渲染
+                    var radio = $($(this).find(".icheckbox_square-green"));
+                    if (radio.hasClass('checked')) {
+                        radio.iCheck('uncheck');
+                    } else {
+                        radio.iCheck('check');
+                    }
                 });
             }
         });
@@ -149,7 +197,6 @@ define(['jquery', 'd3','i-checks'], function ($, d3) {
 
     $("#getBar").click(function () {
         window.location.href = window.location.href.substr(0, window.location.href.indexOf("#")) + "#bar";
-        window.location.reload()
     });
 
 

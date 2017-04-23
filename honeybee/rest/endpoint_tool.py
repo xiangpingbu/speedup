@@ -37,7 +37,7 @@ df_train = pd.read_excel("/Users/lifeng/Downloads/py/df_train.xlsx")
 df_test = None
 
 
-@app.route(base + "/init")
+@app.route(base + "/init",methods=['POST'])
 def init():
     target =  request.form.get('target')
     # invalid = request.form.get('invalid')
