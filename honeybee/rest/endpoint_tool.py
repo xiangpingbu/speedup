@@ -41,13 +41,12 @@ df_test = None
 def init():
     target =  request.form.get('target')
     # invalid = request.form.get('invalid')
-    remove_list = ['name','idcard',u'进件id',u'进件时间',u'进件机构',u'借款用途',u'最高月还',u'还款期限',u'销售人员名称',u'申请产品',u'审批意见',
-        u'处理状态',u'审核报告',u'审批额度',u'建议审批金额',u'合同编号',u'协议生效日期',u'协议失效日期',u'开始还款日期',
-        u'每周还款日', u'已还款总期数',u'当前期数',u'是否新增M1',u'是否首逾',u'总逾期期数',u'是否逾期',
-        u'罚息总额',u'滞纳金总额',u'应还总额',u'合同结清状态',u'最大逾期天数',u'芝麻信用评分','id','max_wob','cell_phone_num',
-        'city','phone_silent','region',u'客户姓名',u'身份证号',u'信用评分',u'违约概率']
-    if target is None:
-        target = "bad_4w"
+    remove_list = request.form.get("remove_list")
+    # remove_list = ['name','idcard',u'进件id',u'进件时间',u'进件机构',u'借款用途',u'最高月还',u'还款期限',u'销售人员名称',u'申请产品',u'审批意见',
+    #     u'处理状态',u'审核报告',u'审批额度',u'建议审批金额',u'合同编号',u'协议生效日期',u'协议失效日期',u'开始还款日期',
+    #     u'每周还款日', u'已还款总期数',u'当前期数',u'是否新增M1',u'是否首逾',u'总逾期期数',u'是否逾期',
+    #     u'罚息总额',u'滞纳金总额',u'应还总额',u'合同结清状态',u'最大逾期天数',u'芝麻信用评分','id','max_wob','cell_phone_num',
+    #     'city','phone_silent','region',u'客户姓名',u'身份证号',u'信用评分',u'违约概率']
     remove_list.append(target)
 
     # invalid = invalid.split(",")

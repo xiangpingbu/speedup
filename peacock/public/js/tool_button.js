@@ -93,14 +93,20 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
             type: 'get',
             async: true,
             success: function (result) {
+                //设置target的input
                 var varSelect = d3.select("#dataframe")
-                    .append("div").attr("class","form-group");
+                    .append("div");
+                    // .attr("class","form-group");
                 varSelect.append("span").attr("class","col-sm-1")
+                    .attr("display","inline-block")
                     .text("target");
                 varSelect
                     .append("div").
-                    attr("class","col-sm-2").
-                append("select").attr("class","form-control").attr("id","target");
+                    // attr("class","col-sm-1").
+                append("select")
+                    .attr("display","inline-block")
+                    // .attr("class","form-control")
+                    .attr("id","target");
 
 
                 var table = d3.select("#dataframe").append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
@@ -161,15 +167,15 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
                  * dataframe行点击事件
                  * 点击一行可以触发radio的勾选和反选
                  */
-                $("#dataframe").find("tr").click(function () {
-                    //.icheckbox_square-green负责按钮的渲染
-                    var radio = $($(this).find(".icheckbox_square-green"));
-                    if (radio.hasClass('checked')) {
-                        radio.iCheck('uncheck');
-                    } else {
-                        radio.iCheck('check');
-                    }
-                });
+                // $("#dataframe").find("tbody tr").find("td:eq(1)").click(function () {
+                //     //.icheckbox_square-green负责按钮的渲染
+                //     var radio = $($(this).parent().find(".icheckbox_square-green"));
+                //     if (radio.hasClass('checked')) {
+                //         radio.iCheck('uncheck');
+                //     } else {
+                //         radio.iCheck('check');
+                //     }
+                // });
             }
         });
     }

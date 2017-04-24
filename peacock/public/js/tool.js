@@ -2,12 +2,13 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://192.168.31.42:8091";
+var host = "http://localhost:8091";
 
 var controlMap = {};
 
 var padding = {left: 25, right: 30, top: 5, bottom: 20};
 
+//numerical的列的排布
 var num_columnMap =
     {
         0: "bin_num",
@@ -24,7 +25,7 @@ var num_columnMap =
         11: "category_t"
     };
 
-
+//categorical的列的排布
 var cate_columnMap =
     {
         0: "bin_num",
@@ -42,21 +43,24 @@ var cate_columnMap =
 var xScale, yScale;
 
 define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
+    /**
+     * 数据图形化初始化
+     * 展示选中的variable的woe值分布
+     */
     function init() {
         //注册右下方按钮的点击事件
         tool_button.output();
+        //提醒等待的样式
         $(".spinner").css('display', 'block');
+        //图形部分位于analyze的div中,初始化前需要将原有数据清空
         $("#analyze").html("");
-        // $("#dataframe").find("tbody").children(".checked").each(function (i, n) {
-        //     var obj = $(n);
-        //     alert(obj.html());//弹出子元素标签
-        // });
 
-        var data = {};
+
         var remove_list = [];
-        data["remove_list"] = remove_list;
-        data["target"] = $('#target').val();
-        // console.log($("#dataframe").find("tbody .checked").length);
+        var target = $('#target').val();
+        /**
+         * 将被选中的variable添加到removeList中
+         */
         $("#dataframe").find("tbody .checked").each(function (i,n) {
             remove_list.push($(n).parents("tr").children().eq(1).html());
         });
@@ -66,27 +70,34 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             url: host + "/tool/init",
             type: 'post',
             data: {
-                data:JSON.stringify(data)
+                remove_list:JSON.stringify(remove_list),
+                target:JSON.stringify(target)
             },
             async: true,
             success: function (result) {
                 var num = 0;
                 var initList = [];
-                for (var key in result.data) {
+                //通过变量名获取数据
+                for (var valName in result.data) {
                     var table_head = [];
-                    for (var subKey in result.data[key][0]) {
+                    for (var subKey in result.data[valName][0]) {
                         table_head.push(subKey);
                     }
-                    var svg = initPanel(key, num, table_head);
-                    renderXAxis(svg, num, result.data[key]);
-                    renderYAxis(svg, num, result.data[key]);
-                    renderBody(svg, result.data[key], num);
+                    var svg = initPanel(valName, num, table_head);
+                    //画出x轴
+                    renderXAxis(svg, num, result.data[valName]);
+                    //画出y轴
+                    renderYAxis(svg, num, result.data[valName]);
+                    //绘制坐标轴内的bar和table
+                    renderBody(svg, result.data[valName], num);
                     initList.push(num);
                     num++;
                 }
                 //记录行数
                 $("#rowNum").val(num);
+                //设置table内的标签可以点击
                 tool_button.changeTd();
+                //初始化按钮,有合并和分裂的操作
                 buttonInit(initList);
                 $(".spinner").css('display', 'none');
 
@@ -102,6 +113,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             .select("div")
             .append("div")
             .attr("id", "svg_" + num)
+            .style("width","2000px")
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
