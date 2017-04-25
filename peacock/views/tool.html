@@ -11,9 +11,13 @@
 <link href="/public/lib/inspinia/css/style.css" rel="stylesheet">
 <link href="/public/lib/inspinia/css/plugins/dropzone/basic.css" rel="stylesheet">
 <link href="/public/lib/inspinia/css/plugins/dropzone/dropzone.css" rel="stylesheet">
+<link href="/public/lib/inspinia/css/plugins/iCheck/custom.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 
 <body>
 <input type="hidden" id="rowNum">
+<input type="hidden" id="temp_name">
+<input type="hidden" id="temp_branch">
 
 <div id="analyze">
 
@@ -40,8 +44,8 @@
 <div class="side-bar">
     <a id="getBar" class="bar">getBar</a>
     <a href="#" id="output" class="bar">apply</a>
-    <a href="#" id="columnConfig" class="bar">column</a>
-    <a href="#" id="prev" class="bar">prev</a>
+    <a href="#bar" id="columnConfig" class="bar">column</a>
+    <a href="#uploaded" id="prev" class="bar">prev</a>
     <!--<a href="#" class="icon-chat">微信<div class="chat-tips"><i></i>-->
     <!--<img style="width:138px;height:138px;" src="helloweba.jpg" alt="微信订阅号"></div></a>-->
     <!--<a target="_blank" href="" class="icon-blog">微博</a>-->
@@ -75,10 +79,10 @@
             });
             this.on("successmultiple", function (files, response) {
                 console.log(response.success);
-                if (response.success == true) {
-
+                if (response.data) {
+                    $("#modelName").val(response.data);
                     window.location.href = window.location.href + "#uploaded";
-                    window.location.reload()
+
                 }
             });
             this.on("errormultiple", function (files, response) {
