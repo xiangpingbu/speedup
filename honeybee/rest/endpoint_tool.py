@@ -14,7 +14,7 @@ import collections
 from util import A99_Functions as a99
 from io import BytesIO
 from flask import send_file
-from service import variable_service as var_service
+from service import variable_service as vs
 
 base = '/tool'
 base_path = "./util/"
@@ -41,29 +41,28 @@ df_test = None
 
 @app.route(base + "/init", methods=['POST'])
 def init():
-    target = request.form.get('target')
-    remove_list = request.form.get("remove_list")
-    selected_list = request.form.get("selected_list")
-    model = request.form.get("model")
+    name = request.form.get("model_name")
     branch = request.form.get("branch")
 
-    if var_service.if_branch_exist(model, branch):
-        var_service.update_branch(model, branch, remove_list, selected_list)
-    else:
-        var_service.create_branch(model, branch, target, remove_list, selected_list)
+    result = vs.load_branch(name,branch)
 
-    remove_list = ['name', 'idcard', u'进件id', u'进件时间', u'进件机构', u'借款用途', u'最高月还', u'还款期限', u'销售人员名称', u'申请产品', u'审批意见',
-                   u'处理状态', u'审核报告', u'审批额度', u'建议审批金额', u'合同编号', u'协议生效日期', u'协议失效日期', u'开始还款日期',
-                   u'每周还款日', u'已还款总期数', u'当前期数', u'是否新增M1', u'是否首逾', u'总逾期期数', u'是否逾期',
-                   u'罚息总额', u'滞纳金总额', u'应还总额', u'合同结清状态', u'最大逾期天数', u'芝麻信用评分', 'id', 'max_wob', 'cell_phone_num',
-                   'city', 'phone_silent', 'region', u'客户姓名', u'身份证号', u'信用评分', u'违约概率']
+    # if var_service.if_branch_exist(model, branch):
+    #     var_service.update_branch(model, branch, remove_list, selected_list)
+    # else:
+    #     var_service.create_branch(model, branch, target, remove_list, selected_list)
+
+    remove_list_json = json.loads(json.loads(result[0]["remove_list"]))
+    remove_list = []
+    for o in remove_list_json :
+        remove_list.append(o)
+
     # remove_list.append(target)
 
     # invalid = invalid.split(",")
     # min = request.form.get("min")
     min_val = 0
     df = df_train
-    out = get_init(df, target="bad_4w", invalid=remove_list)
+    out = get_init(df, target=result[0]["model_target"], invalid=remove_list)
 
     out = get_boundary(out, min_val)
     # for
@@ -303,21 +302,25 @@ def upload():
 def parse():
     df = a99.GetDFSummary(df_train)
     data_map = cmm.df_for_html(df)
-    result = var_service.load_branch(model_name)
+    result = vs.load_model(model_name)
     if len(result) < 1:
-        var_service.create_branch(model_name, "master", None, None)
+        vs.create_branch(model_name, "master", None, None)
         result["model_branch"] = ["master"]
-    remove_list = []
+
     branches = []
 
-    for v in result:
-        if v["remove_list"] is not None:
-            remove_list.append(v["remove_list"])
-        branches.append(v["model_branch"])
+    # 只取master
+    v = result[0]
+    if v["remove_list"] is not None:
+        remove_list = v["remove_list"]
 
-        data_map["current_model"] = model_name
-        data_map["branches"] = branches
-        data_map["remove_list"] = remove_list
+
+    for n in result:
+        branches.append(n["model_branch"])
+
+    data_map["current_model"] = model_name
+    data_map["branches"] = branches
+    data_map["remove_list"] = remove_list
     return responseto(data=data_map)
 
 

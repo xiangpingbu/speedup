@@ -5,14 +5,20 @@ import json
 
 from datetime import  datetime
 
-def load_branch(name):
+def load_model(name):
     '''获得对应模型的所有分支'''
     sql = "select model_branch,remove_list from tool_model where model_name = %s and is_deleted = 0"
     result = util.query(sql,(name))
     return result
 
+def load_branch(name,branch):
+    sql = "select model_target,remove_list,selected_list from tool_model where model_name = %s and model_branch= %s"
+    result = util.query(sql,(name,branch))
+    return result
 
-def create_branch(name,branch,target,remove_list = None,selected_list = None):
+
+
+def create_branch(name,branch,target = None,remove_list = None,selected_list = None):
     '''获得对应模型的所有分支'''
     json_remove_list = None if remove_list is None else json.dumps(remove_list,ensure_ascii=False)
     selected_list = None if selected_list is None else json.dumps(selected_list,ensure_ascii=False)
@@ -30,8 +36,8 @@ def update_branch(name,branch,target,remove_list = None,selected_list = None):
     json_remove_list = None if remove_list is None else json.dumps(remove_list,ensure_ascii=False)
     selected_list = None if selected_list is None else json.dumps(selected_list,ensure_ascii=False)
 
-    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s where model_name=%s and model_branch= %s"
-    result = util.execute(sql,(target,json_remove_list,selected_list,name,branch))
+    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s , modify_date= %s where model_name=%s and model_branch= %s"
+    result = util.execute(sql,(target,json_remove_list,selected_list,datetime.now(),name,branch))
     if result > 0 :
         return True
     return False
@@ -42,3 +48,4 @@ def if_branch_exist(name,branch):
     if result > 0:
         return True
     return False
+

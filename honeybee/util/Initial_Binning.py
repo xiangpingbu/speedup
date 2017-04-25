@@ -47,7 +47,7 @@ def cal(df_train,target,invalid = None):
             new_df_map = tree_bin['df_map']
             iv_rank_map[v] = (v, t, new_df_map, boundary_list, var_iv)
 
-    df_iv = df_iv[['var_name', 'iv', 'tree_boundary']]
+    # df_iv = df_iv[['var_name', 'iv', 'tree_boundary']]
     # df_iv.to_excel("df_iv.xlsx", ",", header=True, index=False)
 
     return iv_rank_map

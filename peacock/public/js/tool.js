@@ -55,23 +55,19 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //图形部分位于analyze的div中,初始化前需要将原有数据清空
         $("#analyze").html("");
 
+        var branch = $("#branch").val();
+        var model_name = $("#model").val();
+        var target = $("#target").val();
 
-        var remove_list = [];
-        var target = $('#target').val();
-        /**
-         * 将被选中的variable添加到removeList中
-         */
-        $("#dataframe").find("tbody .checked").each(function (i,n) {
-            remove_list.push($(n).parents("tr").children().eq(1).html());
-        });
 
 
         $.ajax({
             url: host + "/tool/init",
             type: 'post',
             data: {
-                remove_list:JSON.stringify(remove_list),
-                target:JSON.stringify(target)
+                branch:branch,
+                target:target,
+                model_name:model_name
             },
             async: true,
             success: function (result) {
