@@ -14,6 +14,7 @@ import collections
 from util import A99_Functions as a99
 from io import BytesIO
 from flask import send_file
+from service import variable_service as vs
 
 base = '/tool'
 base_path = "./util/"
@@ -28,35 +29,44 @@ def file_init():
     return [train, test]
 
 
-
-#df_list = file_init()
-#df_train = file_init()
-#df_test = file_init()
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-#df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.csv")
-#df_train = None
-#df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+# df_list = file_init()
+# df_train = file_init()
+# df_test = file_init()
+model_name = "df_train"
+df_train = pd.read_excel("/Users/lifeng/Downloads/py/df_train.xlsx")
+# df_train = None
+# df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
 
 
-@app.route(base + "/init")
+@app.route(base + "/init", methods=['POST'])
 def init():
-    target =  request.form.get('target')
-    # invalid = request.form.get('invalid')
-    remove_list = ['name','idcard',u'进件id',u'进件时间',u'进件机构',u'借款用途',u'最高月还',u'还款期限',u'销售人员名称',u'申请产品',u'审批意见',
-        u'处理状态',u'审核报告',u'审批额度',u'建议审批金额',u'合同编号',u'协议生效日期',u'协议失效日期',u'开始还款日期',
-        u'每周还款日', u'已还款总期数',u'当前期数',u'是否新增M1',u'是否首逾',u'总逾期期数',u'是否逾期',
-        u'罚息总额',u'滞纳金总额',u'应还总额',u'合同结清状态',u'最大逾期天数',u'芝麻信用评分','id','max_wob','cell_phone_num',
-        'city','phone_silent','region',u'客户姓名',u'身份证号',u'信用评分',u'违约概率']
-    if target is None:
-        target = "bad_4w"
-    remove_list.append(target)
+    name = request.form.get("model_name")
+    branch = request.form.get("branch")
+
+    if name is None or name == '':
+        name = model_name
+        branch = "master"
+
+    result = vs.load_branch(name,branch)
+
+    # if var_service.if_branch_exist(model, branch):
+    #     var_service.update_branch(model, branch, remove_list, selected_list)
+    # else:
+    #     var_service.create_branch(model, branch, target, remove_list, selected_list)
+
+    remove_list_json = json.loads(json.loads(result[0]["remove_list"]))
+    remove_list = []
+    for o in remove_list_json :
+        remove_list.append(o)
+
+    # remove_list.append(target)
 
     # invalid = invalid.split(",")
     # min = request.form.get("min")
     min_val = 0
     df = df_train
-    init_result = get_init(df, target="bad_4w", invalid=remove_list)
+    init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
 
     out = get_boundary(init_result, min_val)
     # for
@@ -64,6 +74,68 @@ def init():
     # if first_bin["category_t"] == False:
     #     val[0]["min"] = min_val
     return responseto(data=out)
+
+
+# @app.route(base + "/merge", methods=['POST'])
+# def merge():
+#     """归并操作"""
+#     # 要执行合并的variable
+#     var_name = request.form.get('varName')
+#     # 变量的类型
+#     type = request.form.get('type').encode('utf-8')
+#     # 选定的范围
+#     boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
+#     # 总的范围
+#     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
+#     # 获得target
+#     # target = request.form.get('allBoundary').encode('utf-8');
+#     target = request.form.get('target')
+#     if target is None:
+#         target = 'bad_4w'
+#     excepted_column = {var_name}
+#
+#     min_val = 0
+#
+#     result = None
+#     type_bool = False
+#     df = None
+#     if type == 'False':
+#         # 将字符转换为list
+#         boundary_list = map(eval, boundary.split("&"))
+#         all_boundary_list = []
+#         # 将字符转换为list,nan替换为np.nan
+#         for a in all_boundary.split("&"):
+#             if a != 'nan':
+#                 a = float(a)
+#             else:
+#                 a = np.nan
+#             all_boundary_list.append(a)
+#         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
+#         boundary_list.append(np.nan)
+#         selected_list = boundary_list
+#
+#         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+#                    'category_t']
+#     else:
+#         type_bool = True
+#         temp = []
+#         for s in boundary.split("&"):
+#             temp.extend(map(cmm.transfer, s.split("|")))
+#
+#         selected_list = [temp]
+#         for s in all_boundary.split("&"):
+#             selected_list.append(map(cmm.transfer, s.split("|")))
+#
+#         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+#                    'category_t']
+#
+#     result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
+#                        expected_column=excepted_column)  # 获得合并的结果
+#     df = pd.DataFrame(result[0],
+#                       columns=columns)
+#
+#     data = get_merged(var_name, df, min_val)
+#     return responseto(data=data)
 
 
 @app.route(base + "/divide", methods=['POST'])
@@ -135,7 +207,7 @@ def divide():
         # 删除要被分裂的项
         del list[data_map["selectedIndex"]]
 
-        out = get_init(df,target=target,invalid=[])
+        out = get_init(df, target=target, invalid=[])
         bound_list = get_divide_caterotical_bound(out, name)
         # 被分裂的项的下标
         index = data_map["selectedIndex"]
@@ -222,14 +294,16 @@ def upload():
     if request.method == 'POST':
         global df_train
         global df_test
+        global model_name
         files = request.files.getlist("file[]")
         for file in files:
             filename = secure_filename(file.filename)
+            model_name = filename[0:filename.index(".")]
             print filename
             if filename == 'df_test.xlsx':
-                df_test = pd.read_excel(file,encoding="utf-8")
+                df_test = pd.read_excel(file, encoding="utf-8")
             elif filename == 'df_train.xlsx':
-                df_train = pd.read_excel(file,encoding="utf-8")
+                df_train = pd.read_excel(file, encoding="utf-8")
                 # df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
@@ -238,6 +312,26 @@ def upload():
 def parse():
     df = a99.GetDFSummary(df_train)
     data_map = cmm.df_for_html(df)
+    result = vs.load_model(model_name)
+    if len(result) < 1:
+        vs.create_branch(model_name, "master", None, None)
+        result["model_branch"] = ["master"]
+
+    branches = []
+
+    # 只取master
+    v = result[0]
+    if v["remove_list"] is not None:
+        remove_list = v["remove_list"]
+        data_map["target"] = v["model_target"]
+
+
+    for n in result:
+        branches.append(n["model_branch"])
+
+    data_map["current_model"] = model_name
+    data_map["branches"] = branches
+    data_map["remove_list"] = remove_list
     return responseto(data=data_map)
 
 
@@ -325,6 +419,9 @@ def get_init(df=df_train, target=None, invalid=None):
         # var_type = c[1]
         woe_map = c[2]
         boundary = c[3]
+        iv = c[4]
+        var_content = collections.OrderedDict()
+        var_content['iv'] = iv
         for index, row in woe_map.iterrows():  # 获取每行的index、row
             for col_name in woe_map.columns:
                 if isinstance(row[col_name], np.ndarray):
@@ -337,7 +434,8 @@ def get_init(df=df_train, target=None, invalid=None):
 
             subList.append(row_data)
             row_data = collections.OrderedDict()
-        out[var_name] = subList
+        var_content['var_table'] = subList
+        out[var_name] = var_content
     return out
 
 
@@ -350,7 +448,7 @@ def get_boundary(out, min_val=0):
     for val in data:
         index = 0
         last_bin = None
-        for bin_row in val[1]:
+        for bin_row in val[1]['var_table']:
             if bin_row["type"] == "Numerical":
                 index += 1
                 if index == 1:

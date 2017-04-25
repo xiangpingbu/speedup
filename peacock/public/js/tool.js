@@ -2,12 +2,13 @@ var height = 500,
     width = 500,
     margin = 25;
 
-//var host = "http://192.168.31.42:8091";
-var host = "http://localhost:8091";
+var host = "http://192.168.31.68:8091";
+
 var controlMap = {};
 
 var padding = {left: 25, right: 30, top: 5, bottom: 20};
 
+//numerical的列的排布
 var num_columnMap =
     {
         0: "bin_num",
@@ -24,7 +25,7 @@ var num_columnMap =
         11: "type"
     };
 
-
+//categorical的列的排布
 var cate_columnMap =
     {
         0: "bin_num",
@@ -42,41 +43,79 @@ var cate_columnMap =
 var xScale, yScale;
 
 define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
+    /**
+     * 数据图形化初始化
+     * 展示选中的variable的woe值分布
+     */
     function init() {
+        //注册右下方按钮的点击事件
         tool_button.output();
+        //提醒等待的样式
         $(".spinner").css('display', 'block');
-        d3.json("/tool/init", function (error, result) {
-            var num = 0;
+        //图形部分位于analyze的div中,初始化前需要将原有数据清空
+        $("#analyze").html("");
 
-            var initList = [];
-            for (var key in result.data) {
-                var table_head = [];
-                for (var subKey in result.data[key][0]) {
-                    table_head.push(subKey);
+        var branch = $("#branch").val();
+        var model_name = $("#model").val();
+        if (branch != null && model_name!=null) {
+            localStorage.setItem("branch",branch);
+            localStorage.setItem("model_name",model_name);
+        } else {
+            branch = localStorage.getItem("branch");
+            model_name = localStorage.getItem("model_name");
+        }
+
+
+        $.ajax({
+            url: host + "/tool/init",
+            type: 'post',
+            data: {
+                branch:branch,
+                model_name:model_name
+            },
+            async: true,
+            success: function (result) {
+                var num = 0;
+                var initList = [];
+                //通过变量名获取数据
+                for (var valName in result.data) {
+                    var varData = result.data[valName]["var_table"];
+                    var iv = result.data[valName]["iv"];
+                    var table_head = [];
+                    for (var subKey in varData[0]) {
+                        table_head.push(subKey);
+                    }
+                    var svg = initPanel(valName,iv, num, table_head);
+                    //画出x轴
+                    renderXAxis(svg, num, varData);
+                    //画出y轴
+                    renderYAxis(svg, num, varData);
+                    //绘制坐标轴内的bar和table
+                    renderBody(svg, varData, num);
+                    initList.push(num);
+                    num++;
                 }
-                var svg = initPanel(key, num, table_head);
-                renderXAxis(svg, num, result.data[key]);
-                renderYAxis(svg, num, result.data[key]);
-                renderBody(svg, result.data[key], num);
-                initList.push(num);
-                num++;
+                //记录行数
+                $("#rowNum").val(num);
+                //设置table内的标签可以点击
+                tool_button.changeTd();
+                //初始化按钮,有合并和分裂的操作
+                buttonInit(initList);
+                $(".spinner").css('display', 'none');
+
             }
-            //记录行数
-            $("#rowNum").val(num);
-            tool_button.changeTd();
-            buttonInit(initList);
-            $(".spinner").css('display', 'none');
         });
     }
 
-    function initPanel(rowName, num, table_head) {
+    function initPanel(rowName,iv, num, table_head) {
         d3.select("body")
-            .select("div").append("h5").text(rowName);
+            .select("div").append("h5").text(rowName+"-------"+iv);
         //设置画布
         svg = d3.select("body")
             .select("div")
             .append("div")
             .attr("id", "svg_" + num)
+            .style("width","2000")
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
@@ -361,7 +400,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var min = Math.min(start.index, end.index);
                 var max = Math.max(start.index, end.index);
                 //var isNum = type.indexOf("F") >= 0;
-                var isNum = (type == "Numerical")
+                var isNum = (type == "Numerical");
                 //判断应该从哪一列获取相应的值
                 var valIndex;
                 if (isNum) valIndex = minBoundIndex;
@@ -387,33 +426,34 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         valIndex = minBoundIndex;
                     }
                     else valIndex = categoricalIndex;
+
                     list = list + ($(childTrs.get(iterList[n])).children("td").get(valIndex).innerHTML) + ("&");
                 }
                 //去除末尾的&符号
                 list = list.substring(0, list.length - 1);
 
 
-                    var tdVal;
-                    //numerical按照区间筛选
-                    if (isNum) {
-                        for (var index = 0; index < childTrs.length; index++) {
-                            //整个区间的大部分从mix_bound列中得到,除了inf一列
-                            // if (index == childTrs.length - 2) {
-                            //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
-                            // } else {
-                                tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
-                            // }
-                            wholeList = wholeList + (tdVal) + ("&");
-                        }
-                    }else {
-                        for (var b = 0;  b< childTrs.length; b++) {
-                            //获取categorical的除选中以外的值
-                            debugger;
-                            if (b != min && b != max) {
-                                wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
-                            }
+                var tdVal;
+                //numerical按照区间筛选
+                if (isNum) {
+                    for (var index = 0; index < childTrs.length; index++) {
+                        //整个区间的大部分从mix_bound列中得到,除了inf一列
+                        // if (index == childTrs.length - 2) {
+                        //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
+                        // } else {
+                        tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
+                        // }
+                        wholeList = wholeList + (tdVal) + ("&");
+                    }
+                } else {
+                    for (var b = 0; b < childTrs.length; b++) {
+                        //获取categorical的除选中以外的值
+                        debugger;
+                        if (b != min && b != max) {
+                            wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
                         }
                     }
+                }
 
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');
@@ -508,7 +548,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d, i) {//绑定id
+                .attr("id", function (d,i) {//绑定id
                     return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
@@ -536,8 +576,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
+                .attr("id", function (d,i) {//绑定id
+                    return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
                 .attr("x", function (d) {

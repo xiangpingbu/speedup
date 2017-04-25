@@ -27,7 +27,7 @@ def cal(df_train,target,invalid = None):
     iv_rank_map = {}
 
     #vars =[u'信用卡额度']
-    vars =[u'工作年限']
+    # vars =[u'工作年限']
     #vars =['juxinli_ind']
     for v in vars:
         if v not in invalid_vars_list:
@@ -51,7 +51,7 @@ def cal(df_train,target,invalid = None):
             new_df_map = tree_bin['df_map']
             iv_rank_map[v] = (v, t, new_df_map, boundary_list, var_iv)
 
-    df_iv = df_iv[['var_name', 'iv', 'tree_boundary']]
+    # df_iv = df_iv[['var_name', 'iv', 'tree_boundary']]
     # df_iv.to_excel("df_iv.xlsx", ",", header=True, index=False)
 
     return iv_rank_map
