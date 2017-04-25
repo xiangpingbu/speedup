@@ -7,84 +7,6 @@ from sklearn import tree
 # from pylab import *
 
 
-def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3):
-    '''
-    porcess single variable
-    '''
-    minLeaf=int(len(df) * 0.05)
-    for nv in nullValue:
-        df[var] = df[var].replace(nv, np.nan)
-
-    org_var = var
-    category_t = False
-
-    if varType in ['object', 'str']:
-        df = transform_categorical_to_woe(df, var, target)
-        var += '_woe'
-        category_t = True
-
-    '''
-    if varType in ['object', 'str'] or uniqV <= uniqCap:
-        df = transform_categorical_to_woe(df, var, target)
-        var += '_woe'
-        category_t = True
-        varType = 'str'
-    '''
-    ss = decision_tree_bin(df, var, target, varType, tree_dep=treeDep, min_leaf=minLeaf)
-
-    #print ss['df_woe'].columns
-    var += '_tree_bin'
-    df_cur = ss['df_bin']
-    df_cur[var] = df_cur['bad_hood_woe']
-    df_cur['bad'] = df_cur[target]
-    df_cur['good'] = 1 - df_cur[target]
-    if category_t:
-        org_var_woe = org_var + '_woe'
-        df_cur_grp = df_cur.groupby(var)
-        df_mapping = pd.DataFrame(
-            {'total': df_cur_grp.size(),
-             org_var: df_cur_grp[org_var].unique(),
-             'bads': df_cur_grp['bad'].sum(),
-             'goods': df_cur_grp['good'].sum(),
-             'bad_rate': (df_cur_grp['bad'].sum().astype(float)/df_cur_grp.size())
-             }).reset_index()
-        df_mapping['bad_rate'] = df_mapping['bad_rate'].apply('{0:.2%}'.format)
-    else:
-        df_cur_grp = df_cur.groupby(var, sort=True)
-        #df_mapping = df_group[org_var].agg({'max': np.max, 'min': np.min, 'total': np.size, 'bads': np.bad.sum()}).reset_index()
-        df_mapping = pd.DataFrame(
-            {'total': df_cur_grp.size(),
-             'max': df_cur_grp[org_var].max(),
-             'min': df_cur_grp[org_var].min(),
-             'bads': df_cur_grp['bad'].sum(),
-             'goods': df_cur_grp['good'].sum(),
-             'bad_rate': (df_cur_grp['bad'].sum().astype(float) / df_cur_grp.size())
-             }).reset_index()
-        df_mapping['bad_rate'] = df_mapping['bad_rate'].apply('{0:.2%}'.format)
-        #print df_mapping
-
-
-    df_mapping['category_t'] = category_t
-    df_mapping.rename(columns={var: 'woe'}, inplace=True)
-    df_mapping['total_perc'] = (df_mapping.total/float(df_mapping.total.sum())).apply('{0:.2%}'.format)
-
-    if category_t:
-        df_mapping.sort_values(['total'], ascending=[1], inplace=True)
-        df_mapping['bin_num'] = range(len(df_mapping))
-        df_mapping = df_mapping[['bin_num', org_var, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'category_t']]
-    else:
-        # df_mapping['max'] = df_mapping['max'].apply('{0:.15%}'.format())
-        df_mapping.sort_values(['max'], ascending=[1], inplace=True)
-        df_mapping['bin_num'] = range(len(df_mapping))
-        df_mapping['max'] = df_mapping['max'].apply('{:.15f}'.format)
-        df_mapping['min'] = df_mapping['min'].apply('{:.15f}'.format)
-        df_mapping = df_mapping[['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'category_t']]
-
-    df_mapping['index'] = range(len(df_mapping))
-    df_mapping = df_mapping.set_index(['index'])
-
-    return {'IV': sum(ss['df_woe'].IV), 'category_t': category_t, 'df_map': df_mapping}
-
 
 def transform_categorical_to_woe(df, var, target, null_value='NaNNaN'):
     '''
@@ -154,8 +76,8 @@ def get_categorical_woe(df, var, target, null_value=['NaNNaN']):
     agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
 
     agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
-    # agg['min'] = agg['min'].apply('{:.15f}'.format)
-    # agg['max'] = agg['max'].apply('{:.15f}'.format)
+    #agg['min'] = agg['min'].apply('{:.15f}'.format)
+    #agg['max'] = agg['max'].apply('{:.15f}'.format)
 
     agg.sort_values(['woe'], ascending=[1], inplace=True)
     agg['ks'] = ((agg.bads / ddt.bad.sum()).cumsum() - (agg.goods / ddt.good.sum()).cumsum())
@@ -226,13 +148,6 @@ def decision_tree_bin(df, var, target, varType, tree_dep=3, min_leaf=200):
     dt = DecisionTreeClassifier(criterion='entropy', max_depth=tree_dep, min_samples_leaf=min_leaf)
     df_non_null_tree = dt.fit(df_non_null[[var]], df_non_null[target])
 
-    # visualize the tree
-    ''''
-    dot_data = StringIO()
-    tree.export_graphviz(df_non_null_tree, out_file=dot_data)
-    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-    graph.write_pdf(str(var) + ".pdf")
-    '''
 
     df_non_null_predict = pd.DataFrame(df_non_null_tree.predict_proba(df_non_null[[var]]))
     df_non_null_predict.rename(columns={0: 'good_hood', 1: 'bad_hood'}, inplace=True)
@@ -268,31 +183,23 @@ def decision_tree_bin(df, var, target, varType, tree_dep=3, min_leaf=200):
 
     return {'df_woe': df_woe, 'df_bin': df_result}
 
-def cmp(x,y):
-    if str(x)=='nan':
-        return 1
-    if str(y) == 'nan':
-        return -1
-    if x<y:
-        return -1
-    if x>y:
-        return 1
-    return 0
 
-def get_manual_bin_numeric(df, var, target, boundary_list,pre):
+
+def get_manual_bin_numeric(df, var, target, boundary_list, pre):
     # process single variable
     # sort the boundary_list
-    bl = sorted(boundary_list,cmp)
+    print boundary_list
+    bl = sorted(boundary_list, cmp)
     df_cur = df[[var, target]].copy()
 
     bin_map = get_boundary_mapping(bl)
+    print bin_map
     bin_map_reverse = get_boundary_mapping_reverse(bl, pre)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
     df_woe = get_categorical_woe(df_cur, 'bin_num', target)
     df_woe['min'] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_min(bin_map_reverse, x)).apply('{:.15f}'.format)
     df_woe['max'] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_max(bin_map_reverse, x)).apply('{:.15f}'.format)
     df_woe['category_t'] = 'False'
-
 
     df_result = df_cur
     df_result['min'] = df_cur['bin_num'].apply(lambda x: bin_reverse_assign_min(bin_map_reverse, x))
@@ -333,36 +240,24 @@ def get_manual_bin_categorical(df, var, target, bin_list):
 def bin_assign_categorical(bin_list, v):
     for index, bin in enumerate(bin_list):
         # null value assign -1 bin number
-        if v in bin:
+        if str(v) in bin:
             return index
     return -1
 
 
-def get_boundary_mapping(boundary_list):
-    # as a list to keep the order: low to high
-    return zip(boundary_list, range(0, len(boundary_list)))
 
-
-def get_boundary_mapping_reverse(max_boundary_list,pre=0):
+def get_min_boundary_mapping_reverse(min_boundary_list,pre=0):
     max_min_boundary = []
     # pre = np.nan
-    for mb in max_boundary_list:
-        max_min_boundary.append((pre, mb))
-        pre = mb
+
+    for index,mb in enumerate(min_boundary_list):
+        if index < len(min_boundary_list)-1:
+            max_min_boundary.append((min_boundary_list[index], min_boundary_list[index+1]))
     max_min_boundary.append((pre, np.nan))
 
     #    max inclusive, min exclusive
     return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
 
-
-def bin_assign(bin_map, v):
-    for key, value in bin_map:
-        # null value assign -1 bin number
-        # if np.isnan(v):
-        #     return -1
-        if v <= key:
-            return value
-    return value
 
 
 def bin_reverse_assign_max(bin_map_reserve, v):
@@ -538,7 +433,7 @@ def single_numerical(df_train, df_test, my_var, my_target, my_boundary_list):
 
 def single_numerical_no_html(df_train, type, my_var, my_target, my_boundary_list):
     if type is False:
-        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list,0)
+        my_result_0 = get_manual_bin_numeric(df_train, my_var, my_target, my_boundary_list, 0)
     else:
         my_result_0 = get_manual_bin_categorical(df_train,my_var,my_target,my_boundary_list)
     my_result = my_result_0['df_woe']
@@ -549,6 +444,7 @@ def single_numerical_no_html(df_train, type, my_var, my_target, my_boundary_list
     # df_train_woe = df_train.join(my_result_all[new_name])
     #    print my_result
     return [my_result,my_result_all]
+
 
 def single_categorical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_var_type = str(df_train[my_var].dtype)
@@ -600,3 +496,222 @@ def single_categorical(df_train, df_test, my_var, my_target, my_boundary_list):
     my_html_file.write("<img src='%s' width='450px' height='300px' />" % pic_path)
     my_html_file.write('<hr>')
     return [df_train_woe, df_test_woe]
+
+# print '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.encode("utf8")
+a =  '\xe4\xbb\xa3\xe4\xbb\x98\xe5\xb7\xa5\xe8\xb5\x84\xe6\x9c\x88\xe8\x96\xaa'.decode('utf8')
+
+#********************************************
+
+#
+# given a boundary_list, return a table with binning result and woe
+#
+def get_single_variable_bin(df_train, type, my_var, my_target, boundary_list):
+    #need to adjust later
+    if type is False:
+        type = 'Numerical'
+    else:
+        type = 'Categorical'
+
+    if type == 'Numerical':
+        bin_result = get_single_variable_bin_numeric(df_train, my_var, my_target, boundary_list)
+    else:
+        bin_result = get_single_variable_bin_categorical(df_train,my_var,my_target, boundary_list)
+
+    return bin_result
+
+
+def get_single_variable_bin_numeric(df, var, target, boundary_list):
+    # process single variable
+    # sort the boundary_list
+    boundary_list_high_to_low_sort = sorted(boundary_list, cmp_with_nan)
+    df_cur = df[[var, target]].copy()
+    bin_map = get_boundary_mapping(boundary_list_high_to_low_sort)
+    df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
+    df_woe = get_single_var_bin_woe(df_cur, var, 'bin_num', target, boundary_list)
+    df_woe['type'] = 'Numerical'
+#    df_woe.sort(['bin_num'], ascending=[1], inplace=True)
+
+    return df_woe
+
+
+def get_single_variable_bin_categorical(df, var, target, bin_list):
+    # process single variable
+    df_cur = df[[var, target]].copy()
+    df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign_categorical(bin_list, x))
+    df_woe = get_categorical_woe(df_cur, 'bin_num', target)
+    df_woe[var] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_categorical(bin_list, x))
+    df_woe['category_t'] = 'True'
+
+
+    df_result = df_cur
+    df_result['category_t'] = 'True'
+    df_woe.sort(['bin_num'], ascending=[1], inplace=True)
+    df_final = append_woe(df_result, 'bin_num', df_woe, woe_var='woe')
+    df_final[var+'_woe'] = df_final['bin_num_woe']
+    del df_final['bin_num_woe']
+
+    return {'df_woe': df_woe, 'df_result': df_final}
+
+
+def cmp_with_nan(x, y):
+    if str(x) == 'nan':
+        return 1
+    if str(y) == 'nan':
+        return -1
+    if x < y:
+        return 1
+    if x > y:
+        return -1
+    return 0
+
+
+def get_boundary_mapping(boundary_list):
+    # as a list to keep the order: high to low, nan as the last
+    return zip(boundary_list, range(0, len(boundary_list))[::-1])
+
+
+def get_boundary_mapping_reverse(max_boundary_list,pre=0):
+    max_min_boundary = []
+    # pre = np.nan
+    for mb in max_boundary_list:
+        max_min_boundary.append((pre, mb))
+        pre = mb
+    max_min_boundary.append((pre, np.nan))
+
+    #    max inclusive, min exclusive
+    return dict(zip(range(0, len(max_min_boundary)), max_min_boundary))
+
+
+def bin_assign(bin_map, v):
+    #sort my order to high to low accroding to the key
+    for key, value in bin_map:
+        if v >= key:
+            return value
+    return 0
+
+
+def get_single_var_bin_woe(df, var_ori, var_bin, target, boundary_list):
+    """
+    assume: good is 0 and bad is 1
+    """
+
+    delta_1 = 0.00001
+    ddt = df[[var_ori, var_bin, target]].copy()
+    ddt['good'] = 1 - ddt[target]
+    ddt['bad'] = ddt[target]
+    ddt['var_ori'] = ddt[var_ori]
+
+    grouped = ddt.groupby(var_bin)
+    agg_bad = pd.DataFrame([grouped.sum().bad.index, grouped.sum().bad]).transpose()
+    agg_good = pd.DataFrame([grouped.sum().good.index, grouped.sum().good]).transpose()
+    agg_bad.rename(columns={0: var_bin, 1: 'bads'}, inplace=True)
+    agg_good.rename(columns={0: var_bin, 1: 'goods'}, inplace=True)
+
+    agg_min_max = pd.DataFrame([grouped.sum().var_ori.index, grouped.min().var_ori, grouped.max().var_ori]).transpose()
+    agg_min_max.rename(columns={0: var_bin, 1: 'min', 2: 'max'}, inplace=True)
+
+    agg = pd.merge(agg_bad, agg_good, on=var_bin, how='outer')
+    agg = pd.merge(agg, agg_min_max, on=var_bin, how='outer')
+    agg['bads'] = np.where(pd.isnull(agg.bads), 0, agg.bads)
+    agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
+    agg['total'] = agg.bads + agg.goods
+
+    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
+    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+    agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
+    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+    agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
+
+    agg.sort_values(['bin_num'], ascending=[1], inplace=True)
+    #agg['ks'] = ((agg.bads / ddt.bad.sum()).cumsum() - (agg.goods / ddt.good.sum()).cumsum())
+    agg['total_perc'] = (agg.total / float(ddt.bad.sum() + ddt.good.sum())).apply('{0:.2%}'.format)
+    agg['min_boundary'] = boundary_list[:-1]
+
+    min_shift = agg['min'][1:].append(pd.Series(np.inf))
+    min_shift = min_shift.reset_index()
+    del min_shift['index']
+    agg['max_boundary'] = min_shift
+    agg['max_boundary'] = agg['max_boundary']
+    del agg['oddsrt']
+
+    return agg
+
+
+def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=0.05):
+    '''
+    porcess single variable
+    '''
+
+    minLeaf=int(len(df) * minLeafRate)
+    for nv in nullValue:
+        df[var] = df[var].replace(nv, np.nan)
+
+    org_var = var
+    type = 'Numerical'
+    #category_t = False
+
+    if varType in ['object', 'str']:
+        df = transform_categorical_to_woe(df, var, target)
+        var += '_woe'
+        type = 'Categorical'
+
+    ss = decision_tree_bin(df, var, target, varType, tree_dep=treeDep, min_leaf=minLeaf)
+
+    var += '_tree_bin'
+    df_cur = ss['df_bin']
+    df_cur[var] = df_cur['bad_hood_woe']
+    df_cur['bad'] = df_cur[target]
+    df_cur['good'] = 1 - df_cur[target]
+    if type == 'Categorical':
+        org_var_woe = org_var + '_woe'
+        df_cur_grp = df_cur.groupby(var)
+        df_mapping = pd.DataFrame(
+            {'total': df_cur_grp.size(),
+             org_var: df_cur_grp[org_var].unique(),
+             'bads': df_cur_grp['bad'].sum(),
+             'goods': df_cur_grp['good'].sum(),
+             'bad_rate': (df_cur_grp['bad'].sum().astype(float)/df_cur_grp.size())
+             }).reset_index()
+        df_mapping['bad_rate'] = df_mapping['bad_rate'].apply('{0:.2%}'.format)
+    else:
+        df_cur_grp = df_cur.groupby(var)
+        #df_mapping = df_group[org_var].agg({'max': np.max, 'min': np.min, 'total': np.size, 'bads': np.bad.sum()}).reset_index()
+        df_mapping = pd.DataFrame(
+            {'total': df_cur_grp.size(),
+             'max': df_cur_grp[org_var].max(),
+             'min': df_cur_grp[org_var].min(),
+             'bads': df_cur_grp['bad'].sum(),
+             'goods': df_cur_grp['good'].sum(),
+             'bad_rate': (df_cur_grp['bad'].sum().astype(float) / df_cur_grp.size())
+             }).reset_index()
+        df_mapping['bad_rate'] = df_mapping['bad_rate'].apply('{0:.2%}'.format)
+
+    df_mapping['type'] = type
+    df_mapping.rename(columns={var: 'woe'}, inplace=True)
+    df_mapping['total_perc'] = (df_mapping.total/float(df_mapping.total.sum())).apply('{0:.2%}'.format)
+
+    if type == 'Categorical':
+        df_mapping.sort_values(['total'], ascending=[1], inplace=True, na_position='first')
+        df_mapping['bin_num'] = range(len(df_mapping))
+        df_mapping = df_mapping[['bin_num', org_var, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'type']]
+    else:
+        # df_mapping['max'] = df_mapping['max'].apply('{0:.15%}'.format())
+        df_mapping.sort_values(['min'], ascending=[1], inplace=True, na_position='first')
+        if df_mapping['min'].isnull().values.any():
+            df_mapping['bin_num'] = range(len(df_mapping))
+        else:
+            df_mapping['bin_num'] = [i+1 for i in range(len(df_mapping))]
+        # put the nan to the first row
+        #reindex_list = [i+1 for i in range(len(df_mapping)-1)]
+        #reindex_list.append(0)
+        #df_mapping['bin_num'] = reindex_list
+        #df_mapping.sort_values(['bin_num'], ascending=[1], inplace=True)
+        df_mapping['max'] = df_mapping['max'].apply('{:.15f}'.format)
+        df_mapping['min'] = df_mapping['min'].apply('{:.15f}'.format)
+        df_mapping = df_mapping[['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'type']]
+
+    df_mapping['index'] = range(len(df_mapping))
+    df_mapping = df_mapping.set_index(['index'])
+
+    return {'IV': sum(ss['df_woe'].IV), 'type': type, 'df_map': df_mapping}
+
