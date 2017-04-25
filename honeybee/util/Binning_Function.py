@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
+import copy
 from sklearn.externals.six import StringIO
 import pydotplus
 from sklearn import tree
@@ -523,12 +524,21 @@ def get_single_variable_bin(df_train, type, my_var, my_target, boundary_list):
 
 def get_single_variable_bin_numeric(df, var, target, boundary_list):
     # process single variable
+    boundary_list_with_nan = copy.copy(boundary_list)
     # sort the boundary_list
-    boundary_list_high_to_low_sort = sorted(boundary_list, cmp_with_nan)
+    if not np.isnan(boundary_list).any():
+        boundary_list_with_nan.append(np.nan)
+
+    #[15,5,2, nan]
+    boundary_list_high_to_low_sort = sorted(boundary_list_with_nan, cmp_with_nan_reverse)
+
+    #[nan, 1,3,5] or [1,3,5]
+    boundary_list_low_to_high_sort = sorted(boundary_list, cmp_with_nan)
     df_cur = df[[var, target]].copy()
     bin_map = get_boundary_mapping(boundary_list_high_to_low_sort)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
-    df_woe = get_single_var_bin_woe_numerical(df_cur, var, 'bin_num', target, boundary_list)
+    #df_woe = get_single_var_bin_woe_numerical(df_cur, var, 'bin_num', target, boundary_list)
+    df_woe = get_single_var_bin_woe_numerical(df_cur, var, 'bin_num', target, boundary_list_low_to_high_sort)
     df_woe['type'] = 'Numerical'
 #    df_woe.sort(['bin_num'], ascending=[1], inplace=True)
 
@@ -547,7 +557,7 @@ def get_single_variable_bin_categorical(df, var, target, bin_list):
     return df_woe
 
 
-def cmp_with_nan(x, y):
+def cmp_with_nan_reverse(x, y):
     if str(x) == 'nan':
         return 1
     if str(y) == 'nan':
@@ -556,6 +566,18 @@ def cmp_with_nan(x, y):
         return 1
     if x > y:
         return -1
+    return 0
+
+
+def cmp_with_nan(x, y):
+    if str(x) == 'nan':
+        return -1
+    if str(y) == 'nan':
+        return 1
+    if x < y:
+        return -1
+    if x > y:
+        return 1
     return 0
 
 
@@ -619,7 +641,8 @@ def get_single_var_bin_woe_numerical(df, var_ori, var_bin, target, boundary_list
     agg.sort_values(['bin_num'], ascending=[1], inplace=True)
     #agg['ks'] = ((agg.bads / ddt.bad.sum()).cumsum() - (agg.goods / ddt.good.sum()).cumsum())
     agg['total_perc'] = (agg.total / float(ddt.bad.sum() + ddt.good.sum())).apply('{0:.2%}'.format)
-    agg['min_boundary'] = boundary_list[:-1]
+    #agg['min_boundary'] = boundary_list[:-1]
+    agg['min_boundary'] = boundary_list
 
     min_shift = agg['min'][1:].append(pd.Series(np.inf))
     min_shift = min_shift.reset_index()

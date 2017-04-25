@@ -88,34 +88,38 @@ def divide():
     df = pd.DataFrame(df_train, columns={target, name})
 
     bound_list = None
-    if data_map["selected"]["category_t"] == 'False':
+    if data_map["selected"]["type"] == 'Numerical':
         # 根据min和max的边界去筛选数据
-        min = data_map["selected"]["min_bound"]
-        max = data_map["selected"]["max_bound"]
-        for index, row in df.iterrows():
-            if float(min) <= float(row[name]) < float(max):
-                pass
-            else:
-                df.drop(index, inplace=True)
+        min = data_map["selected"]["min_boundary"]
+        max = data_map["selected"]["max_boundary"]
+        df = df[(df[name].astype(float) >= float(min)) & (df[name].astype(float) < float(max))]
 
-        out = get_init(df,target=target,invalid=[])
-        bound_list = get_divide_max_bound(out)
+        #for index, row in df.iterrows():
+        #    if float(min) <= float(row[name]) < float(
+        # max):
+        #        pass
+        #    else:
+        #        df.drop(index, inplace=True)
+
+        out = get_init(df, target=target, invalid=[])
+        bound_list = get_divide_min_bound(out)
 
         list = data_map["table"]
         # 删除要被分裂的项
         del list[data_map["selectedIndex"]]
 
         for v in list:
-            bound_list.append(float(v["max"]))
-        bound_list.append(np.nan)
+            bound_list.append(float(v["min_boundary"]))
+        #bound_list.append(np.nan)
 
-        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
-                           ,target=target,expected_column={name})
-        columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-                   'category_t']
-        df = pd.DataFrame(result[0],
+        result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
+                           , target=target, expected_column={name})
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'type']
+        df = pd.DataFrame(result,
                           columns=columns)
-        data = get_merged(name, df, min_val)
+        data = generate_response(name, df)
+        #data = get_merged(name, df, min_val)
 
         return responseto(data=data)
 
@@ -138,14 +142,16 @@ def divide():
         # 将分裂的结果加入原有的列表中
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
-        result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
-                           ,target=target,expected_column={name})
+        result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
+                           ,target=target, expected_column={name})
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-                   'category_t']
-        df = pd.DataFrame(result[0],
+                   'type']
+        df = pd.DataFrame(result,
                           columns=columns)
-        data = get_merged(name, df, min_val)
-        return responseto(data=data)
+
+        data = generate_response(name, df)
+        #data = get_merged(name, df, min_val)
+        return responseto(data = data)
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -376,6 +382,14 @@ def get_divide_max_bound(out):
             bound.append(float(val["max_boundary"]))
     return bound
 
+def get_divide_min_bound(out):
+    out = get_boundary(out)
+
+    bound = []
+    for key, list in out.items():
+        for val in list:
+            bound.append(float(val["min"]))
+    return bound
 
 def get_divide_caterotical_bound(out, name):
     bound = []
@@ -490,7 +504,7 @@ def merge():
                 a = np.nan
             all_boundary_list.append(a)
         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
-        boundary_list.append(np.nan)
+        #boundary_list.append(np.nan)
         selected_list = boundary_list
 
         columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
