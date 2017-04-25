@@ -3,8 +3,8 @@ import os
 
 from Binning_Function import *
 
-global MAX_CARDINALITY
-MAX_CARDINALITY = 10
+#global MAX_CARDINALITY
+#MAX_CARDINALITY = 10
 
 
 def cal(df_train,target,invalid = None):
@@ -26,8 +26,9 @@ def cal(df_train,target,invalid = None):
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
-    vars =[u'信用卡额度']
-    #vars =[u'工作年限']
+    #vars =[u'信用卡额度']
+    vars =['province']
+    #vars =['juxinli_ind']
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)

@@ -242,6 +242,7 @@ def bin_assign_categorical(bin_list, v):
         # null value assign -1 bin number
         if str(v) in bin:
             return index
+    # should never reach this line
     return -1
 
 
@@ -515,7 +516,7 @@ def get_single_variable_bin(df_train, type, my_var, my_target, boundary_list):
     if type == 'Numerical':
         bin_result = get_single_variable_bin_numeric(df_train, my_var, my_target, boundary_list)
     else:
-        bin_result = get_single_variable_bin_categorical(df_train,my_var,my_target, boundary_list)
+        bin_result = get_single_variable_bin_categorical(df_train, my_var, my_target, boundary_list)
 
     return bin_result
 
@@ -527,7 +528,7 @@ def get_single_variable_bin_numeric(df, var, target, boundary_list):
     df_cur = df[[var, target]].copy()
     bin_map = get_boundary_mapping(boundary_list_high_to_low_sort)
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign(bin_map, x))
-    df_woe = get_single_var_bin_woe(df_cur, var, 'bin_num', target, boundary_list)
+    df_woe = get_single_var_bin_woe_numerical(df_cur, var, 'bin_num', target, boundary_list)
     df_woe['type'] = 'Numerical'
 #    df_woe.sort(['bin_num'], ascending=[1], inplace=True)
 
@@ -538,19 +539,12 @@ def get_single_variable_bin_categorical(df, var, target, bin_list):
     # process single variable
     df_cur = df[[var, target]].copy()
     df_cur['bin_num'] = df_cur[var].apply(lambda x: bin_assign_categorical(bin_list, x))
-    df_woe = get_categorical_woe(df_cur, 'bin_num', target)
+    df_woe = get_single_var_bin_woe_categorical(df_cur, 'bin_num', target)
     df_woe[var] = df_woe['bin_num'].apply(lambda x: bin_reverse_assign_categorical(bin_list, x))
-    df_woe['category_t'] = 'True'
+    df_woe['type'] = 'Categorical'
+    df_woe['bin_num'] = range(0, len(df_woe))
 
-
-    df_result = df_cur
-    df_result['category_t'] = 'True'
-    df_woe.sort(['bin_num'], ascending=[1], inplace=True)
-    df_final = append_woe(df_result, 'bin_num', df_woe, woe_var='woe')
-    df_final[var+'_woe'] = df_final['bin_num_woe']
-    del df_final['bin_num_woe']
-
-    return {'df_woe': df_woe, 'df_result': df_final}
+    return df_woe
 
 
 def cmp_with_nan(x, y):
@@ -590,7 +584,7 @@ def bin_assign(bin_map, v):
     return 0
 
 
-def get_single_var_bin_woe(df, var_ori, var_bin, target, boundary_list):
+def get_single_var_bin_woe_numerical(df, var_ori, var_bin, target, boundary_list):
     """
     assume: good is 0 and bad is 1
     """
@@ -691,7 +685,7 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=
     df_mapping['total_perc'] = (df_mapping.total/float(df_mapping.total.sum())).apply('{0:.2%}'.format)
 
     if type == 'Categorical':
-        df_mapping.sort_values(['total'], ascending=[1], inplace=True, na_position='first')
+        df_mapping.sort_values(['woe'], ascending=[1], inplace=True, na_position='first')
         df_mapping['bin_num'] = range(len(df_mapping))
         df_mapping = df_mapping[['bin_num', org_var, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'type']]
     else:
@@ -715,3 +709,44 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=
 
     return {'IV': sum(ss['df_woe'].IV), 'type': type, 'df_map': df_mapping}
 
+
+def get_single_var_bin_woe_categorical(df, var, target, null_value=['NaNNaN']):
+    """
+    for given variable in dataframe, replace the nullValue and binning the variable with all kinds of ways
+    to replace category variable.
+    assume: good is 0 and bad is 1
+    """
+
+    delta_1 = 0.00001
+    ddt = df[[var, target]].copy()
+    # is a bug? in zoe code?
+    #ddt[var] = ddt[var].replace(np.nan, null_value)
+    ddt[var] = ddt[var].replace(null_value, np.nan)
+    ddt['good'] = 1 - ddt[target]
+    ddt['bad'] = ddt[target]
+
+    grouped = ddt.groupby(var)
+    agg_bad = pd.DataFrame([grouped.sum().bad.index, grouped.sum().bad]).transpose()
+    agg_good = pd.DataFrame([grouped.sum().good.index, grouped.sum().good]).transpose()
+    agg_bad.rename(columns={0: var, 1: 'bads'}, inplace=True)
+    agg_good.rename(columns={0: var, 1: 'goods'}, inplace=True)
+
+    agg = pd.merge(agg_bad, agg_good, on=var, how='outer')
+    agg['bads'] = np.where(pd.isnull(agg.bads), 0, agg.bads)
+    agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
+    agg['total'] = agg.bads + agg.goods
+
+    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
+    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+    agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
+    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+
+    agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
+
+    agg.sort_values(['woe'], ascending=[1], inplace=True)
+    #agg['ks'] = ((agg.bads / ddt.bad.sum()).cumsum() - (agg.goods / ddt.good.sum()).cumsum())
+    agg['total_perc'] = (agg.total / float(ddt.bad.sum() + ddt.good.sum())).apply('{0:.2%}'.format)
+
+    del agg['oddsrt']
+
+    return agg
