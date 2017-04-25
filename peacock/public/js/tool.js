@@ -79,17 +79,19 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var initList = [];
                 //通过变量名获取数据
                 for (var valName in result.data) {
+                    var varData = result.data[valName]["var_table"];
+                    var iv = result.data[valName]["iv"];
                     var table_head = [];
-                    for (var subKey in result.data[valName][0]) {
+                    for (var subKey in varData[0]) {
                         table_head.push(subKey);
                     }
-                    var svg = initPanel(valName, num, table_head);
+                    var svg = initPanel(valName,iv, num, table_head);
                     //画出x轴
-                    renderXAxis(svg, num, result.data[valName]);
+                    renderXAxis(svg, num, varData);
                     //画出y轴
-                    renderYAxis(svg, num, result.data[valName]);
+                    renderYAxis(svg, num, varData);
                     //绘制坐标轴内的bar和table
-                    renderBody(svg, result.data[valName], num);
+                    renderBody(svg, varData, num);
                     initList.push(num);
                     num++;
                 }
@@ -105,9 +107,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         });
     }
 
-    function initPanel(rowName, num, table_head) {
+    function initPanel(rowName,iv, num, table_head) {
         d3.select("body")
-            .select("div").append("h5").text(rowName);
+            .select("div").append("h5").text(rowName+"-------"+iv);
         //设置画布
         svg = d3.select("body")
             .select("div")
