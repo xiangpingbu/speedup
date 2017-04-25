@@ -13,15 +13,15 @@ var num_columnMap =
         0: "bin_num",
         1: "min",
         2: "max",
-        3: "min_bound",
-        4: "max_bound",
+        3: "min_boundary",
+        4: "max_boundary",
         5: "bads",
         6: "goods",
         7: "total",
         8: "total_perc",
         9: "bad_rate",
         10: "woe",
-        11: "category_t"
+        11: "type"
     };
 
 
@@ -35,7 +35,7 @@ var cate_columnMap =
         5: "total_perc",
         6: "bad_rate",
         7: "woe",
-        8: "category_t"
+        8: "type"
     };
 
 //描绘一个画布
@@ -284,12 +284,13 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var start = controlMap[id].start;
                 var name = $(this).attr("name");
 
+                debugger;
                 var childs = $('#tbody_' + id).children("tr");
                 var tds_0 = $(childs.get(0)).children("td");
 //                var td = $(childs.get(start.index)).children("td");
-                var category_t = tds_0.get(tds_0.length - 1).innerHTML;
+                var type = tds_0.get(tds_0.length - 1).innerHTML;
                 var columnMap;
-                if (category_t.indexOf('F') >= 0) {
+                if (type == 'Numerical') {
                     columnMap = num_columnMap;
                 } else {
                     cate_columnMap[1] = name;
