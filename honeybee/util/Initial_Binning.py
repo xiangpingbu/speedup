@@ -3,6 +3,9 @@ import os
 
 from Binning_Function import *
 
+global MAX_CARDINALITY
+MAX_CARDINALITY = 10
+
 
 def cal(df_train,target,invalid = None):
     ########################## dev vs val ##############################
@@ -23,14 +26,14 @@ def cal(df_train,target,invalid = None):
     df_iv = pd.DataFrame()
     iv_rank_map = {}
 
-    vars =[u'工作年限']
+    vars =[u'信用卡额度']
+    #vars =[u'工作年限']
     for v in vars:
         if v not in invalid_vars_list:
             t = str(df[v].dtype)
-            unique_value = len(df[v].value_counts())
-            max_cardinality = 3
-            if unique_value <= max_cardinality:
-                t = 'object'
+            #unique_value = len(df[v].value_counts())
+            #if unique_value <= MAX_CARDINALITY:
+            #    t = 'object'
             print "current variable: " + v + " current type: " + t
             tree_bin = get_tree_bin(df, v, target, t, nullValue=[])
             # IV
@@ -38,7 +41,7 @@ def cal(df_train,target,invalid = None):
             if t in ['object', 'str']:
                 boundary_list = str(tree_bin['df_map'][v].tolist())
             else:
-                boundary_list = str(tree_bin['df_map']['max'].tolist())
+                boundary_list = str(tree_bin['df_map']['min'].tolist())
 
             new_bin = pd.DataFrame({"var_name": v, "iv": var_iv, "tree_boundary": boundary_list}, index=["0"])
             df_iv = df_iv.append(new_bin)
@@ -51,29 +54,3 @@ def cal(df_train,target,invalid = None):
     # df_iv.to_excel("df_iv.xlsx", ",", header=True, index=False)
 
     return iv_rank_map
-
-##################### get html plot ######################################
-
-# html_file = open('Initial_Binning.html', 'w')
-# keys = iv_rank_map.keys()
-# keys.sort(reverse=True)
-# for k in keys:
-#     c = iv_rank_map[k]
-#     var_name = c[0]
-#     var_type = c[1]
-#     woe_map = c[2]
-#     boundary = c[3]
-#     html_file.write('<br>')
-#     html_file.write('<b>IV: '+str(k)+'</b>')
-#     generate_bin_table_html(woe_map, var_name, var_type, html_file)
-#     html_file.write('<br>')
-#     html_file.write(boundary)
-#     html_file.write('<br>')
-#     path = './pic_initial/' + var_name + '.png'
-#     plot_woe_pic(woe_map, var_name, path)
-#     html_file.write("<img src='%s' width='450px' height='300px' />" % path)
-#     html_file.write('<hr>')
-#
-# html_file.close()
-
-# cal("/Users/lifeng/Work/Code/fork/maas/orca/util/df_train.xlsx","/Users/lifeng/Work/Code/fork/maas/orca/util/df_test.xlsx")
