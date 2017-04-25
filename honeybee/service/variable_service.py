@@ -7,7 +7,7 @@ from datetime import  datetime
 
 def load_model(name):
     '''获得对应模型的所有分支'''
-    sql = "select model_branch,remove_list from tool_model where model_name = %s and is_deleted = 0"
+    sql = "select model_branch,remove_list,model_target from tool_model where model_name = %s and is_deleted = 0"
     result = util.query(sql,(name))
     return result
 

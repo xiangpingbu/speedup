@@ -27,7 +27,7 @@ def cal(df_train,target,invalid = None):
     iv_rank_map = {}
 
     #vars =[u'信用卡额度']
-    vars =[u'工作年限']
+    # vars =[u'工作年限']
     #vars =['juxinli_ind']
     for v in vars:
         if v not in invalid_vars_list:

@@ -44,6 +44,10 @@ def init():
     name = request.form.get("model_name")
     branch = request.form.get("branch")
 
+    if name is None or name == '':
+        name = model_name
+        branch = "master"
+
     result = vs.load_branch(name,branch)
 
     # if var_service.if_branch_exist(model, branch):
@@ -62,7 +66,7 @@ def init():
     # min = request.form.get("min")
     min_val = 0
     df = df_train
-    out = get_init(df, target=result[0]["model_target"], invalid=remove_list)
+    init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
 
     out = get_boundary(init_result, min_val)
     # for
@@ -72,66 +76,66 @@ def init():
     return responseto(data=out)
 
 
-@app.route(base + "/merge", methods=['POST'])
-def merge():
-    """归并操作"""
-    # 要执行合并的variable
-    var_name = request.form.get('varName')
-    # 变量的类型
-    type = request.form.get('type').encode('utf-8')
-    # 选定的范围
-    boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
-    # 总的范围
-    all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
-    # 获得target
-    # target = request.form.get('allBoundary').encode('utf-8');
-    target = request.form.get('target')
-    if target is None:
-        target = 'bad_4w'
-    excepted_column = {var_name}
-
-    min_val = 0
-
-    result = None
-    type_bool = False
-    df = None
-    if type == 'False':
-        # 将字符转换为list
-        boundary_list = map(eval, boundary.split("&"))
-        all_boundary_list = []
-        # 将字符转换为list,nan替换为np.nan
-        for a in all_boundary.split("&"):
-            if a != 'nan':
-                a = float(a)
-            else:
-                a = np.nan
-            all_boundary_list.append(a)
-        boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
-        boundary_list.append(np.nan)
-        selected_list = boundary_list
-
-        columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-                   'category_t']
-    else:
-        type_bool = True
-        temp = []
-        for s in boundary.split("&"):
-            temp.extend(map(cmm.transfer, s.split("|")))
-
-        selected_list = [temp]
-        for s in all_boundary.split("&"):
-            selected_list.append(map(cmm.transfer, s.split("|")))
-
-        columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-                   'category_t']
-
-    result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
-                       expected_column=excepted_column)  # 获得合并的结果
-    df = pd.DataFrame(result[0],
-                      columns=columns)
-
-    data = get_merged(var_name, df, min_val)
-    return responseto(data=data)
+# @app.route(base + "/merge", methods=['POST'])
+# def merge():
+#     """归并操作"""
+#     # 要执行合并的variable
+#     var_name = request.form.get('varName')
+#     # 变量的类型
+#     type = request.form.get('type').encode('utf-8')
+#     # 选定的范围
+#     boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
+#     # 总的范围
+#     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
+#     # 获得target
+#     # target = request.form.get('allBoundary').encode('utf-8');
+#     target = request.form.get('target')
+#     if target is None:
+#         target = 'bad_4w'
+#     excepted_column = {var_name}
+#
+#     min_val = 0
+#
+#     result = None
+#     type_bool = False
+#     df = None
+#     if type == 'False':
+#         # 将字符转换为list
+#         boundary_list = map(eval, boundary.split("&"))
+#         all_boundary_list = []
+#         # 将字符转换为list,nan替换为np.nan
+#         for a in all_boundary.split("&"):
+#             if a != 'nan':
+#                 a = float(a)
+#             else:
+#                 a = np.nan
+#             all_boundary_list.append(a)
+#         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
+#         boundary_list.append(np.nan)
+#         selected_list = boundary_list
+#
+#         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+#                    'category_t']
+#     else:
+#         type_bool = True
+#         temp = []
+#         for s in boundary.split("&"):
+#             temp.extend(map(cmm.transfer, s.split("|")))
+#
+#         selected_list = [temp]
+#         for s in all_boundary.split("&"):
+#             selected_list.append(map(cmm.transfer, s.split("|")))
+#
+#         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+#                    'category_t']
+#
+#     result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
+#                        expected_column=excepted_column)  # 获得合并的结果
+#     df = pd.DataFrame(result[0],
+#                       columns=columns)
+#
+#     data = get_merged(var_name, df, min_val)
+#     return responseto(data=data)
 
 
 @app.route(base + "/divide", methods=['POST'])
@@ -319,6 +323,7 @@ def parse():
     v = result[0]
     if v["remove_list"] is not None:
         remove_list = v["remove_list"]
+        data_map["target"] = v["model_target"]
 
 
     for n in result:

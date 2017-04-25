@@ -8,6 +8,8 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 
+var host = "http://192.168.31.68:8091";
+
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
         $("#output").click(function () {
@@ -17,7 +19,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 form.attr("style", "display:none");
                 form.attr("target", "");
                 form.attr("method", "post");
-                form.attr("action", "http://localhost:8091/tool/apply");
+                form.attr("action", host+"/tool/apply");
                 var input1 = $("<input>");
                 input1.attr("type", "hidden");
                 input1.attr("name", "data");
@@ -89,7 +91,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function getTable() {
         $("#dataframe").html("");
         $.ajax({
-            url: "http://localhost:8091/tool/parse",
+            url: host+"/tool/parse",
             type: 'get',
             async: true,
             success: function (result) {
@@ -110,7 +112,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     });
                     $(this).attr("disabled","disabled");
                     $.ajax({
-                        url: "http://localhost:8091/tool/db/branch/commit-branch",
+                        url: host+"/tool/db/branch/commit-branch",
                         type: 'post',
                         data:{remove_list:JSON.stringify(remove_list),target:target,branch:branch,model_name:model_name},
                         async: true,
@@ -147,7 +149,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                         //当该分支已经存在时
                         if (current == obj) {
                             $.ajax({
-                                url: "http://localhost:8091/tool/db/branch/checkout",
+                                url: host+"/tool/db/branch/checkout",
                                 data:{"branch":current,"model_name":$("#model").val()},
                                 type: 'get',
                                 async: false,
@@ -162,7 +164,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     branches.push(current);
                     d3.select("#branch").append("option").text(current);
                     $.ajax({
-                        url: "http://localhost:8091/tool/db/branch",
+                        url: host+"/tool/db/branch",
                         data:{"branch":current,"model_name":$("#model").val()},
                         type: 'post',
                         async: true,
@@ -200,6 +202,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     }
                     d3.select("#target").append("option").text(b[0]);
                 }
+
+                $('#target').val(data["target"]).trigger("change");
 
 
 
@@ -252,7 +256,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
     $("#columnConfig").click(function () {
         $.ajax({
-            url: "http://localhost:8091/tool/column-config",
+            url: host+"/tool/column-config",
             type: 'post',
             data: {
                 "data": JSON.stringify(exportData())

@@ -2,7 +2,7 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://localhost:8091";
+var host = "http://192.168.31.68:8091";
 
 var controlMap = {};
 
@@ -57,8 +57,13 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
         var branch = $("#branch").val();
         var model_name = $("#model").val();
-        var target = $("#target").val();
-
+        if (branch != null && model_name!=null) {
+            localStorage.setItem("branch",branch);
+            localStorage.setItem("model_name",model_name);
+        } else {
+            branch = localStorage.getItem("branch");
+            model_name = localStorage.getItem("model_name");
+        }
 
 
         $.ajax({
@@ -66,7 +71,6 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             type: 'post',
             data: {
                 branch:branch,
-                target:target,
                 model_name:model_name
             },
             async: true,
@@ -394,7 +398,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var min = Math.min(start.index, end.index);
                 var max = Math.max(start.index, end.index);
                 //var isNum = type.indexOf("F") >= 0;
-                var isNum = (type == "Numerical")
+                var isNum = (type == "Numerical");
                 //判断应该从哪一列获取相应的值
                 var valIndex;
                 if (isNum) valIndex = minBoundIndex;
@@ -570,8 +574,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
+                .attr("id", function (d,i) {//绑定id
+                    return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
                 .attr("x", function (d) {
