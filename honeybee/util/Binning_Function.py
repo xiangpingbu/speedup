@@ -723,8 +723,8 @@ def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=
         #reindex_list.append(0)
         #df_mapping['bin_num'] = reindex_list
         #df_mapping.sort_values(['bin_num'], ascending=[1], inplace=True)
-        df_mapping['max'] = df_mapping['max'].apply('{:.15f}'.format)
-        df_mapping['min'] = df_mapping['min'].apply('{:.15f}'.format)
+        df_mapping['max'] = df_mapping['max'].apply('{:.5f}'.format)
+        df_mapping['min'] = df_mapping['min'].apply('{:.5f}'.format)
         df_mapping = df_mapping[['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe', 'type']]
 
     df_mapping['index'] = range(len(df_mapping))
