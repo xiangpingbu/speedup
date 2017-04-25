@@ -325,6 +325,9 @@ def get_init(df=df_train, target=None, invalid=None):
         # var_type = c[1]
         woe_map = c[2]
         boundary = c[3]
+        iv = c[4]
+        var_content = collections.OrderedDict()
+        var_content['iv'] = iv
         for index, row in woe_map.iterrows():  # 获取每行的index、row
             for col_name in woe_map.columns:
                 if isinstance(row[col_name], np.ndarray):
@@ -337,7 +340,8 @@ def get_init(df=df_train, target=None, invalid=None):
 
             subList.append(row_data)
             row_data = collections.OrderedDict()
-        out[var_name] = subList
+        var_content['var_table'] = subList
+        out[var_name] = var_content
     return out
 
 
@@ -349,7 +353,7 @@ def get_boundary(out, min_val=0):
     for val in data:
         index = 0
         last_bin = None
-        for bin_row in val[1]:
+        for bin_row in val[1]['var_table']:
             if bin_row["type"] == "Numerical":
                 index += 1
                 if index == 1:
