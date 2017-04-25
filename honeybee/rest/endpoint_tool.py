@@ -502,11 +502,12 @@ def merge():
             temp.extend(map(cmm.transfer, s.split("|")))
 
         selected_list = [temp]
-        for s in all_boundary.split("&"):
-            selected_list.append(map(cmm.transfer, s.split("|")))
+        if all_boundary != '':
+            for s in all_boundary.split("&"):
+                selected_list.append(map(cmm.transfer, s.split("|")))
 
         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-                   'category_t']
+                   'type']
 
     result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
                        expected_column=excepted_column)  # 获得合并的结果
