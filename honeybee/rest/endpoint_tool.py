@@ -346,6 +346,7 @@ def get_boundary(out, min_val=0):
         data = out.items()
     else:
         data = [out]
+
     for val in data:
         index = 0
         last_bin = None
