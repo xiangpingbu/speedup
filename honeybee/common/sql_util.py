@@ -6,7 +6,9 @@ class util():
         self.conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='Cisco123', db='wool',charset="utf8")
 
     def query(self, sql, args=None):
-        cur = self.conn.cursor()
+        cur = self.conn.cursor
+        cur =  cur(pymysql.cursors.DictCursor)
+        # cur = self.conn.DictCursor()
         cur.execute(sql, args)
         return cur.fetchall()
 
@@ -17,8 +19,10 @@ class util():
             self.conn.commit()
             return result
 
-        except:
+        except Exception, e:
+            print e
             self.conn.rollback()
 
 
 util = util()
+print util.query("select model_branch,remove_list from tool_model where  is_deleted = 0")

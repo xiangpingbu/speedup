@@ -5,10 +5,10 @@ maxBoundIndex = 4;
 woeIndex = 10;
 binNumIndex = 0;
 cateIndex = 11;
-
 categoricalIndex = 1;
+branches = null;
 
-define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
+define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
         $("#output").click(function () {
                 $("#downloadform").remove();
@@ -94,19 +94,22 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
             async: true,
             success: function (result) {
                 //设置target的input
-                var varSelect = d3.select("#dataframe")
-                    .append("div");
-                    // .attr("class","form-group");
-                varSelect.append("span").attr("class","col-sm-1")
-                    .attr("display","inline-block")
-                    .text("target");
-                varSelect
-                    .append("div").
-                    // attr("class","col-sm-1").
-                append("select")
-                    .attr("display","inline-block")
-                    // .attr("class","form-control")
-                    .attr("id","target");
+                // var varSelect = d3.select("#dataframe")
+                //     .append("div");
+                //     // .attr("class","form-group");
+                // varSelect.append("span").attr("class","col-sm-1")
+                //     .attr("display","inline-block")
+                //     .text("target");
+                // varSelect
+                //     .append("div").
+                //     // attr("class","col-sm-1").
+                // append("select")
+                //     .attr("display","inline-block")
+                //     // .attr("class","form-control")
+                //     .attr("id","target");
+                addLabel("#dataframe", "model");
+                addLabel("#dataframe", "branch");
+                addLabel("#dataframe", "target");
 
 
                 var table = d3.select("#dataframe").append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
@@ -115,6 +118,30 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
                 var thead = table.append("thead");
                 var tbody = table.append("tbody");
                 var tr = thead.append("tr");
+
+                /**
+                 * 添加头部的select标签栏
+                 */
+                branches = data["branches"];
+                for (let obj of branches) {
+                    d3.select("#branch").append("option").text(obj)
+                }
+                d3.select("#model").append("option").text(data["current_model"]);
+
+                $("#branch").on("select2:closing", function (e) {
+                   current =  $(this).val();
+                    for (let obj of branches) {
+                        if (current != obj) {
+
+                        }
+                    }
+
+                });
+
+                function select2Focus() {
+                    $(this).select2('open');
+                }
+
 
                 //head处加入一列,用于控制标签的全选
                 var headTd = tr.append("td").append("div");
@@ -126,6 +153,8 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
                 for (var a of data.head) {
                     tr.append("td").text(a);
                 }
+
+                //绘制table
                 for (var b of data.body) {
                     tr = tbody.append("tr");
                     var select = tr.append("td");
@@ -138,10 +167,7 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
                     for (var item of b) {
                         tr.append("td").text(item)
                     }
-
-                    $("#target").select2();
                     d3.select("#target").append("option").text(b[0]);
-
                 }
                 $('.i-checks').iCheck({
                     checkboxClass: 'icheckbox_square-green',
@@ -205,6 +231,26 @@ define(['jquery', 'd3', 'i-checks','select2'], function ($, d3) {
         window.location.href = window.location.href.substr(0, window.location.href.indexOf("#")) + "#bar";
     });
 
+
+    function addLabel(parent, labelName) {
+        var varSelect = d3.select(parent)
+            .append("div")
+            .attr("class", "table-line");
+        // .attr("class","form-group");
+        varSelect
+            .append("div")
+            .style("display", "inline-block")
+            .attr("class", "table-label")
+            .append("span")
+            .text(labelName);
+        varSelect
+            .append("div")
+            .style("display", "inline-block").append("select")
+            .attr("class", "table-ele")
+            .attr("id", labelName);
+
+        $("#" + labelName).select2({tags: true});
+    }
 
     function exportData() {
         var row = $("#rowNum").val();

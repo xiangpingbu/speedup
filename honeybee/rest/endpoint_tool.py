@@ -14,12 +14,10 @@ import collections
 from util import A99_Functions as a99
 from io import BytesIO
 from flask import send_file
-from common import sql_util
-
+from service import variable_service as var_service
 
 base = '/tool'
 base_path = "./util/"
-
 
 
 def file_init():
@@ -34,23 +32,32 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
+model_name = "df_train"
 df_train = pd.read_excel("/Users/lifeng/Downloads/py/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
 
 
-@app.route(base + "/init",methods=['POST'])
+@app.route(base + "/init", methods=['POST'])
 def init():
-    target =  request.form.get('target')
-    # invalid = request.form.get('invalid')
+    target = request.form.get('target')
     remove_list = request.form.get("remove_list")
-    # remove_list = ['name','idcard',u'进件id',u'进件时间',u'进件机构',u'借款用途',u'最高月还',u'还款期限',u'销售人员名称',u'申请产品',u'审批意见',
-    #     u'处理状态',u'审核报告',u'审批额度',u'建议审批金额',u'合同编号',u'协议生效日期',u'协议失效日期',u'开始还款日期',
-    #     u'每周还款日', u'已还款总期数',u'当前期数',u'是否新增M1',u'是否首逾',u'总逾期期数',u'是否逾期',
-    #     u'罚息总额',u'滞纳金总额',u'应还总额',u'合同结清状态',u'最大逾期天数',u'芝麻信用评分','id','max_wob','cell_phone_num',
-    #     'city','phone_silent','region',u'客户姓名',u'身份证号',u'信用评分',u'违约概率']
-    remove_list.append(target)
+    selected_list = request.form.get("selected_list")
+    model = request.form.get("model")
+    branch = request.form.get("branch")
+
+    if var_service.if_branch_exist(model, branch):
+        var_service.update_branch(model, branch, remove_list, selected_list)
+    else:
+        var_service.create_branch(model, branch, target, remove_list, selected_list)
+
+    remove_list = ['name', 'idcard', u'进件id', u'进件时间', u'进件机构', u'借款用途', u'最高月还', u'还款期限', u'销售人员名称', u'申请产品', u'审批意见',
+                   u'处理状态', u'审核报告', u'审批额度', u'建议审批金额', u'合同编号', u'协议生效日期', u'协议失效日期', u'开始还款日期',
+                   u'每周还款日', u'已还款总期数', u'当前期数', u'是否新增M1', u'是否首逾', u'总逾期期数', u'是否逾期',
+                   u'罚息总额', u'滞纳金总额', u'应还总额', u'合同结清状态', u'最大逾期天数', u'芝麻信用评分', 'id', 'max_wob', 'cell_phone_num',
+                   'city', 'phone_silent', 'region', u'客户姓名', u'身份证号', u'信用评分', u'违约概率']
+    # remove_list.append(target)
 
     # invalid = invalid.split(",")
     # min = request.form.get("min")
@@ -81,7 +88,7 @@ def merge():
     # target = request.form.get('allBoundary').encode('utf-8');
     target = request.form.get('target')
     if target is None:
-        target ='bad_4w'
+        target = 'bad_4w'
     excepted_column = {var_name}
 
     min_val = 0
@@ -160,7 +167,7 @@ def divide():
             else:
                 df.drop(index, inplace=True)
 
-        out = get_init(df,target=target,invalid=[])
+        out = get_init(df, target=target, invalid=[])
         bound_list = get_divide_max_bound(out)
 
         list = data_map["table"]
@@ -172,7 +179,7 @@ def divide():
         bound_list.append(np.nan)
 
         result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
-                           ,target=target,expected_column={name})
+                           , target=target, expected_column={name})
         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
         df = pd.DataFrame(result[0],
@@ -193,7 +200,7 @@ def divide():
         # 删除要被分裂的项
         del list[data_map["selectedIndex"]]
 
-        out = get_init(df,target=target,invalid=[])
+        out = get_init(df, target=target, invalid=[])
         bound_list = get_divide_caterotical_bound(out, name)
         # 被分裂的项的下标
         index = data_map["selectedIndex"]
@@ -201,7 +208,7 @@ def divide():
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
         result = ab.adjust(df_train, data_map["selected"]["category_t"] == 'True', name, bound_list
-                           ,target=target,expected_column={name})
+                           , target=target, expected_column={name})
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'category_t']
         df = pd.DataFrame(result[0],
@@ -278,14 +285,16 @@ def upload():
     if request.method == 'POST':
         global df_train
         global df_test
+        global model_name
         files = request.files.getlist("file[]")
         for file in files:
             filename = secure_filename(file.filename)
+            model_name = filename[0:filename.index(".")]
             print filename
             if filename == 'df_test.xlsx':
-                df_test = pd.read_excel(file,encoding="utf-8")
+                df_test = pd.read_excel(file, encoding="utf-8")
             elif filename == 'df_train.xlsx':
-                df_train = pd.read_excel(file,encoding="utf-8")
+                df_train = pd.read_excel(file, encoding="utf-8")
                 # df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
@@ -294,6 +303,21 @@ def upload():
 def parse():
     df = a99.GetDFSummary(df_train)
     data_map = cmm.df_for_html(df)
+    result = var_service.load_branch(model_name)
+    if len(result) < 1:
+        var_service.create_branch(model_name, "master", None, None)
+        result["model_branch"] = ["master"]
+    remove_list = []
+    branches = []
+
+    for v in result:
+        if v["remove_list"] is not None:
+            remove_list.append(v["remove_list"])
+        branches.append(v["model_branch"])
+
+        data_map["current_model"] = model_name
+        data_map["branches"] = branches
+        data_map["remove_list"] = remove_list
     return responseto(data=data_map)
 
 
@@ -417,7 +441,7 @@ def get_boundary(out, min_val=0):
                     if bin_row["min"] != 'nan':
                         last_bin["max_bound"] = bin_row["min_bound"]
 
-                        if  len(val[1]) ==index :
+                        if len(val[1]) == index:
                             bin_row["max_bound"] = 'inf'
                         last_bin = bin_row
 
@@ -511,6 +535,3 @@ def get_merged(var_name, df, min_val):
 
         data = get_boundary(data, min_val)
     return data
-
-s = u"nan"
-print s

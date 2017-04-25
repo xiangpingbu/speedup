@@ -163,3 +163,19 @@
         -webkit-transform: scaleY(1.0);
     }
 }
+
+.table-line {
+    margin-bottom: 5px;
+}
+
+.table-label {
+    width:35px;
+    margin-left: 10px;
+    margin-right: 13px;
+    /*padding-right: 20px;*/
+}
+
+.table-ele {
+    width:150px;
+}
+

@@ -113,7 +113,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             .select("div")
             .append("div")
             .attr("id", "svg_" + num)
-            .style("width","2000px")
+            .style("width","2000")
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
@@ -422,6 +422,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         valIndex = minBoundIndex;
                     }
                     else valIndex = categoricalIndex;
+
                     list = list + ($(childTrs.get(iterList[n])).children("td").get(valIndex).innerHTML) + ("&");
                 }
                 //去除末尾的&符号
@@ -543,8 +544,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
+                .attr("id", function (d,i) {//绑定id
+                    return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
                 .attr("x", function (d) {
