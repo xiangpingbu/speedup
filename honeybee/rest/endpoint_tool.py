@@ -32,8 +32,8 @@ def file_init():
 # df_list = file_init()
 # df_train = file_init()
 # df_test = file_init()
-model_name = "df_train"
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+model_name = "model_train_selected"
+df_train = pd.read_excel("/Users/lifeng/Desktop/wo_pai/我爱卡/model_train_selected.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
@@ -316,12 +316,14 @@ def parse():
     result = vs.load_model(model_name)
     if len(result) < 1:
         vs.create_branch(model_name, "master", None, None)
-        result["model_branch"] = ["master"]
+        result = []
+        result.append({"model_branch", "master"})
 
     branches = []
 
     # 只取master
     v = result[0]
+    remove_list = ""
     if v["remove_list"] is not None:
         remove_list = v["remove_list"]
         data_map["target"] = v["model_target"]
