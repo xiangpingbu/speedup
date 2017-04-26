@@ -45,9 +45,14 @@ def checkout():
 
 @app.route(base+"/save",methods=['Post'])
 def save():
+    model_name = request.values.get("model_name")
+    branch = request.values.get("branch")
     data = request.values.get("data")
     dict = json.loads(data)
 
+    list = []
     for key,val in dict.items:
-        print  1
+        obj = [model_name,branch,key,val["iv"],val["var_table"]]
+        list.append(obj)
+    vs.save_binning_record(list)
 

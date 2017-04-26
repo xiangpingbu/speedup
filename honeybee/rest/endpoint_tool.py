@@ -493,10 +493,19 @@ def get_divide_min_bound(out):
             bound.append(float(val["min"]))
     return bound
 
+'''
+out格式
+{
+ key:{
+    iv:{}
+    var_table:[]
+ }
+}
+'''
 def get_divide_caterotical_bound(out, name):
     bound = []
     for key, list in out.items():
-        for val in list:
+        for val in list["var_table"]:
             s = val[name]
             bound.append(map(cmm.transfer, s.split("|")))
     return bound

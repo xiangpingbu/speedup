@@ -24,3 +24,14 @@ def execute(sql, args=None):
         except Exception, e:
             print e
             db.conn.rollback()
+
+def executmany(sql, args=None):
+    with getPTConnection() as db:
+        try:
+            cur = db.cursor
+            result = cur.executemany(sql, args)
+            db.conn.commit()
+            return result
+        except Exception, e:
+            print e
+            db.conn.rollback()

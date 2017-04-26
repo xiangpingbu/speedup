@@ -8,7 +8,7 @@ from datetime import  datetime
 def load_model(name):
     '''获得对应模型的所有分支'''
     sql = "select model_branch,remove_list,model_target from tool_model where model_name = %s and is_deleted = 0"
-    result = util.query(sql,(name))
+    result = util.query(sql,[name])
     return result
 
 def load_branch(name,branch):
@@ -49,8 +49,14 @@ def if_branch_exist(name,branch):
         return True
     return False
 
-def save_binning_record(name,branch,variable_list):
-    return None
+def save_binning_record(variable_list):
+    sql = "insert into tool_model_content " \
+          "(model_name,model_branch,variable_name,variable_iv,binning_record)" \
+          " VALUES (%s,%s,%s,%s,%s)"
+    result = util.executmany(sql,variable_list)
+    if result > 0:
+        return True
+    return False
 
 
 
