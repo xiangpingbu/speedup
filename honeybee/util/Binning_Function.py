@@ -71,10 +71,17 @@ def get_categorical_woe(df, var, target, null_value=['NaNNaN']):
     agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
     agg['total'] = agg.bads + agg.goods
 
-    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
-    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+
+#    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
+#    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+#    agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
+#    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+
+
+    agg['odds'] = ( (agg.bads + delta_1)/(agg.goods + delta_1))
+    agg['oddsrt'] = (agg['odds'] / (float(agg.bads.sum())/float(agg.goods.sum())))
     agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
-    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+    agg['IV'] = (agg.bads / sum(agg.bads) -  agg.goods / sum(agg.goods)) * agg.woe
 
     agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
     #agg['min'] = agg['min'].apply('{:.15f}'.format)
@@ -632,10 +639,16 @@ def get_single_var_bin_woe_numerical(df, var_ori, var_bin, target, boundary_list
     agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
     agg['total'] = agg.bads + agg.goods
 
-    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
-    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+#    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
+#    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+#    agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
+#    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+
+    agg['odds'] = ( (agg.bads + delta_1)/(agg.goods + delta_1))
+    agg['oddsrt'] = (agg['odds'] / (float(agg.bads.sum())/float(agg.goods.sum())))
     agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
-    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+    agg['IV'] = (agg.bads / sum(agg.bads) -  agg.goods / sum(agg.goods)) * agg.woe
+
     agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
 
     agg.sort_values(['bin_num'], ascending=[1], inplace=True)
@@ -760,10 +773,15 @@ def get_single_var_bin_woe_categorical(df, var, target, null_value=['NaNNaN']):
     agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
     agg['total'] = agg.bads + agg.goods
 
-    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
-    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+#    agg['odds'] = ((agg.goods + delta_1) / (agg.bads + delta_1))
+#    agg['oddsrt'] = (agg['odds'] / (float(agg.goods.sum()) / float(agg.bads.sum())))
+#    agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
+#    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+
+    agg['odds'] = ( (agg.bads + delta_1)/(agg.goods + delta_1))
+    agg['oddsrt'] = (agg['odds'] / (float(agg.bads.sum())/float(agg.goods.sum())))
     agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
-    agg['IV'] = (agg.goods / sum(agg.goods) - agg.bads / sum(agg.bads)) * agg.woe
+    agg['IV'] = (agg.bads / sum(agg.bads) -  agg.goods / sum(agg.goods)) * agg.woe
 
     agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
 
