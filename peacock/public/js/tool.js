@@ -111,6 +111,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
        var h5 = d3.select("body")
             .select("div").append("h5");
            h5.text(rowName+"-------");
+
            h5.append("span").attr("class","iv").attr("id",rowName).text(iv);
         //设置画布
         svg = d3.select("body")
@@ -147,7 +148,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             .append("div");
 
         buttonDiv.append("button")
-            .attr("class", "btn btn-primary")
+            .attr("class", "btn btn-primary var-btn")
             .attr("id", "merge_" + num)
             .attr("name", rowName)
             .attr("disabled", "disabled")
@@ -155,11 +156,17 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             .style("margin-left", "25px");
 
         buttonDiv.append("button")
-            .attr("class", "btn btn-danger")
+            .attr("class", "btn btn-danger var-btn")
             .attr("id", "divide_" + num)
             .attr("name", rowName)
-            .text("分裂")
-            .style("margin-left", "25px");
+            .text("分裂");
+
+        buttonDiv.append("button")
+            .attr("class", "btn btn-warning var-btn")
+            .attr("id", "save_" + num)
+            .attr("name", rowName)
+            .text("保存记录");
+
 
         return svg
     }
@@ -318,6 +325,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 }
             });
 
+            /**
+             * 分裂选择的bar
+             */
             $("#divide_" + a).click(function () {
                 $(".spinner").css('display', 'block');
                 var data = {};
@@ -375,6 +385,50 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             });
 
             /**
+             * 保存选择的集合
+             */
+            $("#save_"+a).click(function () {
+                $(".spinner").css('display', 'block');
+                var data = {};
+                var content = {};
+
+                var id = $(this).attr("id").split("_")[1];
+                var name = $(this).attr("name");
+                var iv = $("#"+name).val();
+
+                data[name] = content;
+
+                //获得所有的行数据
+                var childs = $('#tbody_' + id).children("tr");
+
+                var var_table = [];
+                content.iv = iv;
+                content.var_table = var_table;
+
+                for (var i = 0; i < childs.length; i++) {
+                    var tds = $(childs.get(i)).children("td");
+                    var obj = {};
+                    for (var j = 0; j < tds.length; j++) {
+                        obj[key] = tds.get(j).innerHTML;
+                    }
+                    var_table.push(obj);
+                }
+
+                $(".spinner").css('display', 'block');
+                $.ajax({
+                    url: host + "/tool/db/save",
+                    type: 'post',
+                    data: {
+                        "data": JSON.stringify(data)
+                    },
+                    async: true,
+                    success: function (result) {
+                        $(".spinner").css('display', "none");
+                    }
+                });
+            });
+
+            /**
              * 合并选择的集合
              */
             $("#merge_" + a).click(function () {
@@ -408,9 +462,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 }
                 for (var n in iterList) {
                     if (iterList[n] == min) {
-                        //如果存在'F',代表type为false,variable为numerical,
                         if (isNum) {
-                            //此时该max的值可以被丢弃
+                            //此时该min的值可以被丢弃
                             continue;
                         }
                     }
@@ -430,12 +483,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 //numerical按照区间筛选
                 if (isNum) {
                     for (var index = 0; index < childTrs.length; index++) {
-                        //整个区间的大部分从mix_bound列中得到,除了inf一列
-                        // if (index == childTrs.length - 2) {
-                        //     tdVal = $(childTrs.get(index)).children("td").get(minBoundIndex).innerHTML;
-                        // } else {
                         tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
-                        // }
                         wholeList = wholeList + (tdVal) + ("&");
                     }
                 } else {
@@ -481,6 +529,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     }
                 });
             });
+
         }
     }
 
@@ -499,7 +548,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //隐藏等待提示
         $(".spinner").css('display', 'none');
 
-        $("#"+name).val(result.data[name]["iv"]);
+        $("#"+name).text(result.data[name]["iv"]);
     }
 
     function renderBody(svg, data, num) {
@@ -609,6 +658,21 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     return 230 / data.length;//设置高度
                 });
         }
+    }
+
+    function getUtf8Length(str){
+        if (str==""||str==null)
+            return 0;
+        var n = 0;
+        len = 0;
+        for (i = 0; i < str.length; i++) {
+            n = str.charCodeAt(i);
+            if (n <= 255)
+                len += 1;
+            else
+                len += 3;
+        }
+        return len;
     }
 
     return {
