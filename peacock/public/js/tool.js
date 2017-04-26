@@ -111,6 +111,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
        var h5 = d3.select("body")
             .select("div").append("h5");
            h5.text(rowName+"-------");
+
            h5.append("span").attr("class","iv").attr("id",rowName).text(iv);
         //设置画布
         svg = d3.select("body")
@@ -547,7 +548,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //隐藏等待提示
         $(".spinner").css('display', 'none');
 
-        $("#"+name).val(result.data[name]["iv"]);
+        $("#"+name).text(result.data[name]["iv"]);
     }
 
     function renderBody(svg, data, num) {
@@ -657,6 +658,21 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     return 230 / data.length;//设置高度
                 });
         }
+    }
+
+    function getUtf8Length(str){
+        if (str==""||str==null)
+            return 0;
+        var n = 0;
+        len = 0;
+        for (i = 0; i < str.length; i++) {
+            n = str.charCodeAt(i);
+            if (n <= 255)
+                len += 1;
+            else
+                len += 3;
+        }
+        return len;
     }
 
     return {
