@@ -49,3 +49,10 @@ def if_branch_exist(name,branch):
         return True
     return False
 
+def save_binning_record(name,branch,variable_list):
+
+    return None
+
+
+
+

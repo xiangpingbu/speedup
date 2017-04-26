@@ -294,7 +294,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             varSelect
                 .append("div")
                 .style("display", "inline-block").append("button")
-                .attr("class", "btn-primary")
+                .attr("class", "btn btn-primary")
                 .attr("id", "branch-commit")
                 .style("margin-left","20px")
                 .text("commit")

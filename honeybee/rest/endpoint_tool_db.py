@@ -32,6 +32,9 @@ def commit_branch():
 
     return responseto(data=vs.update_branch(model_name,branch,target,remove_list))
 
+'''
+@pre-init切换分支
+'''
 @app.route(base + "/branch/checkout", methods=['GET'])
 def checkout():
     model_name = request.values.get("model_name")
@@ -39,3 +42,11 @@ def checkout():
     result = vs.load_branch(model_name,branch)
 
     return responseto(data=result[0])
+
+@app.route(base+"/save",methods=['Post'])
+def save():
+    data = request.values.get("data")
+    dict = json.loads(data)
+
+    for key,val in dict.items:
+
