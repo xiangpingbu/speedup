@@ -73,7 +73,8 @@ def init():
     # first_bin = val[0]
     # if first_bin["category_t"] == False:
     #     val[0]["min"] = min_val
-    return responseto(data=out)
+    out_sorted_iv= sort_iv(out)
+    return responseto(data=out_sorted_iv)
 
 
 # @app.route(base + "/merge", methods=['POST'])
@@ -447,6 +448,7 @@ def get_boundary(out, min_val=0):
         data = out.items()
     else:
         data = [out]
+
     for val in data:
         index = 0
         last_bin = None
@@ -688,3 +690,10 @@ def generate_response(var_name, df, iv):
 
     data[var_name] = var_content
     return data
+
+
+def sort_iv(out):
+    out_sorted_iv = collections.OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
+    return out_sorted_iv
+
+
