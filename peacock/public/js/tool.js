@@ -11,18 +11,22 @@ var padding = {left: 25, right: 30, top: 5, bottom: 20};
 //numerical的列的排布
 var num_columnMap =
     {
-        0: "bin_num",
-        1: "min",
-        2: "max",
-        3: "min_boundary",
-        4: "max_boundary",
-        5: "bads",
-        6: "goods",
-        7: "total",
-        8: "total_perc",
-        9: "bad_rate",
-        10: "woe",
-        11: "type"
+        0: "bin_num", 1: "min",
+        2: "max", 3: "min_boundary",
+        4: "max_boundary", 5: "bads",
+        6: "goods", 7: "total",
+        8: "total_perc", 9: "bad_rate",
+        10: "woe", 11: "type"
+    };
+
+var column_numMap =
+    {
+        "bin_num": 0, "min": 1,
+        "max": 2, "min_boundary": 3,
+        "max_boundary": 4, "bads": 5,
+        "goods": 6, "total": 7,
+        "total_perc": 8, "bad_rate": 9,
+        "woe": 10, "type": 11
     };
 
 //categorical的列的排布
@@ -37,6 +41,15 @@ var cate_columnMap =
         6: "bad_rate",
         7: "woe",
         8: "type"
+    };
+
+var column_cateMap =
+    {
+        "bin_num": 0, "name": 1,
+        "bads": 2, "goods": 3,
+        "total": 4, "total_perc": 5,
+        "bad_rate": 6, "woe": 7,
+        "type": 8
     };
 
 //描绘一个画布
@@ -57,9 +70,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
         var branch = $("#branch").val();
         var model_name = $("#model").val();
-        if (branch != null && model_name!=null) {
-            localStorage.setItem("branch",branch);
-            localStorage.setItem("model_name",model_name);
+        if (branch != null && model_name != null) {
+            localStorage.setItem("branch", branch);
+            localStorage.setItem("model_name", model_name);
         } else {
             branch = localStorage.getItem("branch");
             model_name = localStorage.getItem("model_name");
@@ -70,8 +83,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             url: host + "/tool/init",
             type: 'post',
             data: {
-                branch:branch,
-                model_name:model_name
+                branch: branch,
+                model_name: model_name
             },
             async: true,
             success: function (result) {
@@ -85,7 +98,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     for (var subKey in varData[0]) {
                         table_head.push(subKey);
                     }
-                    var svg = initPanel(valName,iv, num, table_head);
+                    var svg = initPanel(valName, iv, num, table_head);
                     //画出x轴
                     renderXAxis(svg, num, varData);
                     //画出y轴
@@ -107,18 +120,18 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         });
     }
 
-    function initPanel(rowName,iv, num, table_head) {
-       var h5 = d3.select("body")
+    function initPanel(rowName, iv, num, table_head) {
+        var h5 = d3.select("body")
             .select("div").append("h5");
-           h5.text(rowName+"-------");
+        h5.text(rowName + "-------");
 
-           h5.append("span").attr("class","iv").attr("id",rowName).text(iv);
+        h5.append("span").attr("class", "iv").attr("id", rowName).text(iv);
         //设置画布
         svg = d3.select("body")
             .select("div")
             .append("div")
             .attr("id", "svg_" + num)
-            .style("width","2000")
+            .style("width", "2000")
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
@@ -166,6 +179,28 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             .attr("id", "save_" + num)
             .attr("name", rowName)
             .text("保存记录");
+
+        buttonDiv.append("button")
+            .attr("class", "btn btn-success var-btn")
+            .attr("id", "divide_manually_" + num)
+            .attr("name", rowName)
+            .text("手动分裂");
+
+        var inputDiv = buttonDiv
+            .append("div")
+            .attr("id", "divide_area_" + num)
+            .style("display", "none");
+
+        inputDiv.append("textarea")
+            .attr("rows", 5)
+            .attr("cols", 140)
+            .attr("id", "manual_input_" + num)
+            .attr("class", "var-area");
+        inputDiv.append("button")
+            .attr("id","manual_btn_"+num)
+            .attr("class", "btn btn-primary var-area-btn")
+            .attr("name",rowName)
+            .text("提交");
 
 
         return svg
@@ -379,7 +414,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     },
                     async: true,
                     success: function (result) {
-                        adjustTable(result,id,initList,name)
+                        adjustTable(result, id, initList, name)
                     }
                 });
             });
@@ -387,19 +422,29 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             /**
              * 保存选择的集合
              */
-            $("#save_"+a).click(function () {
+            $("#save_" + a).click(function () {
                 $(".spinner").css('display', 'block');
                 var data = {};
                 var content = {};
 
                 var id = $(this).attr("id").split("_")[1];
                 var name = $(this).attr("name");
-                var iv = $("#"+name).val();
+                var iv = $("#" + name).text();
 
                 data[name] = content;
 
                 //获得所有的行数据
                 var childs = $('#tbody_' + id).children("tr");
+                var tds_0 = $(childs.get(0)).children("td");
+//                var td = $(childs.get(start.index)).children("td");
+                var type = tds_0.get(tds_0.length - 1).innerHTML;
+                var columnMap;
+                if (type == 'Numerical') {
+                    columnMap = num_columnMap;
+                } else {
+                    cate_columnMap[1] = name;
+                    columnMap = cate_columnMap;
+                }
 
                 var var_table = [];
                 content.iv = iv;
@@ -409,17 +454,20 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     var tds = $(childs.get(i)).children("td");
                     var obj = {};
                     for (var j = 0; j < tds.length; j++) {
-                        obj[key] = tds.get(j).innerHTML;
+                        obj[columnMap[j]] = tds.get(j).innerHTML;
                     }
                     var_table.push(obj);
                 }
+
 
                 $(".spinner").css('display', 'block');
                 $.ajax({
                     url: host + "/tool/db/save",
                     type: 'post',
                     data: {
-                        "data": JSON.stringify(data)
+                        data: JSON.stringify(data),
+                        model_name: localStorage.getItem("model_name"),
+                        branch: localStorage.getItem("branch")
                     },
                     async: true,
                     success: function (result) {
@@ -525,15 +573,69 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         //
                         // $("#"+name).val(result.data[name]["iv"]);
 
-                        adjustTable(result,id,initList,name)
+                        adjustTable(result, id, initList, name)
                     }
                 });
             });
 
+            $("#divide_manually_" + a).click(function () {
+                var id = $(this).attr("id").split("_")[2];
+                var input_area_id = "#divide_area_"+id;
+                var childTrs = $('#tbody_' + id).children("tr");
+                var tds = $(childTrs.get(0)).children("td");
+                var type = tds.get(tds.length - 1).innerHTML;
+                var isCate = (type == "Categorical");
+
+                if (d3.select(input_area_id).style("display") == 'none') {
+                    d3.select(input_area_id).style("display", "block");
+                    var str = [];
+                    var index = 3;
+                    if (isCate) index = 1;
+                    $('#tbody_' + id).find("tr").each(function (i, n) {
+                        str.push($(n).children().eq(index).html());
+                    });
+                    $("#manual_input_" + id).text(str.join(","));
+                    
+                    $("#manual_btn_"+id).click(function () {
+                        debugger;
+                        var name = $(this).attr("name");
+                        var boundary = $("#manual_input_" + id).val();
+                        alert(boundary);
+                        var branch = localStorage.getItem("branch");
+                        var model_name = localStorage.getItem("model_name");
+                        $(".spinner").css('display', 'block');
+                        $.ajax({
+                            url: host + "/tool/divide_manually",
+                            type: 'post',
+                            data: {
+                                "variable_name": name,
+                                "boundary": boundary,
+                                "branch": branch,
+                                "model_name": model_name,
+                                "type": isCate
+                            },
+                            async: true,
+                            success: function (result) {
+                                adjustTable(result, id, initList, name)
+                            },
+                            error: function (result) {
+                                $(".spinner").css('display', 'none');
+                            }
+                        });
+                    })
+                    
+                } else{
+                    d3.select(input_area_id).style("display", "none");
+                }
+
+
+            })
+
         }
     }
 
-    function adjustTable(result,id,initList,name) {
+    function adjustTable(result, id, initList, name) {
+        debugger;
         var varData = result.data[name]["var_table"];
         var svg = null;
         renderBars(svg, varData, id, true);
@@ -548,7 +650,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //隐藏等待提示
         $(".spinner").css('display', 'none');
 
-        $("#"+name).text(result.data[name]["iv"]);
+        $("#" + name).text(result.data[name]["iv"]);
     }
 
     function renderBody(svg, data, num) {
@@ -612,7 +714,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d,i) {//绑定id
+                .attr("id", function (d, i) {//绑定id
                     return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
@@ -640,7 +742,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d,i) {//绑定id
+                .attr("id", function (d, i) {//绑定id
                     return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
@@ -660,8 +762,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         }
     }
 
-    function getUtf8Length(str){
-        if (str==""||str==null)
+    function getUtf8Length(str) {
+        if (str == "" || str == null)
             return 0;
         var n = 0;
         len = 0;

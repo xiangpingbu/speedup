@@ -81,9 +81,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         });
     }
 
-    $("#prev").click(function () {
-        getTable();
-    });
+    // $("#prev").click(function () {
+    //     getTable();
+    // });
 
     /**
      * 预处理数据并获取表格
@@ -317,7 +317,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 innerList.push(innerDate);
                 var tds = $(childTrs.get(innerRow)).children("td");
                 var category_t = tds.get(tds.length - 1).innerHTML;
-                if (category_t.indexOf("F") >= 0) {
+                if (category_t.indexOf("Numerical") >= 0) {
                     var max = tds.get(maxIndex).innerHTML;
                     var min = tds.get(minIndex).innerHTML;
                     var minBound = tds.get(minBoundIndex).innerHTML;
@@ -334,7 +334,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
                 innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
                 innerDate["binNum"] = binNum;
-                innerDate["category_t"] = category_t;
+                innerDate["type"] = category_t;
             }
         }
 

@@ -51,8 +51,10 @@ def save():
     dict = json.loads(data)
 
     list = []
-    for key,val in dict.items:
-        obj = [model_name,branch,key,val["iv"],val["var_table"]]
+    for key,val in dict.items():
+        obj = [model_name,branch,key,val["iv"],json.dumps(val["var_table"])]
         list.append(obj)
-    vs.save_binning_record(list)
+    if vs.save_binning_record(list) is not True:
+        return responseto(success=False)
+    return responseto()
 
