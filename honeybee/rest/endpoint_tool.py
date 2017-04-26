@@ -33,10 +33,13 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 model_name = "model_train_selected"
-df_train = pd.read_excel("/Users/lifeng/Desktop/wo_pai/我爱卡/model_train_selected.xlsx")
+#df_train = pd.read_excel("/Users/lifeng/Desktop/wo_pai/我爱卡/model_train_selected.xlsx")
+df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-df_test = None
+df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+#df_test = None
 
 
 @app.route(base + "/init", methods=['POST'])
@@ -244,13 +247,15 @@ def apply():
     # 初始化列
     for v in keys:
         test[v + "_woe"] = ""
+
+    #有时间的话，转化为panda dataframe 操作 with lambda function
     for index, row in test_copy.iterrows():
         for column in dict:
             bins = dict[column]
             if bins is not None:
                 for obj in bins:
                     # 根据category_t的布尔值区分类别,如果为false为numerical
-                    if obj["category_t"] == "False":
+                    if obj["type"] == "Numerical":
                         # 比对区间,获得woe的值
                         bin_min = float(obj["min_bound"])
                         bin_max = float(obj["max_bound"])
@@ -273,6 +278,7 @@ def apply():
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
     # test.to_excel("df_iv.xlsx", ",", header=True, index=False)
+
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
 
@@ -704,5 +710,4 @@ def generate_response(var_name, df, iv):
 def sort_iv(out):
     out_sorted_iv = collections.OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
     return out_sorted_iv
-
 
