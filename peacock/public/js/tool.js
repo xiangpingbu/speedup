@@ -2,7 +2,7 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://localhost:8091";
+var host = "http://192.168.31.68:8091";
 
 var controlMap = {};
 
