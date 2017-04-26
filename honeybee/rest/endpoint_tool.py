@@ -33,7 +33,7 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 model_name = "df_train"
-df_train = pd.read_excel("/Users/lifeng/Downloads/py/df_train.xlsx")
+df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
