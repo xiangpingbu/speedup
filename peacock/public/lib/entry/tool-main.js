@@ -39,6 +39,7 @@ require(['jquery', "tool", "tool_button"],
         // tool.init();
 
         function init() {
+            $(".spinner").css('display', 'none');
             var url = window.location.href;
             var ut = url.split("#")[1];
             console.log(ut);

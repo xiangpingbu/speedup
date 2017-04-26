@@ -654,12 +654,13 @@ def get_single_var_bin_woe_numerical(df, var_ori, var_bin, target, boundary_list
     return agg
 
 
-def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=0.05):
+def get_tree_bin(df, var, target, varType, nullValue=[], treeDep=3, minLeafRate=0.0005):
     '''
     porcess single variable
     '''
 
-    minLeaf=int(len(df) * minLeafRate)
+    # minLeaf=int(len(df) * minLeafRate)+1
+    minLeaf=1
     for nv in nullValue:
         df[var] = df[var].replace(nv, np.nan)
 

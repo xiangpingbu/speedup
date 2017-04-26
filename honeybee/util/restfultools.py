@@ -20,10 +20,10 @@ def statusResponse(statu_dic):
     return jsonify({'status': statu_dic})
 
 
-def responseto(data=None, message=None, error=None, **kwargs):
+def responseto(data=None, message=None, success=True, **kwargs):
     """ 封装 json 响应"""
     result = kwargs
-    result['success'] = True
+    result['success'] = success
     result['message'] = message
     result['data'] = data
 

@@ -33,7 +33,7 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 model_name = "model_train_selected"
-df_train = pd.read_excel("/Users/lifeng/Desktop/wo_pai/我爱卡/model_train_selected.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 df_test = None
@@ -217,15 +217,48 @@ def divide():
             bound_list.append(map(cmm.transfer, v[name].split("|")))
         result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
                            ,target=target, expected_column={name})
+        iv = result['IV'].sum()
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
         df = pd.DataFrame(result,
                           columns=columns)
 
-        data = generate_response(name, df)
+        data = generate_response(name, df,iv)
         #data = get_merged(name, df, min_val)
         return responseto(data = data)
 
+@app.route(base + "/divide_manually",methods=['POST'])
+def divide_manually():
+    boundary = request.form.get("boundary")
+    variable_name = request.form.get("variable_name")
+    branch = request.form.get("branch")
+    model_name = request.form.get("model_name")
+    type = request.form.get("type")
+
+    boundary_list = []
+    if type =="true":
+        for s in boundary.split(","):
+            temp = []
+            temp.extend(map(cmm.transfer, s.split("|")))
+            boundary_list.append(temp)
+        columns = ['bin_num', variable_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'type']
+
+    else :
+        for s in boundary.split(","):
+            boundary_list.append(float(s))
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+                   'type']
+
+    target = vs.load_branch(model_name,branch)[0]["model_target"]
+    result = ab.adjust(df_train, type =="true", variable_name, boundary_list
+                       , target=target, expected_column={variable_name})
+
+    iv = result['IV'].sum()
+    df = pd.DataFrame(result,
+                      columns=columns)
+    data = generate_response(variable_name, df, iv)
+    return responseto(data=data)
 
 @app.route(base + "/apply", methods=['POST'])
 def apply():
@@ -317,7 +350,7 @@ def parse():
     if len(result) < 1:
         vs.create_branch(model_name, "master", None, None)
         result = []
-        result.append({"model_branch", "master"})
+        result.append({"model_branch":"master"})
 
     branches = []
 

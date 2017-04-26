@@ -81,9 +81,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         });
     }
 
-    $("#prev").click(function () {
-        getTable();
-    });
+    // $("#prev").click(function () {
+    //     getTable();
+    // });
 
     /**
      * 预处理数据并获取表格
