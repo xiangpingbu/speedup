@@ -2,7 +2,7 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://192.168.31.68:8091";
+var host = "http://localhost:8091";
 
 var controlMap = {};
 
@@ -108,8 +108,10 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     }
 
     function initPanel(rowName,iv, num, table_head) {
-        d3.select("body")
-            .select("div").append("h5").text(rowName+"-------"+iv);
+       var h5 = d3.select("body")
+            .select("div").append("h5");
+           h5.text(rowName+"-------");
+           h5.append("span").attr("class","iv").attr("id",rowName).text(iv);
         //设置画布
         svg = d3.select("body")
             .select("div")
@@ -367,16 +369,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     },
                     async: true,
                     success: function (result) {
-                        var svg = null;
-                        renderBars(svg, result.data[name], id, true);
-                        initList = [id];
-                        buttonInit(initList);
-                        renderTable(result.data[name], id);
-                        tool_button.changeTd();
-                        controlMap[id].start = {};
-                        controlMap[id].end = {};
-                        $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display', 'none');
+                        adjustTable(result,id,initList,name)
                     }
                 });
             });
@@ -468,23 +461,45 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     },
                     async: true,
                     success: function (result) {
-                        var svg = null;
-                        renderBars(svg, result.data[name], id, true);
-                        initList = [id];
-                        buttonInit(initList);
-                        renderTable(result.data[name], id);
-                        tool_button.changeTd();
-                        controlMap[id].start = {};
-                        controlMap[id].end = {};
-                        $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display', 'none');
+                        // var varData = result.data[name]["var_table"];
+                        // var svg = null;
+                        // renderBars(svg, varData, id, true);
+                        // initList = [id];
+                        // buttonInit(initList);
+                        // renderTable(varData, id);
+                        // tool_button.changeTd();
+                        // controlMap[id].start = {};
+                        // controlMap[id].end = {};
+                        // //设置按钮不可用
+                        // $("#merge_" + id).attr("disabled", "disabled");
+                        // //隐藏等待提示
+                        // $(".spinner").css('display', 'none');
+                        //
+                        // $("#"+name).val(result.data[name]["iv"]);
 
+                        adjustTable(result,id,initList,name)
                     }
                 });
             });
-
-
         }
+    }
+
+    function adjustTable(result,id,initList,name) {
+        var varData = result.data[name]["var_table"];
+        var svg = null;
+        renderBars(svg, varData, id, true);
+        initList = [id];
+        buttonInit(initList);
+        renderTable(varData, id);
+        tool_button.changeTd();
+        controlMap[id].start = {};
+        controlMap[id].end = {};
+        //设置按钮不可用
+        $("#merge_" + id).attr("disabled", "disabled");
+        //隐藏等待提示
+        $(".spinner").css('display', 'none');
+
+        $("#"+name).val(result.data[name]["iv"]);
     }
 
     function renderBody(svg, data, num) {

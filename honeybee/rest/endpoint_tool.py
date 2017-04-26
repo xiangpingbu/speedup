@@ -188,9 +188,10 @@ def divide():
                            , target=target, expected_column={name})
         columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
+        iv = result['IV'].sum()
         df = pd.DataFrame(result,
                           columns=columns)
-        data = generate_response(name, df)
+        data = generate_response(name, df, iv)
         #data = get_merged(name, df, min_val)
 
         return responseto(data=data)
@@ -485,8 +486,9 @@ def get_divide_min_bound(out):
     out = get_boundary(out)
 
     bound = []
-    for key, list in out.items():
-        for val in list:
+    for key, var_content in out.items():
+        row_list = var_content['var_table']
+        for val in row_list:
             bound.append(float(val["min"]))
     return bound
 
@@ -624,15 +626,17 @@ def merge():
 
     result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
                        expected_column=excepted_column)  # 获得合并的结果
+    iv = result['IV'].sum()
+
     df = pd.DataFrame(result,
                       columns=columns)
 
-    data = generate_response(var_name, df)
+    data = generate_response(var_name, df, iv)
     #data = get_merged(var_name, df, min_val)
     return responseto(data = data)
 
 
-def generate_response(var_name, df):
+def generate_response(var_name, df, iv):
     """
     adjust方法产生的数据转换成dict.
 
@@ -666,8 +670,11 @@ def generate_response(var_name, df):
 }
     """
 
-    data = {var_name: []}
-
+    #data = {var_name: []}
+    data = collections.OrderedDict()
+    var_content = collections.OrderedDict()
+    var_content['iv'] = iv
+    var_content['var_table'] = []
     for index, row in df.iterrows():  # 获取每行的index、row
         sub_data = collections.OrderedDict()
         for col_name in df.columns:
@@ -676,6 +683,7 @@ def generate_response(var_name, df):
                 sub_data[col_name] = "|".join(str(i.encode('utf-8')) for i in row[col_name])
             else:
                 sub_data[col_name] = str(row[col_name])
-        data[var_name].append(sub_data)
+        var_content['var_table'].append(sub_data)
 
+    data[var_name] = var_content
     return data
