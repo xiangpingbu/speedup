@@ -15,6 +15,8 @@ from util import A99_Functions as a99
 from io import BytesIO
 from flask import send_file
 from service import variable_service as vs
+import sys
+
 
 base = '/tool'
 base_path = "./util/"
@@ -262,6 +264,7 @@ def divide_manually():
     data = generate_response(variable_name, df, iv)
     return responseto(data=data)
 
+'''
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
@@ -324,6 +327,73 @@ def apply():
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
     return responseFile(response)
+'''
+
+@app.route(base + "/apply", methods=['POST'])
+def apply():
+    """将train数据得到的woe与test数据进行匹配"""
+    data = request.form.get('data')
+    target = request.form.get('target')
+    if target is None:
+        target = "bad_4w"
+    var_dict = json.loads(data)
+    df_test.append(df_train)
+    df_woe_append = df_test.drop(target, 1)
+    var_list = var_dict.keys()
+
+    for var_name in var_list:
+        df_woe_append[var_name+'_woe'] = df_woe_append[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, var_dict))
+
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df_woe_append.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
+    workbook = writer.book
+    worksheet = writer.sheets["Sheet_1"]
+    format = workbook.add_format()
+    format.set_bg_color('#eeeeee')
+    worksheet.set_column(0, 9, 28)
+    writer.close()
+
+    output.seek(0)
+    response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
+    return responseFile(response)
+
+
+def isNum(v):
+    try:
+        val = float(v)
+        return True
+    except ValueError:
+        return False
+
+def apply_get_woe_value(var_name, var_value, var_dict):
+    var_content = var_dict[var_name]
+    var_type = var_content[0]['type']
+    if var_type == 'Numerical':
+        if not isNum(var_value):
+            return 0.0
+        for row in var_content:
+            if row['min_boundary'] == '-inf':
+                min_boundary = sys.float_info.min
+            else:
+                min_boundary = float(row['min_boundary'])
+
+            if row['max_boundary'] == 'inf':
+                max_boundary = sys.float_info.max
+            else:
+                max_boundary = float(row['max_boundary'])
+
+            if np.isnan(var_value) and str(min_boundary) == 'nan':
+                return float(row['woe'])
+            elif min_boundary <= var_value < max_boundary:
+                return float(row['woe'])
+        return 'Wrong!'
+    else:
+        for row in var_content:
+            if var_value in row[var_name]:
+                return float(row['woe'])
+        return 0.0
 
 
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
