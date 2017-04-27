@@ -78,6 +78,34 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             model_name = localStorage.getItem("model_name");
         }
 
+        var head = d3.select("#analyze").append("div").attr("class","row wrapper border-bottom white-bg page-heading")
+        var content = head.append("div").attr("class","col-lg-10");
+        content.append("h1").text("Binning Function");
+        var ol = content.append("ol").attr("class","breadcrumb");
+        ol.append("li").append("span").text(model_name);
+        ol.append("li").append("strong").text(branch);
+        ol.append("li").append("span").append("a").attr("id","saveAll").text("保存所有");
+        ol.append("li").append("span").append("a").attr("id","loadAll").text("读取所有");
+
+        $("#saveAll").bind("click",function () {
+            // $(".spinner").css('display', 'block');
+            // $.ajax({
+            //     url: host+"/tool/db/save",
+            //     data:{"branch":localStorage.getItem("branch"),
+            //         "model_name":localStorage.getItem("model_name"),
+            //         "data":JSON.stringify(exportDataWithIV())},
+            //     type: 'post',
+            //     async: true,
+            //     success: function (result) {
+            //         $(".spinner").css('display', 'none');
+            //     }
+            // });
+            $(this).unbind();
+        });
+       // var div = content.append("div");
+       // div.append("h5").text("123");
+
+
 
         $.ajax({
             url: host + "/tool/init",
@@ -595,41 +623,42 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         str.push($(n).children().eq(index).html());
                     });
                     $("#manual_input_" + id).text(str.join(","));
-                    
-                    $("#manual_btn_"+id).click(function () {
-                        debugger;
-                        var name = $(this).attr("name");
-                        var boundary = $("#manual_input_" + id).val();
-                        alert(boundary);
-                        var branch = localStorage.getItem("branch");
-                        var model_name = localStorage.getItem("model_name");
-                        $(".spinner").css('display', 'block');
-                        $.ajax({
-                            url: host + "/tool/divide_manually",
-                            type: 'post',
-                            data: {
-                                "variable_name": name,
-                                "boundary": boundary,
-                                "branch": branch,
-                                "model_name": model_name,
-                                "type": isCate
-                            },
-                            async: true,
-                            success: function (result) {
-                                adjustTable(result, id, initList, name)
-                            },
-                            error: function (result) {
-                                $(".spinner").css('display', 'none');
-                            }
-                        });
-                    })
+
                     
                 } else{
                     d3.select(input_area_id).style("display", "none");
                 }
 
+                $("#manual_btn_"+id).click(function () {
+                    var name = $(this).attr("name");
+                    var boundary = $("#manual_input_" + id).val();
+                    alert(boundary);
+                    var branch = localStorage.getItem("branch");
+                    var model_name = localStorage.getItem("model_name");
+                    $(".spinner").css('display', 'block');
+                    $.ajax({
+                        url: host + "/tool/divide_manually",
+                        type: 'post',
+                        data: {
+                            "variable_name": name,
+                            "boundary": boundary,
+                            "branch": branch,
+                            "model_name": model_name,
+                            "type": isCate
+                        },
+                        async: true,
+                        success: function (result) {
+                            adjustTable(result, id, initList, name);
+                            $(".spinner").css('display', 'none');
+                        },
+                        error: function (result) {
+                            $(".spinner").css('display', 'none');
+                        }
+                    });
+                });
+            });
 
-            })
+
 
         }
     }
@@ -762,20 +791,6 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         }
     }
 
-    function getUtf8Length(str) {
-        if (str == "" || str == null)
-            return 0;
-        var n = 0;
-        len = 0;
-        for (i = 0; i < str.length; i++) {
-            n = str.charCodeAt(i);
-            if (n <= 255)
-                len += 1;
-            else
-                len += 3;
-        }
-        return len;
-    }
 
     return {
         init: init
