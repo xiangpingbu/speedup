@@ -8,8 +8,8 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 
-//var host = "http://192.168.31.68:8091";
-var host = "http://localhost:8091";
+var host = "http://192.168.31.68:8091";
+// var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
@@ -307,7 +307,6 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
 
     function exportDataWithIV() {
-        debugger;
         var row = $("#rowNum").val();
         var data = {};
         for (var i = 0; i < row; i++) {
@@ -330,16 +329,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     var maxBound = tds.get(maxBoundIndex).innerHTML;
                     innerDate["max"] = max;
                     innerDate["min"] = min;
-                    innerDate["min_bound"] = minBound;
-                    innerDate["max_bound"] = maxBound;
+                    innerDate["min_boundary"] = minBound;
+                    innerDate["max_boundary"] = maxBound;
                 } else {
-                    var ca = tds.get(categoricalIndex).innerHTML;
-
-                    innerDate[name] = ca.split('|');
+                    innerDate[name] = tds.get(categoricalIndex).innerHTML;
                 }
                 var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
                 innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
-                innerDate["binNum"] = binNum;
+                innerDate["bad_rate"] = tds.get(tds.length - 3).innerHTML;
+                innerDate["total_perc"] = tds.get(tds.length - 4).innerHTML;
+                innerDate["total"] = tds.get(tds.length - 5).innerHTML;
+                innerDate["goods"] = tds.get(tds.length - 6).innerHTML;
+                innerDate["bads"] = tds.get(tds.length - 7).innerHTML;
+                innerDate["bin_num"] = binNum;
                 innerDate["type"] = category_t;
             }
         }

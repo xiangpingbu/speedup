@@ -33,8 +33,8 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 model_name = "model_train_selected"
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-#df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
@@ -338,12 +338,13 @@ def upload():
         files = request.files.getlist("file[]")
         for file in files:
             filename = secure_filename(file.filename)
-            model_name = filename[0:filename.index(".")]
+
             print filename
-            if filename == 'df_test.xlsx':
+            if filename.find("test") >0:
                 df_test = pd.read_excel(file, encoding="utf-8")
-            elif filename == 'df_train.xlsx':
+            if filename.find("train") >0:
                 df_train = pd.read_excel(file, encoding="utf-8")
+                model_name = filename[0:filename.index("_")]
                 # df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
@@ -740,6 +741,6 @@ def generate_response(var_name, df, iv):
 
 
 def sort_iv(out):
-    out_sorted_iv = collections.OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
+    out_sorted_iv = OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
     return out_sorted_iv
 
