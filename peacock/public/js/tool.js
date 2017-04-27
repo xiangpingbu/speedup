@@ -88,19 +88,32 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         ol.append("li").append("span").append("a").attr("id","loadAll").text("读取所有");
 
         $("#saveAll").bind("click",function () {
-            // $(".spinner").css('display', 'block');
-            // $.ajax({
-            //     url: host+"/tool/db/save",
-            //     data:{"branch":localStorage.getItem("branch"),
-            //         "model_name":localStorage.getItem("model_name"),
-            //         "data":JSON.stringify(exportDataWithIV())},
-            //     type: 'post',
-            //     async: true,
-            //     success: function (result) {
-            //         $(".spinner").css('display', 'none');
-            //     }
-            // });
-            $(this).unbind();
+            $(".spinner").css('display', 'block');
+            $.ajax({
+                url: host+"/tool/db/save",
+                data:{"branch":localStorage.getItem("branch"),
+                    "model_name":localStorage.getItem("model_name"),
+                    "data":JSON.stringify(tool_button.saveAll())},
+                type: 'post',
+                async: true,
+                success: function (result) {
+                    $(".spinner").css('display', 'none');
+                }
+            });
+        });
+        $("#saveAll").bind("click",function () {
+            $(".spinner").css('display', 'block');
+            $.ajax({
+                url: host+"/tool/db/save",
+                data:{"branch":localStorage.getItem("branch"),
+                    "model_name":localStorage.getItem("model_name"),
+                    "data":JSON.stringify(tool_button.saveAll())},
+                type: 'post',
+                async: true,
+                success: function (result) {
+                    $(".spinner").css('display', 'none');
+                }
+            });
         });
        // var div = content.append("div");
        // div.append("h5").text("123");

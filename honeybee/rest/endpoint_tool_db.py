@@ -50,6 +50,8 @@ def save():
     data = request.values.get("data")
     dict = json.loads(data)
 
+    vs.del_binnbing_record(model_name,branch)
+
     list = []
     for key,val in dict.items():
         obj = [model_name,branch,key,val["iv"],json.dumps(val["var_table"])]

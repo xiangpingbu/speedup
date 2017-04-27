@@ -306,6 +306,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
 
     function exportDataWithIV() {
+        debugger;
         var row = $("#rowNum").val();
         var data = {};
         for (var i = 0; i < row; i++) {
@@ -409,7 +410,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     return {
         output: outputDateMap,
         changeTd: changeTd,
-        getTable: getTable
+        getTable: getTable,
+        saveAll:exportDataWithIV
     }
 });
 
