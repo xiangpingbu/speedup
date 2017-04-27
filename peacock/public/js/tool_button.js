@@ -368,8 +368,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     var maxBound = tds.get(maxBoundIndex).innerHTML;
                     innerDate["max"] = max;
                     innerDate["min"] = min;
-                    innerDate["min_bound"] = minBound;
-                    innerDate["max_bound"] = maxBound;
+                    innerDate["min_boundary"] = minBound;
+                    innerDate["max_boundary"] = maxBound;
                 } else {
                     var ca = tds.get(categoricalIndex).innerHTML;
 
