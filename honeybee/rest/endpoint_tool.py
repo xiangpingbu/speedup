@@ -33,7 +33,8 @@ def file_init():
 # df_train = file_init()
 # df_test = file_init()
 model_name = "model_train_selected"
-df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+#df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
@@ -175,7 +176,7 @@ def divide():
         #    else:
         #        df.drop(index, inplace=True)
 
-        out = get_init(df, target=target, invalid=[])
+        out = get_init(df, target=target, invalid=[], fineMinLeafRate=0)
         bound_list = get_divide_min_bound(out)
 
         list = data_map["table"]
@@ -210,7 +211,7 @@ def divide():
         # 删除要被分裂的项
         del list[data_map["selectedIndex"]]
 
-        out = get_init(df, target=target, invalid=[])
+        out = get_init(df, target=target, invalid=[], fineMinLeafRate=0)
         bound_list = get_divide_caterotical_bound(out, name)
         # 被分裂的项的下标
         index = data_map["selectedIndex"]
@@ -448,8 +449,8 @@ def column_config():
     return ""
 
 
-def get_init(df=df_train, target=None, invalid=None):
-    data_map = ib.cal(df, target, invalid)
+def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
+    data_map = ib.cal(df, target, invalid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
