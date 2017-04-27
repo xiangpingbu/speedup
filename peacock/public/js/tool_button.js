@@ -8,7 +8,8 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 
-var host = "http://192.168.31.68:8091";
+//var host = "http://192.168.31.68:8091";
+var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
@@ -302,6 +303,49 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
         $("#" + labelName).select2({tags: true});
     }
+
+
+
+    function exportDataWithIV() {
+        var row = $("#rowNum").val();
+        var data = {};
+        for (var i = 0; i < row; i++) {
+            var name = $('#merge_' + i).attr("name");
+            var innerObj = {};
+            innerObj.var_table = [];
+            innerObj.iv = $("#"+name).text();
+            data[name] = innerObj;
+
+            var childTrs = $('#tbody_' + i).children("tr");
+            for (var innerRow = 0; innerRow < childTrs.length; innerRow++) {
+                var innerDate = {};
+                innerObj.var_table.push(innerDate);
+                var tds = $(childTrs.get(innerRow)).children("td");
+                var category_t = tds.get(tds.length - 1).innerHTML;
+                if (category_t.indexOf("Numerical") >= 0) {
+                    var max = tds.get(maxIndex).innerHTML;
+                    var min = tds.get(minIndex).innerHTML;
+                    var minBound = tds.get(minBoundIndex).innerHTML;
+                    var maxBound = tds.get(maxBoundIndex).innerHTML;
+                    innerDate["max"] = max;
+                    innerDate["min"] = min;
+                    innerDate["min_bound"] = minBound;
+                    innerDate["max_bound"] = maxBound;
+                } else {
+                    var ca = tds.get(categoricalIndex).innerHTML;
+
+                    innerDate[name] = ca.split('|');
+                }
+                var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
+                innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
+                innerDate["binNum"] = binNum;
+                innerDate["type"] = category_t;
+            }
+        }
+
+        return data
+    }
+
 
     function exportData() {
         var row = $("#rowNum").val();
