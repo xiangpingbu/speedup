@@ -793,6 +793,10 @@ def merge():
     #data = get_merged(var_name, df, min_val)
     return responseto(data = data)
 
+@app.route(base+"/variable_select",methods=['POST'])
+def variable_select():
+
+    return None
 
 def generate_response(var_name, df, iv):
     """
