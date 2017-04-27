@@ -7,7 +7,7 @@ from Binning_Function import *
 #MAX_CARDINALITY = 10
 
 
-def cal(df_train,target,invalid = None):
+def cal(df_train,target,invalid = None, fineMinLeafRate=0.05):
     ########################## dev vs val ##############################
     # df_train = pd.read_excel(train)
     # df_test = pd.read_excel(test)
@@ -36,7 +36,7 @@ def cal(df_train,target,invalid = None):
             #if unique_value <= MAX_CARDINALITY:
             #    t = 'object'
             print "current variable: " + v + " current type: " + t
-            tree_bin = get_tree_bin(df, v, target, t, nullValue=[])
+            tree_bin = get_tree_bin(df, v, target, t, nullValue=[], treeDep=3, minLeafRate=fineMinLeafRate)
             # IV
             var_iv = tree_bin['IV']
             if t in ['object', 'str']:
