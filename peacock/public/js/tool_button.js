@@ -8,7 +8,7 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 
-var host = "http://192.168.31.68:8091";
+var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
