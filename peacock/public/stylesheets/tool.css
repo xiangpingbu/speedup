@@ -25,7 +25,8 @@
     padding-top: 26px;
     text-align: center;
     text-decoration:none;
-    font-size: 2px;
+    font-size: 15px;
+    color: #000000;
 }
 
 /*.side-bar .icon-chat {background-position: 0 -130px;position: relative;}*/
@@ -162,3 +163,33 @@
         -webkit-transform: scaleY(1.0);
     }
 }
+
+.table-line {
+    margin-bottom: 5px;
+}
+
+.table-label {
+    width:35px;
+    margin-left: 10px;
+    margin-right: 13px;
+    /*padding-right: 20px;*/
+}
+
+.table-ele {
+    width:150px;
+}
+
+.var-btn {
+    margin-left:25px
+}
+
+.var-area {
+    margin-left:25px;
+    margin-top:5px
+}
+
+.var-area-btn {
+    margin-left:25px;
+    margin-bottom:30px !important;
+}
+

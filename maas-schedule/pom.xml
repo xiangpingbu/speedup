@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mass-schedule</artifactId>
+    <artifactId>maas-schedule</artifactId>
 
     <dependencies>
         <dependency>

@@ -2,29 +2,35 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://localhost:8091";
+//var host = "http://192.168.31.68:8091";
+var host = "http:/localhost:8091";
 
 var controlMap = {};
 
 var padding = {left: 25, right: 30, top: 5, bottom: 20};
 
+//numerical的列的排布
 var num_columnMap =
     {
-        0: "bin_num",
-        1: "min",
-        2: "max",
-        3: "min_bound",
-        4: "max_bound",
-        5: "bads",
-        6: "goods",
-        7: "total",
-        8: "total_perc",
-        9: "bad_rate",
-        10: "woe",
-        11: "category_t"
+        0: "bin_num", 1: "min",
+        2: "max", 3: "min_boundary",
+        4: "max_boundary", 5: "bads",
+        6: "goods", 7: "total",
+        8: "total_perc", 9: "bad_rate",
+        10: "woe", 11: "type"
     };
 
+var column_numMap =
+    {
+        "bin_num": 0, "min": 1,
+        "max": 2, "min_boundary": 3,
+        "max_boundary": 4, "bads": 5,
+        "goods": 6, "total": 7,
+        "total_perc": 8, "bad_rate": 9,
+        "woe": 10, "type": 11
+    };
 
+//categorical的列的排布
 var cate_columnMap =
     {
         0: "bin_num",
@@ -35,48 +41,126 @@ var cate_columnMap =
         5: "total_perc",
         6: "bad_rate",
         7: "woe",
-        8: "category_t"
+        8: "type"
+    };
+
+var column_cateMap =
+    {
+        "bin_num": 0, "name": 1,
+        "bads": 2, "goods": 3,
+        "total": 4, "total_perc": 5,
+        "bad_rate": 6, "woe": 7,
+        "type": 8
     };
 
 //描绘一个画布
 var xScale, yScale;
 
-define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
+define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
+    /**
+     * 数据图形化初始化
+     * 展示选中的variable的woe值分布
+     */
     function init() {
+        //注册右下方按钮的点击事件
         tool_button.output();
+        //提醒等待的样式
         $(".spinner").css('display', 'block');
-        d3.json("/tool/init", function (error, result) {
-            var num = 0;
+        //图形部分位于analyze的div中,初始化前需要将原有数据清空
+        $("#analyze").html("");
 
-            var initList = [];
-            for (var key in result.data) {
-                var table_head = [];
-                for (var subKey in result.data[key][0]) {
-                    table_head.push(subKey);
+        var branch = $("#branch").val();
+        var model_name = $("#model").val();
+        if (branch != null && model_name != null) {
+            localStorage.setItem("branch", branch);
+            localStorage.setItem("model_name", model_name);
+        } else {
+            branch = localStorage.getItem("branch");
+            model_name = localStorage.getItem("model_name");
+        }
+
+        var head = d3.select("#analyze").append("div").attr("class","row wrapper border-bottom white-bg page-heading")
+        var content = head.append("div").attr("class","col-lg-10");
+        content.append("h1").text("Binning Function");
+        var ol = content.append("ol").attr("class","breadcrumb");
+        ol.append("li").append("span").text(model_name);
+        ol.append("li").append("strong").text(branch);
+        ol.append("li").append("span").append("a").attr("id","saveAll").text("保存所有");
+        ol.append("li").append("span").append("a").attr("id","loadAll").text("读取所有");
+
+        $("#saveAll").bind("click",function () {
+            // $(".spinner").css('display', 'block');
+            // $.ajax({
+            //     url: host+"/tool/db/save",
+            //     data:{"branch":localStorage.getItem("branch"),
+            //         "model_name":localStorage.getItem("model_name"),
+            //         "data":JSON.stringify(exportDataWithIV())},
+            //     type: 'post',
+            //     async: true,
+            //     success: function (result) {
+            //         $(".spinner").css('display', 'none');
+            //     }
+            // });
+            $(this).unbind();
+        });
+       // var div = content.append("div");
+       // div.append("h5").text("123");
+
+
+
+        $.ajax({
+            url: host + "/tool/init",
+            type: 'post',
+            data: {
+                branch: branch,
+                model_name: model_name
+            },
+            async: true,
+            success: function (result) {
+                var num = 0;
+                var initList = [];
+                //通过变量名获取数据
+                for (var valName in result.data) {
+                    var varData = result.data[valName]["var_table"];
+                    var iv = result.data[valName]["iv"];
+                    var table_head = [];
+                    for (var subKey in varData[0]) {
+                        table_head.push(subKey);
+                    }
+                    var svg = initPanel(valName, iv, num, table_head);
+                    //画出x轴
+                    renderXAxis(svg, num, varData);
+                    //画出y轴
+                    renderYAxis(svg, num, varData);
+                    //绘制坐标轴内的bar和table
+                    renderBody(svg, varData, num);
+                    initList.push(num);
+                    num++;
                 }
-                var svg = initPanel(key, num, table_head);
-                renderXAxis(svg, num, result.data[key]);
-                renderYAxis(svg, num, result.data[key]);
-                renderBody(svg, result.data[key], num);
-                initList.push(num);
-                num++;
+                //记录行数
+                $("#rowNum").val(num);
+                //设置table内的标签可以点击
+                tool_button.changeTd();
+                //初始化按钮,有合并和分裂的操作
+                buttonInit(initList);
+                $(".spinner").css('display', 'none');
+
             }
-            //记录行数
-            $("#rowNum").val(num);
-            tool_button.changeTd();
-            buttonInit(initList);
-            $(".spinner").css('display', 'none');
         });
     }
 
-    function initPanel(rowName, num, table_head) {
-        d3.select("body")
-            .select("div").append("h5").text(rowName);
+    function initPanel(rowName, iv, num, table_head) {
+        var h5 = d3.select("body")
+            .select("div").append("h5");
+        h5.text(rowName + "-------");
+
+        h5.append("span").attr("class", "iv").attr("id", rowName).text(iv);
         //设置画布
         svg = d3.select("body")
             .select("div")
             .append("div")
             .attr("id", "svg_" + num)
+            .style("width", "2000")
             .attr("class", "svg-content")
             .append("svg")
             .attr("class", "axis")
@@ -106,7 +190,7 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
             .append("div");
 
         buttonDiv.append("button")
-            .attr("class", "btn btn-primary")
+            .attr("class", "btn btn-primary var-btn")
             .attr("id", "merge_" + num)
             .attr("name", rowName)
             .attr("disabled", "disabled")
@@ -114,14 +198,43 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
             .style("margin-left", "25px");
 
         buttonDiv.append("button")
-            .attr("class", "btn btn-danger")
+            .attr("class", "btn btn-danger var-btn")
             .attr("id", "divide_" + num)
             .attr("name", rowName)
-            .text("分裂")
-            .style("margin-left", "25px");
+            .text("分裂");
+
+        buttonDiv.append("button")
+            .attr("class", "btn btn-warning var-btn")
+            .attr("id", "save_" + num)
+            .attr("name", rowName)
+            .text("保存记录");
+
+        buttonDiv.append("button")
+            .attr("class", "btn btn-success var-btn")
+            .attr("id", "divide_manually_" + num)
+            .attr("name", rowName)
+            .text("手动分裂");
+
+        var inputDiv = buttonDiv
+            .append("div")
+            .attr("id", "divide_area_" + num)
+            .style("display", "none");
+
+        inputDiv.append("textarea")
+            .attr("rows", 5)
+            .attr("cols", 140)
+            .attr("id", "manual_input_" + num)
+            .attr("class", "var-area");
+        inputDiv.append("button")
+            .attr("id","manual_btn_"+num)
+            .attr("class", "btn btn-primary var-area-btn")
+            .attr("name",rowName)
+            .text("提交");
+
 
         return svg
     }
+
     /**
      * 描绘x轴
      * 需要指定画布(svg),variable的下标,variable的相关数据
@@ -217,6 +330,12 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
             var rects = $('#svg_' + a).find('.MyRect').click(function () {
                 //id和a的值是一致的,因此可以通过这个值从map中得到数据
                 var id = $(this).parent().parent().attr("id").split("_")[1];
+                var childTrs = $('#tbody_' + id).children("tr");
+                var tds = $(childTrs.get(0)).children("td");
+                //判断是否为categorical还是numerical
+                var type = tds.get(tds.length - 1).innerHTML;
+                var isNum = (type == "Numerical");
+
                 //觉得应该可以用队列来实现
                 var array = controlMap[id].array;
                 var start = controlMap[id].start;
@@ -234,11 +353,20 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                     if (!$.isEmptyObject(start) && !$.isEmptyObject(end)) {
                         var si = parseInt(start.index);
                         var ei = parseInt(end.index);
-                        for (var i = Math.min(si, ei); i <= Math.max(si, ei); i++) {
-
-                            var bar = $("#index_" + id + "_" + i);
-                            array.push(bar);
+                        var bar;
+                        if (isNum) {
+                            for (var i = Math.min(si, ei); i <= Math.max(si, ei); i++) {
+                                bar = $("#index_" + id + "_" + i);
+                                array.push(bar);
+                                bar.attr("fill", "brown");
+                            }
+                        } else {
+                            bar = $("#index_" + id + "_" + si);
                             bar.attr("fill", "brown");
+                            array.push(bar);
+                            bar = $("#index_" + id + "_" + ei);
+                            bar.attr("fill", "brown");
+                            array.push(bar);
                         }
                     }
                 } else {
@@ -261,6 +389,9 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 }
             });
 
+            /**
+             * 分裂选择的bar
+             */
             $("#divide_" + a).click(function () {
                 $(".spinner").css('display', 'block');
                 var data = {};
@@ -268,12 +399,13 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 var start = controlMap[id].start;
                 var name = $(this).attr("name");
 
+                debugger;
                 var childs = $('#tbody_' + id).children("tr");
                 var tds_0 = $(childs.get(0)).children("td");
 //                var td = $(childs.get(start.index)).children("td");
-                var category_t = tds_0.get(tds_0.length - 1).innerHTML;
+                var type = tds_0.get(tds_0.length - 1).innerHTML;
                 var columnMap;
-                if (category_t.indexOf('F') >= 0) {
+                if (type == 'Numerical') {
                     columnMap = num_columnMap;
                 } else {
                     cate_columnMap[1] = name;
@@ -311,16 +443,64 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                     },
                     async: true,
                     success: function (result) {
-                        var svg = null;
-                        renderBars(svg, result.data[name], id, true);
-                        initList = [id];
-                        buttonInit(initList);
-                        renderTable(result.data[name], id);
-                        tool_button.changeTd();
-                        controlMap[id].start = {};
-                        controlMap[id].end = {};
-                        $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display', 'none');
+                        adjustTable(result, id, initList, name)
+                    }
+                });
+            });
+
+            /**
+             * 保存选择的集合
+             */
+            $("#save_" + a).click(function () {
+                $(".spinner").css('display', 'block');
+                var data = {};
+                var content = {};
+
+                var id = $(this).attr("id").split("_")[1];
+                var name = $(this).attr("name");
+                var iv = $("#" + name).text();
+
+                data[name] = content;
+
+                //获得所有的行数据
+                var childs = $('#tbody_' + id).children("tr");
+                var tds_0 = $(childs.get(0)).children("td");
+//                var td = $(childs.get(start.index)).children("td");
+                var type = tds_0.get(tds_0.length - 1).innerHTML;
+                var columnMap;
+                if (type == 'Numerical') {
+                    columnMap = num_columnMap;
+                } else {
+                    cate_columnMap[1] = name;
+                    columnMap = cate_columnMap;
+                }
+
+                var var_table = [];
+                content.iv = iv;
+                content.var_table = var_table;
+
+                for (var i = 0; i < childs.length; i++) {
+                    var tds = $(childs.get(i)).children("td");
+                    var obj = {};
+                    for (var j = 0; j < tds.length; j++) {
+                        obj[columnMap[j]] = tds.get(j).innerHTML;
+                    }
+                    var_table.push(obj);
+                }
+
+
+                $(".spinner").css('display', 'block');
+                $.ajax({
+                    url: host + "/tool/db/save",
+                    type: 'post',
+                    data: {
+                        data: JSON.stringify(data),
+                        model_name: localStorage.getItem("model_name"),
+                        branch: localStorage.getItem("branch")
+                    },
+                    async: true,
+                    success: function (result) {
+                        $(".spinner").css('display', "none");
                     }
                 });
             });
@@ -334,7 +514,7 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 var start = controlMap[id].start;
                 var end = controlMap[id].end;
                 var list = '';
-                var wholeList = [];
+                var wholeList = '';
                 var childTrs = $('#tbody_' + id).children("tr");
 
                 var tds = $(childTrs.get(0)).children("td");
@@ -343,51 +523,56 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 //得到每个bin的最大值
                 var min = Math.min(start.index, end.index);
                 var max = Math.max(start.index, end.index);
-                var isNum = type.indexOf("F") >= 0;
+                //var isNum = type.indexOf("F") >= 0;
+                var isNum = (type == "Numerical");
                 //判断应该从哪一列获取相应的值
                 var valIndex;
-                if (isNum) valIndex = maxIndex;
+                if (isNum) valIndex = minBoundIndex;
                 else valIndex = categoricalIndex;
-
-                for (var i = min; i <= max; i++) {
-                    if (i == max) {
-                        //如果存在'F',代表type为false,variable为numerical,
+                debugger;
+                var iterList = [];
+                if (!isNum) iterList = [min, max];
+                else {
+                    for (var i = min; i <= max; i++) {
+                        iterList.push(i);
+                    }
+                }
+                for (var n in iterList) {
+                    if (iterList[n] == min) {
                         if (isNum) {
-                            //此时该max的值可以被丢弃
+                            //此时该min的值可以被丢弃
                             continue;
                         }
                     }
-
-
                     if (isNum) {
 //                        valIndex = maxIndex;
-                        valIndex = maxBoundIndex;
+                        valIndex = minBoundIndex;
                     }
                     else valIndex = categoricalIndex;
-                    list = list + ($(childTrs.get(i)).children("td").get(valIndex).innerHTML) + ("&");
-                }
 
+                    list = list + ($(childTrs.get(iterList[n])).children("td").get(valIndex).innerHTML) + ("&");
+                }
+                //去除末尾的&符号
                 list = list.substring(0, list.length - 1);
 
-                for (var index = 0; index < childTrs.length; index++) {
-                    var tdVal;
-                    if (isNum) {
-                        //整个区间的大部分从max_bound列中得到,除了inf一列
-                        if (index == childTrs.length - 2) {
-                            tdVal = $(childTrs.get(index)).children("td").get(maxIndex).innerHTML;
-                        } else {
-                            tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML
-                        }
+
+                var tdVal;
+                //numerical按照区间筛选
+                if (isNum) {
+                    for (var index = 0; index < childTrs.length; index++) {
+                        tdVal = $(childTrs.get(index)).children("td").get(valIndex).innerHTML;
                         wholeList = wholeList + (tdVal) + ("&");
-                    } else {
+                    }
+                } else {
+                    for (var b = 0; b < childTrs.length; b++) {
                         //获取categorical的除选中以外的值
-                        if (index < min || index > max) {
-                            wholeList = wholeList + ($(childTrs.get(index)).children("td").get(valIndex).innerHTML) + ("&");
-                        } else {
-                            wholeList = "&"
+                        debugger;
+                        if (b != min && b != max) {
+                            wholeList = wholeList + ($(childTrs.get(b)).children("td").get(valIndex).innerHTML) + ("&");
                         }
                     }
                 }
+
                 wholeList = wholeList.substring(0, wholeList.length - 1);
                 $(".spinner").css('display', 'block');
                 $.ajax({
@@ -401,23 +586,101 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                     },
                     async: true,
                     success: function (result) {
-                        var svg = null;
-                        renderBars(svg, result.data[name], id, true);
-                        initList = [id];
-                        buttonInit(initList);
-                        renderTable(result.data[name], id);
-                        tool_button.changeTd();
-                        controlMap[id].start = {};
-                        controlMap[id].end = {};
-                        $("#merge_" + id).attr("disabled", "disabled");
-                        $(".spinner").css('display', 'none');
+                        // var varData = result.data[name]["var_table"];
+                        // var svg = null;
+                        // renderBars(svg, varData, id, true);
+                        // initList = [id];
+                        // buttonInit(initList);
+                        // renderTable(varData, id);
+                        // tool_button.changeTd();
+                        // controlMap[id].start = {};
+                        // controlMap[id].end = {};
+                        // //设置按钮不可用
+                        // $("#merge_" + id).attr("disabled", "disabled");
+                        // //隐藏等待提示
+                        // $(".spinner").css('display', 'none');
+                        //
+                        // $("#"+name).val(result.data[name]["iv"]);
 
+                        adjustTable(result, id, initList, name)
                     }
                 });
             });
 
+            $("#divide_manually_" + a).click(function () {
+                var id = $(this).attr("id").split("_")[2];
+                var input_area_id = "#divide_area_"+id;
+                var childTrs = $('#tbody_' + id).children("tr");
+                var tds = $(childTrs.get(0)).children("td");
+                var type = tds.get(tds.length - 1).innerHTML;
+                var isCate = (type == "Categorical");
+
+                if (d3.select(input_area_id).style("display") == 'none') {
+                    d3.select(input_area_id).style("display", "block");
+                    var str = [];
+                    var index = 3;
+                    if (isCate) index = 1;
+                    $('#tbody_' + id).find("tr").each(function (i, n) {
+                        str.push($(n).children().eq(index).html());
+                    });
+                    $("#manual_input_" + id).text(str.join(","));
+
+                    
+                } else{
+                    d3.select(input_area_id).style("display", "none");
+                }
+
+                $("#manual_btn_"+id).click(function () {
+                    var name = $(this).attr("name");
+                    var boundary = $("#manual_input_" + id).val();
+                    alert(boundary);
+                    var branch = localStorage.getItem("branch");
+                    var model_name = localStorage.getItem("model_name");
+                    $(".spinner").css('display', 'block');
+                    $.ajax({
+                        url: host + "/tool/divide_manually",
+                        type: 'post',
+                        data: {
+                            "variable_name": name,
+                            "boundary": boundary,
+                            "branch": branch,
+                            "model_name": model_name,
+                            "type": isCate
+                        },
+                        async: true,
+                        success: function (result) {
+                            adjustTable(result, id, initList, name);
+                            $(".spinner").css('display', 'none');
+                        },
+                        error: function (result) {
+                            $(".spinner").css('display', 'none');
+                        }
+                    });
+                });
+            });
+
+
 
         }
+    }
+
+    function adjustTable(result, id, initList, name) {
+        debugger;
+        var varData = result.data[name]["var_table"];
+        var svg = null;
+        renderBars(svg, varData, id, true);
+        initList = [id];
+        buttonInit(initList);
+        renderTable(varData, id);
+        tool_button.changeTd();
+        controlMap[id].start = {};
+        controlMap[id].end = {};
+        //设置按钮不可用
+        $("#merge_" + id).attr("disabled", "disabled");
+        //隐藏等待提示
+        $(".spinner").css('display', 'none');
+
+        $("#" + name).text(result.data[name]["iv"]);
     }
 
     function renderBody(svg, data, num) {
@@ -481,8 +744,8 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
+                .attr("id", function (d, i) {//绑定id
+                    return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
                 .attr("x", function (d) {
@@ -509,8 +772,8 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 .append("rect")
                 .attr("class", "MyRect")
                 .attr("fill", "#000000")//设定bar的颜色
-                .attr("id", function (d) {//绑定id
-                    return "index_" + num + "_" + d.bin_num;
+                .attr("id", function (d, i) {//绑定id
+                    return "index_" + num + "_" + i;
                 })
                 .attr("transform", "translate(" + padding.left + "," + 40 + ")")//设置偏移位置
                 .attr("x", function (d) {
@@ -528,6 +791,8 @@ define(['jquery', 'd3','tool_button'],function ($,d3,tool_button){
                 });
         }
     }
+
+
     return {
         init: init
     };
