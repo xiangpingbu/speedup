@@ -262,6 +262,7 @@ def divide_manually():
     data = generate_response(variable_name, df, iv)
     return responseto(data=data)
 
+
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
@@ -309,6 +310,8 @@ def apply():
                             test.loc[index, [column + "_woe"]] = obj["woe"]
                             break
     # test.to_excel("df_iv.xlsx", ",", header=True, index=False)
+
+
 
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
