@@ -13,41 +13,41 @@ var host = "http://192.168.31.68:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
-        // $("#output").click(function () {
-        //         $("#downloadform").remove();
-        //         var form = $("<form>");//定义一个form表单
-        //         form.attr("id", "downloadform");
-        //         form.attr("style", "display:none");
-        //         form.attr("target", "");
-        //         form.attr("method", "post");
-        //         form.attr("action", host+"/tool/apply");
-        //         var input1 = $("<input>");
-        //         input1.attr("type", "hidden");
-        //         input1.attr("name", "data");
-        //
-        //         // var data ={
-        //         //     "data": JSON.stringify(exportData())
-        //         // };
-        //
-        //         input1.attr("value", JSON.stringify(exportData()));
-        //         form.append(input1);
-        //         $("body").append(form);//将表单放置在web中
-        //
-        //         form.submit();//表单提交
-        //
-        //         // $.ajax({
-        //         //     url: "http://localhost:8091/tool/apply",
-        //         //     type: 'post',
-        //         //     data: {
-        //         //         "data": JSON.stringify(exportData())
-        //         //     },
-        //         //     async: true,
-        //         //     success: function (result) {
-        //         //
-        //         //     }
-        //         // });
-        //     }
-        // )
+        $("#output").click(function () {
+                $("#downloadform").remove();
+                var form = $("<form>");//定义一个form表单
+                form.attr("id", "downloadform");
+                form.attr("style", "display:none");
+                form.attr("target", "");
+                form.attr("method", "post");
+                form.attr("action", host+"/tool/apply");
+                var input1 = $("<input>");
+                input1.attr("type", "hidden");
+                input1.attr("name", "data");
+
+                // var data ={
+                //     "data": JSON.stringify(exportData())
+                // };
+
+                input1.attr("value", JSON.stringify(exportData()));
+                form.append(input1);
+                $("body").append(form);//将表单放置在web中
+
+                form.submit();//表单提交
+
+                // $.ajax({
+                //     url: host+"/tool/apply",
+                //     type: 'post',
+                //     data: {
+                //         "data": JSON.stringify(exportData())
+                //     },
+                //     async: true,
+                //     success: function (result) {
+                //
+                //     }
+                // });
+            }
+        )
     }
 
     function changeTd() {
