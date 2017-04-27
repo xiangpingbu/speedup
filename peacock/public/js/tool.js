@@ -625,7 +625,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     });
                     $("#manual_input_" + id).text(str.join(","));
 
-                    
+
                 } else{
                     d3.select(input_area_id).style("display", "none");
                 }
