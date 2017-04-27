@@ -34,10 +34,9 @@ def file_init():
 # df_test = file_init()
 model_name = "model_train_selected"
 df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-#df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 #df_test = None
 
 
@@ -480,7 +479,7 @@ def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
         out[var_name] = var_content
     return out
 
-
+'''
 def get_boundary(out, min_val=0):
     if isinstance(out, dict):
         data = out.items()
@@ -508,6 +507,38 @@ def get_boundary(out, min_val=0):
 
                     else:
                         last_bin["max_boundary"] = 'inf'
+            else:
+                break
+
+    return out
+'''
+
+#有时间的话， 要做优化修改
+def get_boundary(out, min_val=0):
+    if isinstance(out, dict):
+        data = out.items()
+    else:
+        data = [out]
+
+    for val in data:
+        index = 0
+        last_bin = None
+        for i, bin_row in enumerate(val[1]['var_table']):
+            index += 1
+            if bin_row["type"] == "Numerical":
+                if i == 0 and bin_row["min"] == 'nan':
+                    bin_row["max_boundary"] = 'nan'
+                else:
+                    if index == 1:
+                        # if float(bin_row["min"]) >= min_val:
+                        bin_row["min_boundary"] = min_val
+                        if i == (len(val[1]['var_table'])-1):
+                            bin_row["max_boundary"] = 'inf'
+                    else:
+                        last_bin["max_boundary"] = bin_row["min_boundary"]
+                        if i == (len(val[1]['var_table'])-1):
+                            bin_row["max_boundary"] = 'inf'
+                last_bin = bin_row
             else:
                 break
 
