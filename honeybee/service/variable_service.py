@@ -58,6 +58,18 @@ def save_binning_record(variable_list):
         return True
     return False
 
+def del_binnbing_record(model_name,model_branch):
+    sql = "update tool_model_content set is_deleted=1 where model_name=%s and model_branch = %s  "
+    result = util.execute(sql,(model_name,model_branch))
+    if result > 0:
+        return True
+    return False
+
+def load_binning_record(model_name,model_branch):
+    sql = "select id,model_name,model_branch,variable_name,variable_iv,binning_record " \
+          "from tool_model_content where model_name= %s and model_branch = %s and is_deleted = 0"
+    result = util.query(sql,(model_name,model_branch))
+    return result
 
 
 

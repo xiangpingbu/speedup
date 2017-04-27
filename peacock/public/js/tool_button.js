@@ -8,46 +8,46 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 
-//var host = "http://192.168.31.68:8091";
-var host = "http://localhost:8091";
+var host = "http://192.168.31.68:8091";
+// var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function outputDateMap() {
-        $("#output").click(function () {
-                $("#downloadform").remove();
-                var form = $("<form>");//定义一个form表单
-                form.attr("id", "downloadform");
-                form.attr("style", "display:none");
-                form.attr("target", "");
-                form.attr("method", "post");
-                form.attr("action", host+"/tool/apply");
-                var input1 = $("<input>");
-                input1.attr("type", "hidden");
-                input1.attr("name", "data");
-
-                // var data ={
-                //     "data": JSON.stringify(exportData())
-                // };
-
-                input1.attr("value", JSON.stringify(exportData()));
-                form.append(input1);
-                $("body").append(form);//将表单放置在web中
-
-                form.submit();//表单提交
-
-                // $.ajax({
-                //     url: "http://localhost:8091/tool/apply",
-                //     type: 'post',
-                //     data: {
-                //         "data": JSON.stringify(exportData())
-                //     },
-                //     async: true,
-                //     success: function (result) {
-                //
-                //     }
-                // });
-            }
-        )
+        // $("#output").click(function () {
+        //         $("#downloadform").remove();
+        //         var form = $("<form>");//定义一个form表单
+        //         form.attr("id", "downloadform");
+        //         form.attr("style", "display:none");
+        //         form.attr("target", "");
+        //         form.attr("method", "post");
+        //         form.attr("action", host+"/tool/apply");
+        //         var input1 = $("<input>");
+        //         input1.attr("type", "hidden");
+        //         input1.attr("name", "data");
+        //
+        //         // var data ={
+        //         //     "data": JSON.stringify(exportData())
+        //         // };
+        //
+        //         input1.attr("value", JSON.stringify(exportData()));
+        //         form.append(input1);
+        //         $("body").append(form);//将表单放置在web中
+        //
+        //         form.submit();//表单提交
+        //
+        //         // $.ajax({
+        //         //     url: "http://localhost:8091/tool/apply",
+        //         //     type: 'post',
+        //         //     data: {
+        //         //         "data": JSON.stringify(exportData())
+        //         //     },
+        //         //     async: true,
+        //         //     success: function (result) {
+        //         //
+        //         //     }
+        //         // });
+        //     }
+        // )
     }
 
     function changeTd() {
@@ -329,16 +329,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     var maxBound = tds.get(maxBoundIndex).innerHTML;
                     innerDate["max"] = max;
                     innerDate["min"] = min;
-                    innerDate["min_bound"] = minBound;
-                    innerDate["max_bound"] = maxBound;
+                    innerDate["min_boundary"] = minBound;
+                    innerDate["max_boundary"] = maxBound;
                 } else {
-                    var ca = tds.get(categoricalIndex).innerHTML;
-
-                    innerDate[name] = ca.split('|');
+                    innerDate[name] = tds.get(categoricalIndex).innerHTML;
                 }
                 var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
                 innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
-                innerDate["binNum"] = binNum;
+                innerDate["bad_rate"] = tds.get(tds.length - 3).innerHTML;
+                innerDate["total_perc"] = tds.get(tds.length - 4).innerHTML;
+                innerDate["total"] = tds.get(tds.length - 5).innerHTML;
+                innerDate["goods"] = tds.get(tds.length - 6).innerHTML;
+                innerDate["bads"] = tds.get(tds.length - 7).innerHTML;
+                innerDate["bin_num"] = binNum;
                 innerDate["type"] = category_t;
             }
         }
@@ -410,7 +413,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     return {
         output: outputDateMap,
         changeTd: changeTd,
-        getTable: getTable
+        getTable: getTable,
+        saveAll:exportDataWithIV
     }
 });
 
