@@ -270,9 +270,7 @@ def divide_manually():
     data = generate_response(variable_name, df, iv)
     return responseto(data=data)
 
-<<<<<<< HEAD
 
-=======
 '''
 >>>>>>> upstream/master
 @app.route(base + "/apply", methods=['POST'])
