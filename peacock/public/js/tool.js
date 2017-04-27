@@ -100,12 +100,19 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     function initHead() {
         var branch = $("#branch").val();
         var model_name = $("#model").val();
+        var target = $("#target").val();
         if (branch != null && model_name != null) {
             localStorage.setItem("branch", branch);
             localStorage.setItem("model_name", model_name);
+            localStorage.setItem("target", target);
         } else {
             branch = localStorage.getItem("branch");
             model_name = localStorage.getItem("model_name");
+            target = localStorage.getItem("target");
+        }
+
+        if (target == null || target == ''){
+            alert("target is null");
         }
 
         var head = d3.select("#analyze").append("div").attr("class", "row wrapper border-bottom white-bg page-heading")
@@ -479,7 +486,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     url: host + "/tool/divide",
                     type: 'post',
                     data: {
-                        "data": JSON.stringify(data)
+                        "data": JSON.stringify(data),
+                        "target":localStorage.getItem("target")
                     },
                     async: true,
                     success: function (result) {
@@ -620,7 +628,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         "varName": name,
                         "boundary": list,
                         "allBoundary": wholeList,
-                        "type": type
+                        "type": type,
+                        "target":localStorage.getItem("target")
                     },
                     async: true,
                     success: function (result) {

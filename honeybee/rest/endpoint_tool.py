@@ -39,6 +39,7 @@ df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 #df_test = None
+safely_apply = False
 
 
 @app.route(base + "/init", methods=['POST'])
@@ -158,7 +159,7 @@ def divide():
     # 解析json
     data_map = json.loads(data, object_pairs_hook=OrderedDict)
     name = data_map["name"]
-    target = "bad_4w"
+    target = request.form.get("target")
     # 将excel转化为dataframe,只读取target和name两列
     df = pd.DataFrame(df_train, columns={target, name})
 
@@ -201,11 +202,15 @@ def divide():
 
     else:
         val = data_map["selected"][name].split("|")
-        for index, row in df.iterrows():
-            if row[name] in val:
-                pass
-            else:
-                df.drop(index, inplace=True)
+        # for index, row in df.iterrows():
+        #     if row[name] in val:
+        #         pass
+        #     else:
+        #         df.drop(index, inplace=True)
+
+        df[name] = df[name].apply(lambda x: float_nan_to_str_nan(x))
+
+        df = df[df[name].isin(val)]
 
         list = data_map["table"]
         # 删除要被分裂的项
@@ -321,9 +326,10 @@ def apply():
     format.set_bg_color('#eeeeee')
     worksheet.set_column(0, 9, 28)
     writer.close()
-
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
+    global safely_apply
+    safely_apply = True
     return responseFile(response)
 
 
@@ -342,9 +348,8 @@ def upload():
             print filename
             if filename.find("test") >0:
                 df_test = pd.read_excel(file, encoding="utf-8")
-            if filename.find("train") >0:
+            elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file, encoding="utf-8")
-                model_name = filename[0:filename.index("_")]
                 # df_train['bad_7mon_60'] = df_train['bad_4w']
     return responseto(data="success")
 
@@ -776,3 +781,8 @@ def sort_iv(out):
     out_sorted_iv = OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
     return out_sorted_iv
 
+def float_nan_to_str_nan(x):
+    if type(x) == float:
+        return str(x)
+    else:
+        return x

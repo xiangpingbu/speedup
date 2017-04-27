@@ -83,7 +83,7 @@ def load_all():
     if result is not None:
         for row in result:
             data[row["variable_name"]] = {"iv": row["variable_iv"],
-                                          "var_table": OrderedDict(json.loads(row["binning_record"]))}
+                                          "var_table": json.loads(row["binning_record"])}
     return responseto(data = sort_iv(data))
 
 
