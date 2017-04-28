@@ -4,6 +4,8 @@ from service import variable_service as vs
 import requests
 import json
 from collections import OrderedDict
+from datetime import datetime
+
 
 
 base = "/tool/db"
@@ -65,7 +67,8 @@ def save():
 
     list = []
     for key, val in dict.items():
-        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"])]
+        now = datetime.now()
+        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"]),now,now]
         list.append(obj)
     if vs.save_binning_record(list) is not True:
         return responseto(success=False)
@@ -84,7 +87,7 @@ def load_all():
         for row in result:
             data[row["variable_name"]] = {"iv": row["variable_iv"],
                                           "var_table": json.loads(row["binning_record"])}
-    return responseto(data = sort_iv(data))
+    return responseto(data = data)
 
 
 def sort_iv(data):
