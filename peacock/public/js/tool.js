@@ -2,7 +2,6 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http://192.168.31.68:8091";
 // var host = "http:/localhost:8091";
 
 var controlMap = {};
@@ -97,6 +96,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         });
     }
 
+    /**
+     * 初始化binning function的头部信息
+     */
     function initHead() {
         var branch = $("#branch").val();
         var model_name = $("#model").val();
@@ -111,18 +113,25 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             target = localStorage.getItem("target");
         }
 
-        if (target == null || target == ''){
+        if (target == null || target == '') {
             alert("target is null");
         }
 
-        var head = d3.select("#analyze").append("div").attr("class", "row wrapper border-bottom white-bg page-heading")
+        var head = d3.select("#analyze").append("div");
+        head.attr("class", "row wrapper border-bottom white-bg page-heading");
         var content = head.append("div").attr("class", "col-lg-10");
         content.append("h1").text("Binning Function");
         var ol = content.append("ol").attr("class", "breadcrumb");
         ol.append("li").append("span").text(model_name);
         ol.append("li").append("strong").text(branch);
+        ol.append("li").append("span").append("a").attr("id", "initBar").text("初始化");
         ol.append("li").append("span").append("a").attr("id", "saveAll").text("保存所有");
         ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
+        ol.append("li").append("span").append("a").attr("id", "selectAll").attr("value", 0).text("选取所有");
+
+        $("#initBar").bind("click", function () {
+            init();
+        });
 
         $("#saveAll").bind("click", function () {
             $(".spinner").css('display', 'block');
@@ -161,6 +170,17 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 }
             });
         });
+
+        $("#selectAll").bind("click", function () {
+            var v = $(this).attr("value");
+            if (v == "0") {
+                $(".apply-checks").iCheck("check");
+                $("#selectAll").attr("value", "1");
+            } else {
+                $(".apply-checks").iCheck("uncheck");
+                $("#selectAll").attr("value", "0");
+            }
+        })
     }
 
     function initBar(result) {
@@ -198,11 +218,20 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     }
 
     function initPanel(rowName, iv, num, table_head) {
-        var h5 = d3.select("body")
-            .select("div").append("h5");
-        h5.text(rowName + "-------");
+        var h5 = d3.select("#analyze").append("div").style("margin", "5px 0px 5px 10px");
+
+        // var h5 = div.append("div").style("margin-left","20px");
+        h5.append("input")
+            .attr("type", "checkbox")
+            .attr("class", "apply-checks")
+            .attr("name", rowName);
+
+        h5.append("span").style("margin-left", "10px").text(rowName + "-------");
 
         h5.append("span").attr("class", "iv").attr("id", rowName).text(iv);
+        $(".apply-checks").iCheck({
+            checkboxClass: 'icheckbox_square-green variable_apply'
+        });
         //设置画布
         svg = d3.select("body")
             .select("div")
@@ -365,6 +394,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
      * 例如 [0,1,2] ,初始化三个前三个variable的合并按钮
      */
     function buttonInit(initList) {
+        $(".var-btn").unbind("click");
         /**
          * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
          */
@@ -440,7 +470,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             /**
              * 分裂选择的bar
              */
-            $("#divide_" + a).click(function () {
+            $("#divide_" + a).bind("click", function () {
                 $(".spinner").css('display', 'block');
                 var data = {};
                 var id = $(this).attr("id").split("_")[1];
@@ -487,76 +517,77 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     type: 'post',
                     data: {
                         "data": JSON.stringify(data),
-                        "target":localStorage.getItem("target")
+                        "target": localStorage.getItem("target")
                     },
                     async: true,
                     success: function (result) {
+                        $(this).unbind();
                         adjustTable(result, id, initList, name)
                     }
                 });
             });
 
-            /**
-             * 保存选择的集合
-             */
-            $("#save_" + a).click(function () {
-                $(".spinner").css('display', 'block');
-                var data = {};
-                var content = {};
-
-                var id = $(this).attr("id").split("_")[1];
-                var name = $(this).attr("name");
-                var iv = $("#" + name).text();
-
-                data[name] = content;
-
-                //获得所有的行数据
-                var childs = $('#tbody_' + id).children("tr");
-                var tds_0 = $(childs.get(0)).children("td");
-//                var td = $(childs.get(start.index)).children("td");
-                var type = tds_0.get(tds_0.length - 1).innerHTML;
-                var columnMap;
-                if (type == 'Numerical') {
-                    columnMap = num_columnMap;
-                } else {
-                    cate_columnMap[1] = name;
-                    columnMap = cate_columnMap;
-                }
-
-                var var_table = [];
-                content.iv = iv;
-                content.var_table = var_table;
-
-                for (var i = 0; i < childs.length; i++) {
-                    var tds = $(childs.get(i)).children("td");
-                    var obj = {};
-                    for (var j = 0; j < tds.length; j++) {
-                        obj[columnMap[j]] = tds.get(j).innerHTML;
-                    }
-                    var_table.push(obj);
-                }
-
-
-                $(".spinner").css('display', 'block');
-                $.ajax({
-                    url: host + "/tool/db/save",
-                    type: 'post',
-                    data: {
-                        data: JSON.stringify(data),
-                        model_name: localStorage.getItem("model_name"),
-                        branch: localStorage.getItem("branch")
-                    },
-                    async: true,
-                    success: function (result) {
-                        $(".spinner").css('display', "none");
-                    }
-                });
-            });
+//             /**
+//              * 保存选择的集合
+//              */
+//             $("#save_" + a).click(function () {
+//                 $(".spinner").css('display', 'block');
+//                 var data = {};
+//                 var content = {};
+//
+//                 var id = $(this).attr("id").split("_")[1];
+//                 var name = $(this).attr("name");
+//                 var iv = $("#" + name).text();
+//
+//                 data[name] = content;
+//
+//                 //获得所有的行数据
+//                 var childs = $('#tbody_' + id).children("tr");
+//                 var tds_0 = $(childs.get(0)).children("td");
+// //                var td = $(childs.get(start.index)).children("td");
+//                 var type = tds_0.get(tds_0.length - 1).innerHTML;
+//                 var columnMap;
+//                 if (type == 'Numerical') {
+//                     columnMap = num_columnMap;
+//                 } else {
+//                     cate_columnMap[1] = name;
+//                     columnMap = cate_columnMap;
+//                 }
+//
+//                 var var_table = [];
+//                 content.iv = iv;
+//                 content.var_table = var_table;
+//
+//                 for (var i = 0; i < childs.length; i++) {
+//                     var tds = $(childs.get(i)).children("td");
+//                     var obj = {};
+//                     for (var j = 0; j < tds.length; j++) {
+//                         obj[columnMap[j]] = tds.get(j).innerHTML;
+//                     }
+//                     var_table.push(obj);
+//                 }
+//
+//
+//                 $(".spinner").css('display', 'block');
+//                 $.ajax({
+//                     url: host + "/tool/db/save",
+//                     type: 'post',
+//                     data: {
+//                         data: JSON.stringify(data),
+//                         model_name: localStorage.getItem("model_name"),
+//                         branch: localStorage.getItem("branch")
+//                     },
+//                     async: true,
+//                     success: function (result) {
+//                         $(".spinner").css('display', "none");
+//                     }
+//                 });
+//             });
 
             /**
              * 合并选择的集合
              */
-            $("#merge_" + a).click(function () {
+            $("#merge_" + a).bind("click", function () {
                 var id = $(this).attr("id").split("_")[1];
                 var name = $(this).attr("name");
                 var start = controlMap[id].start;
@@ -629,7 +660,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         "boundary": list,
                         "allBoundary": wholeList,
                         "type": type,
-                        "target":localStorage.getItem("target")
+                        "target": localStorage.getItem("target")
                     },
                     async: true,
                     success: function (result) {
@@ -648,13 +679,13 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         // $(".spinner").css('display', 'none');
                         //
                         // $("#"+name).val(result.data[name]["iv"]);
-
                         adjustTable(result, id, initList, name)
                     }
                 });
             });
 
             $("#divide_manually_" + a).click(function () {
+                $(".var-area-btn").unbind("click");
                 var id = $(this).attr("id").split("_")[2];
                 var input_area_id = "#divide_area_" + id;
                 var childTrs = $('#tbody_' + id).children("tr");
@@ -677,7 +708,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     d3.select(input_area_id).style("display", "none");
                 }
 
-                $("#manual_btn_" + id).bind(function () {
+                $("#manual_btn_" + id).bind("click", function () {
                     var name = $(this).attr("name");
                     var boundary = $("#manual_input_" + id).val();
                     alert(boundary);
@@ -703,7 +734,6 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                             $(".spinner").css('display', 'none');
                         }
                     });
-                    $(this).unbind();
                 });
             });
 
@@ -735,7 +765,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
     }
 
-    function renderTable(data, num,headMap) {
+    function renderTable(data, num, headMap) {
         var tbody = d3.select("#tbody_" + num);
         tbody.selectAll("tr").remove();
         var height;
@@ -756,7 +786,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 var td = tr.append("td");
 
                 if (key == 'name') {
-                    key = getVarName(obj,headMap)
+                    key = getVarName(obj, headMap)
                 }
 
                 if (index == 0 || index == obj.length - 2) {
@@ -844,9 +874,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         }
     }
 
-    function getVarName(obj,headMap) {
+    function getVarName(obj, headMap) {
         for (var v in obj) {
-            if (headMap[v] == undefined){
+            if (headMap[v] == undefined) {
                 return v;
             }
         }
@@ -854,7 +884,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
 
     return {
-        init: init
+        init: init,
+        initHead: initHead
     };
 });
 
