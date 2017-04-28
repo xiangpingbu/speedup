@@ -11,7 +11,12 @@ from Model_Selection_Macro import *
 # attributes selection
 
 
-def get_logit_backward(train_x, train_y, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
+def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
+
+    train_y = train[[target]]
+    woe_var_list = [x for x in train.columns if x.endswith('woe')]
+    train_x = train[woe_var_list]
+
     result = logit_backward(train_x, train_y, vars=in_vars, varpatter=in_varpatter, p_value=in_p_value, max_loop=in_max_loop)
     data = {}
 
@@ -36,8 +41,10 @@ def get_logit_backward(train_x, train_y, target, in_vars=[], in_varpatter='_woe'
     selected_var['conf_int'] = result.conf_int()
     data['selected_var'] = selected_var
 
-    woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
-    train_woe_data = train_x[woe_var_list]
+
+    #woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
+    woe_var_list.append(target)
+    train_woe_data = train[woe_var_list]
     model_para_list = result.params.tolist()
     marginal_var_result = get_marginal_var(train_woe_data, target, model_para_list)
     data['marginal_var'] = marginal_var_result
@@ -130,18 +137,12 @@ def logit_base_model(x, y):
     print '<MDL start>'
     logit = sm.Logit(y, x)
     result = logit.fit()
-    print result.summary2()
+    #print result.summary2()
     return result
 
 
 
 def get_marginal_var(train_woe_data, target, model_para_list):
-
-    model_para_list = ['credit_query_times_three_woe', 'credit_c_credit_amount_sum_woe', 'credit_utilization_woe', \
-                       'personal_education_woe', 'personal_live_case_woe', 'client_gender_woe', \
-                       'personal_live_join_woe', 'personal_year_income_woe', 'loan_repayment_frequency_avg_woe', \
-                       'age_woe','intercept']
-
 
     marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list)
     return marginal_var_result
@@ -182,3 +183,10 @@ def check_corr(x, y, corr_cap=0.75):
 
     return list(base_col)
 '''
+
+train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_iv_test.xlsx')
+target = 'bad_4w'
+
+train = train[0:1000]
+
+result = get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100)
