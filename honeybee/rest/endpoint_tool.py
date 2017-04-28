@@ -330,9 +330,8 @@ def apply_get_woe_value(var_name, var_value, var_dict):
                 return float(row['woe'])
             elif min_boundary <= var_value < max_boundary:
                 return float(row['woe'])
-            else:
-                return 0.0
-        #return 'Wrong!'
+
+        return 0.0
     else:
         for row in var_content:
             if var_value in row[var_name]:
