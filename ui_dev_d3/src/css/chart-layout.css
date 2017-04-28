@@ -1,4 +1,5 @@
 .chart-card {
+  position: relative;
   background-color: #1f1d1d;
   /*background-color: #191970;*/
   margin: 10px;
@@ -6,6 +7,27 @@
   border: 1px solid #292929;
   font-size: 1.1rem;
   text-align: center;
+}
+
+.chart-card::before {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  bottom: 10%;
+  content: ' ';
+  background: #1f1d1d;
+  width: 84px;
+  height: 20px;
+}
+
+.chart-card::after {
+  position: absolute;
+  right: 0;
+  bottom: 10%;
+  content: ' ';
+  background: #1f1d1d;
+  width: 43px;
+  height: 20px;
 }
 
 .loading-img {

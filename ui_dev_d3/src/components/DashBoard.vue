@@ -30,6 +30,7 @@
       </div>
     </div>
   </div>
+
   <div class="pure-g">
     <div class="pure-u-1-3">
       <div class="chart-card" @click="viewChart(id[3], 'line')">
@@ -43,6 +44,27 @@
         <barChart v-if="!loading" :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]"></barChart>
       </div>
     </div>
+    <div class="pure-u-1-3">
+      <div class="chart-card" @click="viewChart(psiId[0], 'psi')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <psiLineChart v-if="!loading" :id="psiId[0]" :dataSet="dataMap[psiId[0]]" :variable="varMap[psiId[0]]"></psiLineChart>
+      </div>
+    </div>
+  </div>
+
+  <div class="pure-g">
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(countId[1], 'bar')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <barChart v-if="!loading" :id="countId[1]" :dataSet="dataMap[countId[1]]" :variable="varMap[countId[1]]" :nameMap="this.nameMap[countId[1]]"></barChart>
+      </div>
+    </div>
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(countId[2], 'bar')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <barChart v-if="!loading" :id="countId[2]" :dataSet="dataMap[countId[2]]" :variable="varMap[countId[2]]" :nameMap="this.nameMap[countId[2]]"></barChart>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -51,6 +73,7 @@
 import topbar from '@/components/TopBar.vue'
 import lineChart from '@/components/lineChart.vue'
 import barChart from '@/components/barChart.vue'
+import psiLineChart from '@/components/psiChart.vue'
 // import * as d3 from 'd3'
 // import axios from 'axios'
 import * as getData from '@/service/data.js'
@@ -61,16 +84,7 @@ export default {
     // console.log(66666)
     var PromiseList = []
     var CatePromiseList = []
-    // this.numUrls.forEach(function (d) {
-    //   PromiseList.push(getData.getNumData(d))
-    // })
-    // Promise.all(PromiseList).then((receivedData) => {
-    //   receivedData.forEach((d, i) => {
-    //     // console.log(d.newJsonData)
-    //     this.dataMap[this.id[i]] = d.newJsonData
-    //     this.varMap[this.id[i]] = d.variable
-    //   })
-    // })
+    var PsiPromiseList = []
 
     // get & parse numerical data
     this.numUrls.forEach(function (d) {
@@ -96,6 +110,17 @@ export default {
       })
     })
 
+    // get & parse psi data
+    this.PsiUrls.forEach(function (d) {
+      PsiPromiseList.push(getData.getResponse(d))
+    })
+    Promise.all(PsiPromiseList).then((response) => {
+      response.forEach((d, i) => {
+        var res = getData.parsePsiData(d.data)
+        this.dataMap[this.psiId[i]] = res.newJsonData
+      })
+    })
+
     // getData.getCateData(url4).then((receivedData) => {
     //   this.dataMap[this.countId[0]] = receivedData.newJsonData
     //   this.varMap[this.countId[0]] = receivedData.category
@@ -117,6 +142,20 @@ export default {
       '1,2,4,': '父母、配偶子女、其他',
       'others': '不属于以上情况'
     }
+
+    this.nameMap[this.countId[1]] = {
+      '1': '硕士及以上',
+      '2': '本科',
+      '3': '专科',
+      '4': '其他',
+      'others': '不属于以上情况'
+    }
+
+    this.nameMap[this.countId[2]] = {
+      '1': '男',
+      '2': '女',
+      'others': '其他'
+    }
     // console.log(this.nameMap.personal_live_join)
 
     setTimeout(() => {
@@ -130,10 +169,14 @@ export default {
         '/monitor/model_xyb_monitor_percentile_age',
         '/monitor/model_xyb_monitor_percentile_credit_query_times',
         '/monitor/model_xyb_monitor_percentile_credit_limit'],
-      CateUrls: ['/monitor/model_xyb_monitor_count_personal_live_join'],
+      CateUrls: ['/monitor/model_xyb_monitor_count_personal_live_join',
+        '/monitor/model_xyb_monitor_count_personal_education/',
+        '/monitor/model_xyb_monitor_count_client_gender'],
+      PsiUrls: ['/monitor/model_xyb_monitor_psi_age'],
       id: ['score', 'age', 'credit_query_times', 'credit_limit'],
+      countId: ['personal_live_join', 'personal_education', 'client_gender'],
+      psiId: ['psi_age'],
       type: '',
-      countId: ['personal_live_join'],
       dataMap: [],
       nameMap: [],
       subChartEnabled: false,
@@ -171,7 +214,8 @@ export default {
   components: {
     topbar,
     lineChart,
-    barChart
+    barChart,
+    psiLineChart
   }
 }
 </script>

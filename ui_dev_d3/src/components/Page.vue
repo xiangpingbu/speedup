@@ -5,6 +5,7 @@
       <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
       <lineChart v-if="(!loading)&&type==='line'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable"></lineChart>
       <barChart v-if="(!loading)&&type==='bar'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable" :nameMap="nameMap"></barChart>
+      <psiLineChart v-if="(!loading)&&type==='psi'" :id="id" :dataSet="dataSet" :subChartEnabled="true"></psiLineChart>
     </div>
   </div>
 </template>
@@ -13,6 +14,7 @@
 import topbar from '@/components/TopBar.vue'
 import lineChart from '@/components/lineChart.vue'
 import barChart from '@/components/barChart.vue'
+import psiLineChart from '@/components/psiChart.vue'
 // import {mapMutations} from 'vuex'
 export default {
   name: 'Page',
@@ -68,7 +70,8 @@ export default {
   components: {
     topbar,
     lineChart,
-    barChart
+    barChart,
+    psiLineChart
   }
 }
 </script>

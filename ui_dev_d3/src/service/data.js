@@ -157,3 +157,12 @@ export function parseCateData (json) {
   })
   return {newJsonData, category}
 }
+
+export function parsePsiData (json) {
+  var tt = json.data.hits.hits
+  var newJsonData = []
+  tt.forEach(function (d) {
+    newJsonData.push(d._source)
+  })
+  return {newJsonData}
+}

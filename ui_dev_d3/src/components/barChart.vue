@@ -72,6 +72,7 @@ export default {
           keys: {
             x: 'date',
             value: names
+            // value: newDataFields
           },
           names: this.nameMap,
           // order: 'desc',
@@ -88,6 +89,7 @@ export default {
               }
             }
           },
+          groups: [names],
           order: 'desc'
         },
         // tooltip: {
@@ -129,7 +131,7 @@ export default {
           }
         },
         zoom: {
-          enabled: true,
+          enabled: this.subChartEnabled,
           onzoomstart: function (event) {
             console.log('onzoomstart', event)
           },
@@ -151,11 +153,11 @@ export default {
         })
       }
       // test group
-      setTimeout(() => {
-        var tg = []
-        tg.push(newDataFields)
-        chart.groups(tg)
-      }, 2000)
+      // setTimeout(() => {
+      //   var tg = []
+      //   tg.push(newDataFields)
+      //   chart.groups(tg)
+      // }, 2000)
     })
   }
 }

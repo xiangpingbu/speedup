@@ -1,5 +1,5 @@
 <template lang='html'>
-  <div >
+  <div>
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
   </div>
@@ -23,10 +23,6 @@ export default {
   props: ['id', 'dataSet', 'subChartEnabled', 'variable'],
   created () {
     this.$nextTick(() => {
-      // console.log(this.dataSet[this.dataSet.length - 1].date)
-      // console.warn(this.nameMap)
-      // console.log(d3.keys(this.dataSet[0]))
-
       // create new data fields
       var newDataFields = d3.keys(this.dataSet[0])
       newDataFields.splice(newDataFields.indexOf('date'), 1)
@@ -100,7 +96,7 @@ export default {
           r: 3
         },
         zoom: {
-          enabled: true,
+          enabled: this.subChartEnabled,
           onzoomstart: function (event) {
             console.log('onzoomstart', event)
           },

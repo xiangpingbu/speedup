@@ -43,8 +43,8 @@
           <li><a href="#">Contact</a></li>
 
           <li style="float: right; width: 200px;">
-            <!-- <router-link to="/dash/" class="pure-menu-link" style="position:absolute; right:0;">Back to DashBoard</router-link> -->
-            <a href="/dash/" style="position:absolute; right:0;">Back to DashBoard</a>
+            <router-link to="/dash/" style="position:absolute; right:0;">Back to DashBoard</router-link>
+            <!-- <a href="/#/dash" style="position:absolute; right:0;">Back to DashBoard</a> -->
           </li>
       </ul>
 
