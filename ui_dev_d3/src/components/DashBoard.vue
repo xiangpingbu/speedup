@@ -66,6 +66,20 @@
       </div>
     </div>
   </div>
+  <div class="pure-g">
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(id[4], 'line')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <lineChart v-if="!loading" :id="id[4]" :dataSet="dataMap[id[4]]" :variable="varMap[id[4]]"></lineChart>
+      </div>
+    </div>
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(psiId[1], 'psi')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <psiLineChart v-if="!loading" :id="psiId[1]" :dataSet="dataMap[psiId[1]]" :variable="varMap[psiId[1]]"></psiLineChart>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 
@@ -168,14 +182,15 @@ export default {
         '/monitor/model_xyb_monitor_percentile_score',
         '/monitor/model_xyb_monitor_percentile_age',
         '/monitor/model_xyb_monitor_percentile_credit_query_times',
-        '/monitor/model_xyb_monitor_percentile_credit_limit'],
+        '/monitor/model_xyb_monitor_percentile_credit_limit',
+        '/monitor/model_xyb_monitor_percentile_personal_year_income'],
       CateUrls: ['/monitor/model_xyb_monitor_count_personal_live_join',
         '/monitor/model_xyb_monitor_count_personal_education/',
         '/monitor/model_xyb_monitor_count_client_gender'],
-      PsiUrls: ['/monitor/model_xyb_monitor_psi_age'],
-      id: ['score', 'age', 'credit_query_times', 'credit_limit'],
+      PsiUrls: ['/monitor/model_xyb_monitor_psi_age', '/monitor/model_xyb_monitor_psi_score'],
+      id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income'],
       countId: ['personal_live_join', 'personal_education', 'client_gender'],
-      psiId: ['psi_age'],
+      psiId: ['psi_age', 'psi_score'],
       type: '',
       dataMap: [],
       nameMap: [],

@@ -80,6 +80,16 @@ export default {
             }
           },
           y: {
+            tick: {
+              format: function (d) {
+                // fix the psi y-axis label to '0.01'
+                var s = d3.formatSpecifier('f')
+                s.precision = d3.precisionFixed(0.01)
+                var f = d3.format(s)
+
+                return f(d)
+              }
+            },
             label: {
               // text: this.variable,
               position: 'outer-top'
