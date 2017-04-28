@@ -7,10 +7,42 @@ Created on Wed Mar 15 17:29:53 2017
 
 import pandas as pd
 import statsmodels.api as sm
-
+from Model_Selection_Macro import *
 # attributes selection
 
 
+def get_logit_backward(train_x, train_y, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
+    result = logit_backward(train_x, train_y, vars=in_vars, varpatter=in_varpatter, p_value=in_p_value, max_loop=in_max_loop)
+    data = {}
+
+    model_analysis = {}
+    model_analysis['target'] = target
+    model_analysis['nobs'] = result.nobs
+    model_analysis['df_model'] = result.model.df_model
+    model_analysis['df_resid'] = result.model.df_resid
+    model_analysis['prsquared'] = result.prsquared
+    model_analysis['aic'] = result.aic
+    model_analysis['bic'] = result.bic
+    model_analysis['likelyhood'] = result.llf
+    model_analysis['llnull'] = result.llnull
+    model_analysis['llr'] = result.llr_pvalue
+    data['model_analysis'] = model_analysis
+
+    selected_var = {}
+    selected_var['coef'] = result.params
+    selected_var['pvalues'] = result.pvalues
+    selected_var['bse'] = result.bse
+    selected_var['z'] = result.tvalues
+    selected_var['conf_int'] = result.conf_int()
+    data['selected_var'] = selected_var
+
+    woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
+    train_woe_data = train_x[woe_var_list]
+    model_para_list = result.params.tolist()
+    marginal_var_result = get_marginal_var(train_woe_data, target, model_para_list)
+    data['marginal_var'] = marginal_var_result
+
+    return data
 
 def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
     count = 0
@@ -43,19 +75,17 @@ def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
         if (temp_dict['p_value'] < p_value):
             # all pvalue are good to go
 
-            # to drop positive woe coef
-            var_to_drop = positive_coef_to_drop(result, varpatter=varpatter)
+            # to drop negative woe coef
+            var_to_drop = negative_coef_to_drop(result, varpatter=varpatter)
             if (var_to_drop == None):
                 print "<MDL SELECTION> DONE"
                 next = False
             else:
-                print '<RMV VAR> %s' % str(var_to_drop)
+                print '<RMV VAR> %s' % (var_to_drop)
                 del X[var_to_drop]
 
-
-                # return result
         else:
-            print '<RMV VAR> %s' % str(temp_dict.var_name)
+            print '<RMV VAR> %s' % (temp_dict.var_name)
             del X[str(temp_dict.var_name)]
 
         count = count + 1
@@ -104,13 +134,17 @@ def logit_base_model(x, y):
     return result
 
 
-train_woe_data = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/train_woe_data.xlsx')
 
-train_y = train_woe_data[['bad_7mon_60']]
-train_x = train_woe_data.drop(['apply_id', 'bad_7mon_60'], axis=1)
+def get_marginal_var(train_woe_data, target, model_para_list):
 
-result = logit_backward(train_x, train_y, vars=[], varpatter='_woe', p_value=0.01, max_loop=100)
+    model_para_list = ['credit_query_times_three_woe', 'credit_c_credit_amount_sum_woe', 'credit_utilization_woe', \
+                       'personal_education_woe', 'personal_live_case_woe', 'client_gender_woe', \
+                       'personal_live_join_woe', 'personal_year_income_woe', 'loan_repayment_frequency_avg_woe', \
+                       'age_woe','intercept']
 
+
+    marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list)
+    return marginal_var_result
 
 # remove high correlation variables
 '''
