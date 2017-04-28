@@ -9,6 +9,7 @@ import pandas as pd
 import statsmodels.api as sm
 from Model_Selection_Macro import *
 # attributes selection
+import json
 
 
 def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
@@ -17,6 +18,7 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     woe_var_list = [x for x in train.columns if x.endswith('woe')]
     train_x = train[woe_var_list]
 
+    in_vars = map(lambda x:x+"_woe",in_vars)
     result = logit_backward(train_x, train_y, vars=in_vars, varpatter=in_varpatter, p_value=in_p_value, max_loop=in_max_loop)
     data = {}
 
@@ -184,9 +186,13 @@ def check_corr(x, y, corr_cap=0.75):
     return list(base_col)
 '''
 
-train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_iv_test.xlsx')
-target = 'bad_4w'
-
-train = train[0:1000]
-
-result = get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100)
+# train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_iv_test.xlsx')
+# target = 'bad_4w'
+#
+# train = train[0:1000]
+#
+# result = get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100)
+df = pd.DataFrame({'date': [20130101, 20130101, 20130102], 'location': ['a', 'a', 'c']})
+print df
+d =df[df["location"] == "c"].iloc[0]
+print json.dumps(d.date)

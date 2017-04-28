@@ -16,6 +16,7 @@ from io import BytesIO
 from flask import send_file
 from service import variable_service as vs
 import sys
+from util import model_function
 
 
 base = '/tool'
@@ -42,6 +43,7 @@ df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 safely_apply = False
+apply_result = None
 
 
 @app.route(base + "/init", methods=['POST'])
@@ -285,7 +287,9 @@ def apply():
     for var_name in var_list:
         df[var_name+'_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
 
-
+    global apply_result,safely_apply
+    apply_result = df
+    safely_apply = True
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
@@ -730,14 +734,11 @@ def merge():
 
 @app.route(base+"/variable_select",methods=['POST'])
 def variable_select():
-    data = {}
-    data["Model"] = "Logit"
-    data["Dependent Variable"] = "bad_7mon_60"
-    data["Date"] = "2017-04-27 18:16"
-    data["No. Observations"] = "6016"
-    data["Df Model"] = 9
 
-    return None
+    var_list = request.form.get("var_list")
+    target = request.form.get("target")
+    data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    return data
 
 def generate_response(var_name, df, iv):
     """

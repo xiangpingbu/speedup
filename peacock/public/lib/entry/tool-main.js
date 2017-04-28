@@ -19,6 +19,8 @@ require.config({
     }
 });
 
+var host = "http://192.168.31.68:8091";
+
 
 require(['jquery', "tool", "tool_button","tool_variable_select"],
     function ($, tool, tool_button,tool_variable_select) {
@@ -37,7 +39,6 @@ require(['jquery', "tool", "tool_button","tool_variable_select"],
             $(".spinner").css('display', 'none');
             var url = window.location.href;
             var ut = url.split("#")[1];
-            console.log(ut);
             if (!ut || ut.length == 0) {
                 display("upload");
                 // $('#upload').css("display", "block");
@@ -46,7 +47,8 @@ require(['jquery', "tool", "tool_button","tool_variable_select"],
                 tool_button.getTable();
             } else if (ut == 'bar') {
                 display("analyze");
-                tool.init();
+                $("#analyze").html("");
+                tool.initHead();
             } else if (ut == 'select') {
                 display("variableSelect");
                 tool_variable_select.variableSelect();

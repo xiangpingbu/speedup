@@ -3,6 +3,25 @@
  */
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function variableSelect() {
+        var selected_variable = [];
+        $(".variable_apply.checked").each(function () {
+            selected_variable.push($(this).find(".apply-checks").attr("name"));
+        });
+
+        $.ajax({
+            url: host + "/tool/variable_select",
+            type: 'post',
+            data: {
+                "var_list": selected_variable.join(","),
+                "target":localStorage.getItem("target")
+            },
+            async: true,
+            success: function (result) {
+                adjustTable(result, id, initList, name)
+            }
+        });
+
+
         $("#variableSelect").html("");
         // d3.select("#variableSelect").append()
 
@@ -12,7 +31,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         content.append("h1").text("variable Select");
 
         var ol = content.append("ol").attr("class", "breadcrumb");
-        ol.append("li").append("span").append("a").attr("id", "saveAll").text("保存数据");
+        ol.append("li").append("span").append("a").attr("id", "execute").text("保存数据");
         // var ol = content.append("ol").attr("class", "breadcrumb");
         // ol.append("li").append("span").text(model_name);
         // ol.append("li").append("strong").text(branch);
@@ -30,10 +49,25 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         tr.append("td").text("0.041");
 
         tr = tbody.append("tr");
-        tr.append("th").text("model");
-        tr.append("td").text("loGit");
-        tr.append("th").text("Pseudo R-squared");
-        tr.append("td").text("0.041");
+        tr.append("th").text("Depandent Variable");
+        tr.append("td").text("data[model_analysis].target");
+        tr.append("th").text("AIC");
+        tr.append("td").text("data[model_analysis].aic");
+        tr = tbody.append("tr");
+        tr.append("th").text("nobs");
+        tr.append("td").text("data[model_analysis].nobs");
+        tr.append("th").text("BIC");
+        tr.append("td").text("data[model_analysis].bic");
+        tr = tbody.append("tr");
+        tr.append("th").text("df_resid");
+        tr.append("td").text("data[model_analysis].df_resid");
+        tr.append("th").text("likelyhood");
+        tr.append("td").text("data[model_analysis].likelyhood");
+        tr = tbody.append("tr");
+        tr.append("th").text("llnull");
+        tr.append("td").text("data[model_analysis].llnull");
+        tr.append("th").text("llr");
+        tr.append("td").text("data[model_analysis].llr");
         //必选项
         div.append("div").text("必选项");
         table = div.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
@@ -121,6 +155,14 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         }).on('ifUnchecked', function () {
             $('.backup-body').iCheck('uncheck');
         });
+
+
+        $("#execute").bind("click",function () {
+            var selectList = [];
+            $("#dataframe").find("tbody .checked").each(function (i, n) {
+                selectList[$(n).parents("tr").children().eq(1).html()] = i;
+            });
+        })
     }
 
     return {variableSelect: variableSelect}
