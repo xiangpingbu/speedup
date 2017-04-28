@@ -11,13 +11,15 @@ from Model_Selection_Macro import *
 # attributes selection
 
 
+
 def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
 
     train_y = train[[target]]
-    woe_var_list = [x for x in train.columns if x.endswith('woe')]
+    woe_var_list = [x for x in train.columns if x.endswith(in_varpatter)]
     train_x = train[woe_var_list]
 
-    result = logit_backward(train_x, train_y, vars=in_vars, varpatter=in_varpatter, p_value=in_p_value, max_loop=in_max_loop)
+    result = logit_backward(train_x, train_y, vars=in_vars, p_value=in_p_value, max_loop=in_max_loop)
+    """
     data = {}
 
     model_analysis = {}
@@ -50,8 +52,9 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     data['marginal_var'] = marginal_var_result
 
     return data
+    """
 
-def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
+def logit_backward(x, y, vars=[], p_value=0.05, max_loop=100):
     count = 0
     # decide variables list
     if (len(vars) <= 0):
@@ -77,13 +80,13 @@ def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
         # print pv['p_value'].idxmax()
         temp_dict = pv.ix[pv['p_value'].idxmax()]
         # dfrm.ix[dfrm['A'].idxmax()]
-
+        var_to_drop = negative_coef_to_drop(result)
 
         if (temp_dict['p_value'] < p_value):
             # all pvalue are good to go
 
             # to drop negative woe coef
-            var_to_drop = negative_coef_to_drop(result, varpatter=varpatter)
+            var_to_drop = negative_coef_to_drop(result)
             if (var_to_drop == None):
                 print "<MDL SELECTION> DONE"
                 next = False
@@ -93,7 +96,7 @@ def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
 
         else:
             print '<RMV VAR> %s' % (temp_dict.var_name)
-            del X[str(temp_dict.var_name)]
+            del X[temp_dict.var_name]
 
         count = count + 1
         if (count > max_loop):
@@ -102,33 +105,15 @@ def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
     return result
 
 
-def positive_coef_to_drop(mdlresult, varpatter='_woe'):
+
+def negative_coef_to_drop(mdlresult):
     #
     aa = mdlresult.params.copy()
-    aa.sort_values(inplace=True, ascending=0)
-    Found = False
-    for i in aa[aa > 0].index:
-        if (str(i).find(varpatter) != -1):
-            Found = True
-            break
-    if Found:
-        return str(i)
-    else:
-        return None
+    aa.sort_values(inplace=True, ascending=True)
+    aa = aa[aa<0]
 
-
-def negative_coef_to_drop(mdlresult, varpatter='_woe'):
-
-    #
-    aa = mdlresult.params.copy()
-    aa.sort_values(inplace=True, ascending=0)
-    Found = False
-    for i in aa[aa < 0].index:
-        if (str(i).find(varpatter) != -1):
-            Found = True
-            break
-    if Found:
-        return str(i)
+    if len(aa) >0:
+        return aa.index[0]
     else:
         return None
 
@@ -138,6 +123,7 @@ def logit_base_model(x, y):
     logit = sm.Logit(y, x)
     result = logit.fit()
     #print result.summary2()
+    #print result.params
     return result
 
 
@@ -146,6 +132,7 @@ def get_marginal_var(train_woe_data, target, model_para_list):
 
     marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list)
     return marginal_var_result
+
 
 # remove high correlation variables
 '''
@@ -184,9 +171,10 @@ def check_corr(x, y, corr_cap=0.75):
     return list(base_col)
 '''
 
-train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_iv_test.xlsx')
+train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
 
 train = train[0:1000]
 
-result = get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100)
+result = get_logit_backward(train, target, in_vars=[], in_p_value=0.05, in_max_loop=100)
+print result.params
