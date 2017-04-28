@@ -20,7 +20,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         // ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
 
         var div = selectArea.append("div").attr("class", "ibox-content");
-        div.append("div").text("1111");
+        div.append("div").text("模型信息");
         var table = div.append("table").attr("class", "table table-striped");
         var tbody = table.append("tbody");
         var tr = tbody.append("tr");
@@ -35,7 +35,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         tr.append("th").text("Pseudo R-squared");
         tr.append("td").text("0.041");
         //必选项
-        div.append("div").text("1111");
+        div.append("div").text("必选项");
         table = div.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
         tbody = table.append("tbody").attr("id", "tbody-selected");
         var thead = table.append("thead");
@@ -65,7 +65,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         tr.append("td").text("11");
         tr.append("td").text("11");
 
-        div.append("div").text("1111");
+        div.append("div").text("可选项");
         //备选的table
         table = div.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
         tbody = table.append("tbody");
