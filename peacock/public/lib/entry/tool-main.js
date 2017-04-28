@@ -5,39 +5,34 @@ require.config({
         // "dropzone": "../inspinia/js/plugins/dropzone/dropzone-amd-module.js",
         "tool": "/public/js/tool",
         "tool_button": "/public/js/tool_button",
+        "tool_variable_select": "/public/js/tool_variable_select",
         "i-checks": "../inspinia/js/plugins/iCheck/icheck.min",
         "select2": "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min"
         // "upload_init": "/public/js/upload_init"
     },
 
     shim: {
-
         'i-checks': {
-
             deps: ['jquery'],
-
             exports: 'i-checks'
         }
-
     }
 });
 
 
-require(['jquery', "tool", "tool_button"],
-    function ($, tool, tool_button) {
+require(['jquery', "tool", "tool_button","tool_variable_select"],
+    function ($, tool, tool_button,tool_variable_select) {
         block = {
             "upload": $("#upload"),
             "analyze": $("#analyze"),
-            "dataframe": $("#dataframe")
+            "dataframe": $("#dataframe"),
+            "variableSelect":$("#variableSelect")
         };
         init();
         window.onhashchange = function () {
             // var hashCode = location.hash;
             init();
         };
-        // some code here
-        // tool.init();
-
         function init() {
             $(".spinner").css('display', 'none');
             var url = window.location.href;
@@ -52,6 +47,9 @@ require(['jquery', "tool", "tool_button"],
             } else if (ut == 'bar') {
                 display("analyze");
                 tool.init();
+            } else if (ut == 'select') {
+                display("variableSelect");
+                tool_variable_select.variableSelect();
             }
         }
     });

@@ -40,7 +40,7 @@ df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-#df_test = None
+df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 safely_apply = False
 
 
@@ -339,22 +339,21 @@ def apply():
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
-    data = request.form.get('data')
-    target = request.form.get('target')
-    if target is None:
-        target = "bad_4w"
-    var_dict = json.loads(data)
-    df_test.append(df_train)
-    df_woe_append = df_test.drop(target, 1)
-    var_list = var_dict.keys()
+    req = request.form.get('data')
+    var_dict = json.loads(req)
+
+    data = var_dict["data"]
+
+    df = df_test.append(df_train)
+    var_list = data.keys()
 
     for var_name in var_list:
-        df_woe_append[var_name+'_woe'] = df_woe_append[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, var_dict))
+        df[var_name+'_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
 
 
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df_woe_append.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
+    df.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
     workbook = writer.book
     worksheet = writer.sheets["Sheet_1"]
     format = workbook.add_format()
@@ -395,7 +394,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
                 return float(row['woe'])
             elif min_boundary <= var_value < max_boundary:
                 return float(row['woe'])
-        return 'Wrong!'
+        return 0.0
     else:
         for row in var_content:
             if var_value in row[var_name]:
@@ -795,6 +794,12 @@ def merge():
 
 @app.route(base+"/variable_select",methods=['POST'])
 def variable_select():
+    data = {}
+    data["Model"] = "Logit"
+    data["Dependent Variable"] = "bad_7mon_60"
+    data["Date"] = "2017-04-27 18:16"
+    data["No. Observations"] = "6016"
+    data["Df Model"] = 9
 
     return None
 
