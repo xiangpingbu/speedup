@@ -6,7 +6,6 @@ import kafka.server.KafkaConfig;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
