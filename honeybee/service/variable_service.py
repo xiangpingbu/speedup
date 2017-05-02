@@ -56,7 +56,7 @@ def if_branch_exist(name, branch):
 def save_binning_record(variable_list):
     sql = "insert into tool_model_content " \
           "(model_name,model_branch,variable_name,variable_iv,binning_record,create_date,modify_date)" \
-          " VALUES (%s,%s,%s,%s,%s,%s,%s)"
+          " VALUES (%s,%s,%s,%s,%s,now(),now())"
     result = util.executmany(sql, variable_list)
     if result > 0:
         return True
@@ -76,3 +76,6 @@ def load_binning_record(model_name, model_branch):
           "from tool_model_content where model_name= %s and model_branch = %s and is_deleted = 0"
     result = util.query(sql, (model_name, model_branch))
     return result
+
+result = load_binning_record("model_train_selected","master")
+print 123
