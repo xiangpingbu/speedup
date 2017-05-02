@@ -37,11 +37,11 @@ def file_init():
 # df_test = file_init()
 model_name = "model_train_selected"
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
 safely_apply = False
 apply_result = None
 

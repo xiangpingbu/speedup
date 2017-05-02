@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.common.utils.file;
 
+import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
 import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.*;
@@ -39,6 +40,8 @@ public class ConfigurationManager {
                 //从本地获取配置文件
                 rootPath = new File(System.getProperty("user.dir")).getParent();
                 applicationProp = rootPath + "/maas/maas-web/target/classes/application.properties";
+                //activejdbc 编译期添加信息
+                MakeInstrumentationUtil.make();
             } else {
                 //从服务器的目录获取配置文件
                 applicationProp = productConfigDir + "/application.properties";
@@ -62,6 +65,7 @@ public class ConfigurationManager {
                 }
             }
 
+            //加入默认的kafka配置
             conf.addProperty("defaultKafkaConfig", new MaasKafkaConfig());
 
             cc.addConfiguration(conf);
