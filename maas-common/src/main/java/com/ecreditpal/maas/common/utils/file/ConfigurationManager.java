@@ -1,6 +1,8 @@
 package com.ecreditpal.maas.common.utils.file;
 
+import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
 import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,16 +17,20 @@ import java.util.Properties;
  * @author lifeng
  * @version 2017/4/10.
  */
+@Slf4j
 public class ConfigurationManager {
-    private static Logger logger = LoggerFactory
-            .getLogger(ConfigurationManager.class);
 
     private static final CompositeConfiguration cc = new CompositeConfiguration();
-    private static final String basePath = null;
+
+    /**
+     * 禁止实例化
+     */
+    private ConfigurationManager() {
+    }
 
     static {
         try {
-            logger.info("loading system properties ...");
+            log.info("loading system properties ...");
             cc.addConfiguration(new SystemConfiguration());
             //判断是否为本地
             String productConfigDir = cc.getString("config.dir");
@@ -33,13 +39,15 @@ public class ConfigurationManager {
             if (productConfigDir == null) {
                 //从本地获取配置文件
                 rootPath = new File(System.getProperty("user.dir")).getParent();
-                applicationProp = rootPath + "/maas-web/target/classes/application.properties";
+                applicationProp = rootPath + "/maas/maas-web/target/classes/application.properties";
+                //activejdbc 编译期添加信息
+                MakeInstrumentationUtil.make();
             } else {
                 //从服务器的目录获取配置文件
                 applicationProp = productConfigDir + "/application.properties";
             }
 
-            logger.info("loading  property in directory {}.", applicationProp);
+            log.info("loading  property in directory {}.", applicationProp);
             PropertiesConfiguration conf = new PropertiesConfiguration(
                     applicationProp);
 
@@ -57,24 +65,20 @@ public class ConfigurationManager {
                 }
             }
 
+            //加入默认的kafka配置
             conf.addProperty("defaultKafkaConfig", new MaasKafkaConfig());
 
             cc.addConfiguration(conf);
         } catch (Exception e) {
-            logger.error("Failed to load configuration files", e);
+            log.error("Failed to load configuration files", e);
         }
     }
 
-    private ConfigurationManager() {
-    }
 
     public static Configuration getConfiguration() {
         return cc;
     }
 
-    public static void main(String[] args) {
-        System.out.println(FileUtil.getFilePath("application.properties"));
-    }
 
     private static void listFile(File file, PropertiesConfiguration conf) {
         if (file.isDirectory()) {

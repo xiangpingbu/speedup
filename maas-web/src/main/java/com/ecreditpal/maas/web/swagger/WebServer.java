@@ -19,13 +19,11 @@ public class WebServer {
         context.setContextPath("/");
         context.setDescriptor(configuration.getString("maas.web","./maas-web/src/main/webapp/WEB-INF/web.xml"));
         String webapp = configuration.getString("maas.webapp","./maas-web/src/main/webapp");
+
         context.setResourceBase(webapp);
         context.setParentLoaderPriority(true);
 
-
         server.setHandler(context);
-//        IPBasedRateLimiter.getInstance();
-
         try {
             server.start();
             server.join();
