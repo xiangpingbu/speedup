@@ -39,21 +39,28 @@
       </div>
     </div>
     <div class="pure-u-1-3">
-      <div class="chart-card" @click="viewChart(countId[0], 'bar')">
+      <div class="chart-card" @click="viewChart(id[4], 'line')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]"></barChart>
+        <lineChart v-if="!loading" :id="id[4]" :dataSet="dataMap[id[4]]" :variable="varMap[id[4]]"></lineChart>
       </div>
     </div>
     <div class="pure-u-1-3">
-      <div class="chart-card" @click="viewChart(psiId[0], 'psi')">
+      <div class="chart-card" @click="viewChart(id[5], 'line')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="psiId[0]" :dataSet="dataMap[psiId[0]]" :variable="varMap[psiId[0]]"></psiLineChart>
+        <lineChart v-if="!loading" :id="id[5]" :dataSet="dataMap[id[5]]" :variable="varMap[id[5]]"></lineChart>
       </div>
     </div>
   </div>
 
   <div class="pure-g">
-    <div class="pure-u-1-2">
+    <div class="pure-u-1-2" v-for="mid in countId">
+      <div class="chart-card" @click="viewChart(mid, 'bar')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <barChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]"></barChart>
+      </div>
+    </div>
+  </div>
+    <!-- <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[1], 'bar')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
         <barChart v-if="!loading" :id="countId[1]" :dataSet="dataMap[countId[1]]" :variable="varMap[countId[1]]" :nameMap="this.nameMap[countId[1]]"></barChart>
@@ -64,13 +71,35 @@
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
         <barChart v-if="!loading" :id="countId[2]" :dataSet="dataMap[countId[2]]" :variable="varMap[countId[2]]" :nameMap="this.nameMap[countId[2]]"></barChart>
       </div>
-    </div>
-  </div>
-  <div class="pure-g">
+    </div> -->
+
+  <!-- <div class="pure-g">
     <div class="pure-u-1-2">
-      <div class="chart-card" @click="viewChart(id[4], 'line')">
+      <div class="chart-card" @click="viewChart(countId[0], 'bar')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[4]" :dataSet="dataMap[id[4]]" :variable="varMap[id[4]]"></lineChart>
+        <barChart v-if="!loading" :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]"></barChart>
+      </div>
+    </div>
+    
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(countId[3], 'bar')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <barChart v-if="!loading" :id="countId[3]" :dataSet="dataMap[countId[3]]" :variable="varMap[countId[3]]" :nameMap="this.nameMap[countId[3]]"></barChart>
+      </div>
+    </div>
+  </div> -->
+  <div class="pure-g">
+    <div class="pure-u-1-3" v-for="mid in psiId">
+      <div class="chart-card" @click="viewChart(mid, 'psi')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <psiLineChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]"></psiLineChart>
+      </div>
+    </div>
+
+    <!-- <div class="pure-u-1-2">
+      <div class="chart-card" @click="viewChart(psiId[0], 'psi')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <psiLineChart v-if="!loading" :id="psiId[0]" :dataSet="dataMap[psiId[0]]" :variable="varMap[psiId[0]]"></psiLineChart>
       </div>
     </div>
     <div class="pure-u-1-2">
@@ -78,7 +107,7 @@
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
         <psiLineChart v-if="!loading" :id="psiId[1]" :dataSet="dataMap[psiId[1]]" :variable="varMap[psiId[1]]"></psiLineChart>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 </template>
@@ -95,7 +124,22 @@ import {mapMutations} from 'vuex'
 export default {
   name: 'DashBoard',
   created () {
-    // console.log(66666)
+    // get numerical urls
+    this.id.forEach((d) => {
+      var urlStr = '/monitor/model_xyb_monitor_percentile_' + d
+      this.numUrls.push(urlStr)
+    })
+    // get categorocal urls
+    this.countId.forEach((d) => {
+      var urlStr = '/monitor/model_xyb_monitor_count_' + d
+      this.CateUrls.push(urlStr)
+    })
+    // get psi urls
+    this.psiId.forEach((d) => {
+      var urlStr = '/monitor/model_xyb_monitor_' + d
+      this.PsiUrls.push(urlStr)
+    })
+
     var PromiseList = []
     var CatePromiseList = []
     var PsiPromiseList = []
@@ -170,6 +214,18 @@ export default {
       '2': '女',
       'others': '其他'
     }
+
+    this.nameMap[this.countId[3]] = {
+      '1': '自有商业按揭房',
+      '2': '自有无按揭购房',
+      '3': '自有公积金按揭购房',
+      '4': '自建房',
+      '5': '租房',
+      '6': '亲戚住房',
+      '7': '宿舍',
+      '8': '其他',
+      'others': '不属于以上情况'
+    }
     // console.log(this.nameMap.personal_live_join)
 
     setTimeout(() => {
@@ -179,18 +235,18 @@ export default {
   data () {
     return {
       numUrls: [
-        '/monitor/model_xyb_monitor_percentile_score',
-        '/monitor/model_xyb_monitor_percentile_age',
-        '/monitor/model_xyb_monitor_percentile_credit_query_times',
-        '/monitor/model_xyb_monitor_percentile_credit_limit',
-        '/monitor/model_xyb_monitor_percentile_personal_year_income'],
-      CateUrls: ['/monitor/model_xyb_monitor_count_personal_live_join',
-        '/monitor/model_xyb_monitor_count_personal_education/',
-        '/monitor/model_xyb_monitor_count_client_gender'],
-      PsiUrls: ['/monitor/model_xyb_monitor_psi_age', '/monitor/model_xyb_monitor_psi_score'],
-      id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income'],
-      countId: ['personal_live_join', 'personal_education', 'client_gender'],
-      psiId: ['psi_age', 'psi_score'],
+        // '/monitor/model_xyb_monitor_percentile_score',
+        // '/monitor/model_xyb_monitor_percentile_age',
+        // '/monitor/model_xyb_monitor_percentile_credit_query_times',
+        // '/monitor/model_xyb_monitor_percentile_credit_limit',
+        // '/monitor/model_xyb_monitor_percentile_personal_year_income',
+        // '/monitor/model_xyb_monitor_percentile_credit_utilization'
+      ],
+      CateUrls: [],
+      PsiUrls: [],
+      id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
+      countId: ['personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
+      psiId: ['psi_score', 'psi_age', 'psi_credit_query_times', 'psi_credit_limit', 'psi_personal_year_income'],
       type: '',
       dataMap: [],
       nameMap: [],
