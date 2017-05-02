@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.model.bean;
+package com.ecreditpal.maas.model.bean.db;
 
 import com.ecreditpal.maas.common.db.activejdbc.ActiveJDBCUtil;
 import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;

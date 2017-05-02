@@ -1,12 +1,9 @@
-package com.ecreditpal.maas.model.bean;
+package com.ecreditpal.maas.model.bean.db;
 
-import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
-import org.javalite.activejdbc.Model;
+import com.ecreditpal.maas.model.bean.db.CommonBean;
 import org.javalite.activejdbc.annotations.DbName;
 import org.javalite.activejdbc.annotations.IdName;
 import org.javalite.activejdbc.annotations.Table;
-
-import java.util.List;
 
 /**
  * @author lifeng
@@ -15,7 +12,7 @@ import java.util.List;
 @DbName("tool")
 @Table("tool_model")
 @IdName("id")
-public class ToolModel extends CommonBean{
+public class ToolModel extends CommonBean {
 
 
     public String getModelName() {

@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.model.bean;
+package com.ecreditpal.maas.model.bean.db;
 
 import org.javalite.activejdbc.Model;
 import org.joda.time.DateTime;
