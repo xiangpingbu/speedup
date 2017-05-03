@@ -1,16 +1,10 @@
 package com.ecreditpal.maas.common.kafka;
 
-import com.ecreditpal.maas.common.utils.ConvertUtil;
 import com.google.common.collect.Maps;
-import kafka.server.KafkaConfig;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author lifeng

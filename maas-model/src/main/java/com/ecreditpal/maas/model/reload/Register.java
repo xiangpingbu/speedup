@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.schedule;
+package com.ecreditpal.maas.model.reload;
 
 /**
  * @author lifeng
