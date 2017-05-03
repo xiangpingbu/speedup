@@ -35,13 +35,10 @@ public class ConfigurationManager {
             //判断是否为本地
             String productConfigDir = cc.getString("config.dir");
             String applicationProp;
-            String rootPath = null;
+            String rootPath = FileUtil.getRootPath();
             if (productConfigDir == null) {
                 //从本地获取配置文件
-                rootPath = new File(System.getProperty("user.dir")).getParent();
-                applicationProp = rootPath + "/maas/maas-web/target/classes/application.properties";
-                //activejdbc 编译期添加信息
-                MakeInstrumentationUtil.make();
+                applicationProp = rootPath + "/maas-web/target/classes/application.properties";
             } else {
                 //从服务器的目录获取配置文件
                 applicationProp = productConfigDir + "/application.properties";
@@ -60,7 +57,7 @@ public class ConfigurationManager {
             } else {
                 List subModels = conf.getList("maven.submodel");
                 for (Object subModel : subModels) {
-                    File file = new File(rootPath+"/maas/"+subModel.toString() + "/src/main/resources");
+                    File file = new File(rootPath+"/"+subModel.toString() + "/src/main/resources");
                     listFile(file, conf);
                 }
             }

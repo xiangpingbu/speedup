@@ -7,9 +7,9 @@ import org.javalite.instrumentation.Instrumentation;
  * @version 1.0 on 2017/5/1.
  */
 public class MakeInstrumentationUtil {
-    public static void make() {
+    public static void make(String rootpath) {
         Instrumentation instrumentation = new Instrumentation();
-        String path =System.getProperty("user.dir")+"/maas-model/target/classes/";
+        String path =rootpath+"/maas-model/target/classes/";
         instrumentation.setOutputDirectory(path);
         instrumentation.instrument();
     }
