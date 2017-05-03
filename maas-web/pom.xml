@@ -17,6 +17,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ecreditpal</groupId>
+            <artifactId>maas-schedule</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>com.ecreditpal</groupId>-->
             <!--<artifactId>maas-schedule</artifactId>-->

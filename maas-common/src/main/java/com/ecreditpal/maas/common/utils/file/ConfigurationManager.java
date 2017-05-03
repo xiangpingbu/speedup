@@ -60,7 +60,7 @@ public class ConfigurationManager {
             } else {
                 List subModels = conf.getList("maven.submodel");
                 for (Object subModel : subModels) {
-                    File file = new File(rootPath+"/"+subModel.toString() + "/src/main/resources");
+                    File file = new File(rootPath+"/maas/"+subModel.toString() + "/src/main/resources");
                     listFile(file, conf);
                 }
             }

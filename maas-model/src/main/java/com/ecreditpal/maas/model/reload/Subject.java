@@ -1,6 +1,7 @@
-package com.ecreditpal.maas.schedule;
+package com.ecreditpal.maas.model.reload;
 
 /**
+ * 任务的注册和读取接口
  * @author lifeng
  * @version 1.0 on 2017/3/6.
  */

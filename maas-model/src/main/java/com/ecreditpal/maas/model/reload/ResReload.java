@@ -1,12 +1,7 @@
-package com.ecreditpal.maas.schedule;
+package com.ecreditpal.maas.model.reload;
 
-import com.ecreditpal.maas.schedule.Register;
-import com.ecreditpal.maas.schedule.Subject;
+import com.ecreditpal.maas.model.model.minganci.MinGanCiFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,9 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author lifeng
  * @version 1.0 on 2017/3/6.
  */
-
+@Slf4j
 public class ResReload implements  Subject {
-    private final static Logger log = LoggerFactory.getLogger(ResReload.class);
 
     //loaded model will be put into this map;
     private static Map<String, Register> registers = new ConcurrentHashMap<>();
@@ -30,8 +24,8 @@ public class ResReload implements  Subject {
     }
 
     private static void autoLoad() {
-//        MinGanCiFilter minGanCiFilter = new MinGanCiFilter();
-//        registers.put(minGanCiFilter.toString(),minGanCiFilter);
+        MinGanCiFilter minGanCiFilter = new MinGanCiFilter();
+        registers.put(minGanCiFilter.toString(),minGanCiFilter);
     }
 
     @Override
