@@ -35,4 +35,8 @@ public class FileUtil {
         }
         return rootPath;
     }
+
+    public static void main(String[] args) {
+
+    }
 }
