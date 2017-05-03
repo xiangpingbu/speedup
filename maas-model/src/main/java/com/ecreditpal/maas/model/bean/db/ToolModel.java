@@ -55,5 +55,7 @@ public class ToolModel extends CommonBean {
         setString("selected_list",removeList);
     }
 
-
+    public static void main(String[] args) {
+        System.out.println(123);
+    }
 }

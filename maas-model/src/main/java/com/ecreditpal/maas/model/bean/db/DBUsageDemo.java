@@ -2,6 +2,7 @@ package com.ecreditpal.maas.model.bean.db;
 
 import com.ecreditpal.maas.common.db.activejdbc.ActiveJDBCUtil;
 import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class DBUsageDemo {
     public static void main(String[] args) {
-        MakeInstrumentationUtil.make();
+        MakeInstrumentationUtil.make(FileUtil.getRootPath());
 
         //初始化数据库连接
         ActiveJDBCUtil.getDB("tool");
