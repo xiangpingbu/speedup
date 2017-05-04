@@ -32,16 +32,15 @@ def file_init():
     return [train, test]
 
 
-# df_list = file_init()
-# df_train = file_init()
-# df_test = file_init()
+
 model_name = "model_train_selected"
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
-# df_train = None
+# df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
+# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
+df_test = None
 safely_apply = False
 apply_result = None
 
