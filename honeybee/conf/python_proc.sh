@@ -7,11 +7,11 @@ ORCA_CONFIG=conf/gun.py
 
 if [ -f $PID_FILE ];then
         pid=`cat $PID_FILE`
-        echo $pid
+        echo "will kill the pid: $pid"
         kill -9 $pid
 fi
 
-    cd $ORCA_HOME/conf
-    echo `pwd`
+    cd $ORCA_HOME
+    echo "current path `pwd`"
     echo $ORCA_CONFIG
-    nohup gunicorn -c gun.py honeybee_server:app > $LOG_FILE 2>&1 &
+    nohup gunicorn -c conf/gun.py conf.honeybee_server:app > $LOG_FILE 2>&1 &

@@ -172,10 +172,10 @@ def check_corr(x, y, corr_cap=0.75):
     return list(base_col)
 '''
 
-train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
-target = 'bad_4w'
-
-train = train[0:1000]
-
-result = get_logit_backward(train, target, in_vars=[], in_p_value=0.05, in_max_loop=100)
-print result.params
+# train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
+# target = 'bad_4w'
+#
+# train = train[0:1000]
+#
+# result = get_logit_backward(train, target, in_vars=[], in_p_value=0.05, in_max_loop=100)
+# print result.params
