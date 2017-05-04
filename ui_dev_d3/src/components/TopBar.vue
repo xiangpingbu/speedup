@@ -43,7 +43,7 @@
           <li><a href="#">Contact</a></li>
 
           <li style="float: right; width: 200px;">
-            <router-link to="/dash/" style="position:absolute; right:0;">Back to DashBoard</router-link>
+            <router-link :to="'/'+model" style="position:absolute; right:0;">Back to DashBoard</router-link>
             <!-- <a href="/#/dash" style="position:absolute; right:0;">Back to DashBoard</a> -->
           </li>
       </ul>
@@ -66,11 +66,9 @@
 export default {
   name: 'topbar',
   props: ['numIds', 'countIds'],
-  data () {
-    return {
-      health: 100,
-      available: 50,
-      busy: 10
+  computed: {
+    model () {
+      return this.$route.params.model
     }
   }
 }

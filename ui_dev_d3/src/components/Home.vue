@@ -17,7 +17,7 @@
               <div class="dashlist-section">
                 <h6 class="dashlist-section-header">Starred Models</h6>
                 <div class="dashlist-item">
-                  <router-link to="/dash/" class="dashlist-link dashlist-link-dash-db">
+                  <router-link to="/xyb_model" class="dashlist-link dashlist-link-dash-db">
                       <span class="dashlist-title">xyb_model </span>
                       <span class="dashlist-star">
                         <i class="fa fa-star"></i>

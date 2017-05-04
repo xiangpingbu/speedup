@@ -3,12 +3,6 @@
   <topbar :numIds="id" :countIds="countId"></topbar>
   <div class="pure-g">
 
-    <!-- <div class="pure-u-1-2">
-      <div v-for="mid in id" class="chart-card" @click="viewChart(mid, 'line')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]"></lineChart>
-      </div>
-    </div> -->
     <div class="pure-u-1-1">
       <div class="chart-card" @click="viewChart(id[0], 'line')" name='score'>
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
@@ -26,7 +20,7 @@
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(id[2], 'line')" name='credit_query_times'>
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[2]" :dataSet="dataMap.credit_query_times" :variable="varMap.credit_query_times"></lineChart>
+        <lineChart v-if="!loading" :id="id[2]" :dataSet="dataMap[id[2]]" :variable="varMap[id[2]]"></lineChart>
       </div>
     </div>
   </div>
@@ -35,7 +29,7 @@
     <div class="pure-u-1-3">
       <div class="chart-card" @click="viewChart(id[3], 'line')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[3]" :dataSet="dataMap.credit_limit" :variable="varMap.credit_limit"></lineChart>
+        <lineChart v-if="!loading" :id="id[3]" :dataSet="dataMap[id[3]]" :variable="varMap[id[3]]"></lineChart>
       </div>
     </div>
     <div class="pure-u-1-3">
@@ -80,7 +74,7 @@
         <barChart v-if="!loading" :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]"></barChart>
       </div>
     </div>
-    
+
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[3], 'bar')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
@@ -90,9 +84,9 @@
   </div> -->
   <div class="pure-g">
     <div class="pure-u-1-3" v-for="mid in psiId">
-      <div class="chart-card" @click="viewChart(mid, 'psi')">
+      <div class="chart-card" @click="viewChart('psi_' + mid, 'psi')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]"></psiLineChart>
+        <psiLineChart v-if="!loading" :id="'psi_' + mid" :dataSet="dataMap['psi_' + mid]"></psiLineChart>
       </div>
     </div>
 
@@ -119,36 +113,37 @@ import barChart from '@/components/barChart.vue'
 import psiLineChart from '@/components/psiChart.vue'
 // import * as d3 from 'd3'
 // import axios from 'axios'
+import ConfigInfo from '@/config/config.js'
 import * as getData from '@/service/data.js'
 import {mapMutations} from 'vuex'
 export default {
   name: 'DashBoard',
   created () {
-    // get numerical urls
-    this.id.forEach((d) => {
-      var urlStr = '/monitor/model_xyb_monitor_percentile_' + d
-      this.numUrls.push(urlStr)
-    })
-    // get categorocal urls
-    this.countId.forEach((d) => {
-      var urlStr = '/monitor/model_xyb_monitor_count_' + d
-      this.CateUrls.push(urlStr)
-    })
-    // get psi urls
-    this.psiId.forEach((d) => {
-      var urlStr = '/monitor/model_xyb_monitor_' + d
-      this.PsiUrls.push(urlStr)
-    })
-
-    var PromiseList = []
+    var NumPromiseList = []
     var CatePromiseList = []
     var PsiPromiseList = []
 
-    // get & parse numerical data
-    this.numUrls.forEach(function (d) {
-      PromiseList.push(getData.getResponse(d))
+    // get numerical urls
+    this.id.forEach((d) => {
+      var urlStr = ConfigInfo.url_prefix + this.type[0] + '_' + d
+      NumPromiseList.push(getData.getResponse(urlStr))
     })
-    Promise.all(PromiseList).then((response) => {
+    // get categorocal urls
+    this.countId.forEach((d) => {
+      var urlStr = ConfigInfo.url_prefix + this.type[1] + '_' + d
+      CatePromiseList.push(getData.getResponse(urlStr))
+    })
+    // get psi urls
+    this.psiId.forEach((d) => {
+      var urlStr = ConfigInfo.url_prefix + this.type[2] + '_' + d
+      PsiPromiseList.push(getData.getResponse(urlStr))
+    })
+
+    // get & parse numerical data
+    // this.numUrls.forEach(function (d) {
+    //   NumPromiseList.push(getData.getResponse(d))
+    // })
+    Promise.all(NumPromiseList).then((response) => {
       response.forEach((d, i) => {
         var res = getData.parseNumData(d.data)
         this.dataMap[this.id[i]] = res.newJsonData
@@ -157,9 +152,9 @@ export default {
     })
 
     // get & parse categorocal data
-    this.CateUrls.forEach(function (d) {
-      CatePromiseList.push(getData.getResponse(d))
-    })
+    // this.CateUrls.forEach(function (d) {
+    //   CatePromiseList.push(getData.getResponse(d))
+    // })
     Promise.all(CatePromiseList).then((response) => {
       response.forEach((d, i) => {
         var res = getData.parseCateData(d.data)
@@ -169,24 +164,23 @@ export default {
     })
 
     // get & parse psi data
-    this.PsiUrls.forEach(function (d) {
-      PsiPromiseList.push(getData.getResponse(d))
-    })
+    // this.PsiUrls.forEach(function (d) {
+    //   PsiPromiseList.push(getData.getResponse(d))
+    // })
     Promise.all(PsiPromiseList).then((response) => {
       response.forEach((d, i) => {
         var res = getData.parsePsiData(d.data)
-        this.dataMap[this.psiId[i]] = res.newJsonData
+        this.dataMap['psi_' + this.psiId[i]] = res.newJsonData
       })
     })
 
-    // getData.getCateData(url4).then((receivedData) => {
-    //   this.dataMap[this.countId[0]] = receivedData.newJsonData
-    //   this.varMap[this.countId[0]] = receivedData.category
-    //   // console.log(this.dataMap[this.countId[0]])
-    // })
-
+    // store id lists for top bar
     localStorage.setItem('numIds', JSON.stringify(this.id))
     localStorage.setItem('countIds', JSON.stringify(this.countId))
+
+    // this.countId.forEach((d) => {
+    //   this.nameMap[d] = ConfigInfo[d]
+    // })
 
     // set personal_live_join nameMap
     this.nameMap[this.countId[0]] = {
@@ -227,6 +221,7 @@ export default {
       'others': '不属于以上情况'
     }
     // console.log(this.nameMap.personal_live_join)
+    // console.log(this.$route.params.model)
 
     setTimeout(() => {
       this.loading = false
@@ -234,20 +229,10 @@ export default {
   },
   data () {
     return {
-      numUrls: [
-        // '/monitor/model_xyb_monitor_percentile_score',
-        // '/monitor/model_xyb_monitor_percentile_age',
-        // '/monitor/model_xyb_monitor_percentile_credit_query_times',
-        // '/monitor/model_xyb_monitor_percentile_credit_limit',
-        // '/monitor/model_xyb_monitor_percentile_personal_year_income',
-        // '/monitor/model_xyb_monitor_percentile_credit_utilization'
-      ],
-      CateUrls: [],
-      PsiUrls: [],
       id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
       countId: ['personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
-      psiId: ['psi_score', 'psi_age', 'psi_credit_query_times', 'psi_credit_limit', 'psi_personal_year_income'],
-      type: '',
+      psiId: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
+      type: ['percentile', 'count', 'psi'],
       dataMap: [],
       nameMap: [],
       subChartEnabled: false,

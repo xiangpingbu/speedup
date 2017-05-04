@@ -22,12 +22,12 @@ export default new Router({
       component: Hello
     },
     {
-      path: '/dash/',
+      path: '/:model',
       name: 'DashBoard',
       component: DashBoard
     },
     {
-      path: '/dash/:id',
+      path: '/:model/:id',
       name: 'Page',
       component: Page
     }
