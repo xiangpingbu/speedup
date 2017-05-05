@@ -35,8 +35,8 @@ def file_init():
 
 model_name = "model_train_selected"
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-# df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
-df_train = None
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+# df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 # df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
@@ -61,7 +61,7 @@ def init():
     # else:
     #     var_service.create_branch(model, branch, target, remove_list, selected_list)
 
-    remove_list_json = json.loads(json.loads(result[0]["remove_list"]))
+    remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
     for o in remove_list_json :
         remove_list.append(o)
@@ -301,7 +301,7 @@ def apply():
 
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
-    return responseFile(response)
+    return responsePandas(response)
 
 
 def isNum(v):
@@ -739,8 +739,15 @@ def variable_select():
     data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
     return data
 
-def generate_response(var_name, df, iv):
-    """
+'''
+导出变量配置
+'''
+@app.route(base+"/export",methods=['POST'])
+def export_variables():
+    data = request.form.get("data")
+    response = make_response(data)
+    return responseFile(response,"variable_config.json")
+'''
     adjust方法产生的数据转换成dict.
 
     Parameters:
@@ -771,8 +778,8 @@ def generate_response(var_name, df, iv):
         {..},
         {..}]
 }
-    """
-
+    '''
+def generate_response(var_name, df, iv):
     #data = {var_name: []}
     data = collections.OrderedDict()
     var_content = collections.OrderedDict()

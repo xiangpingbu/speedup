@@ -171,16 +171,16 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                                 return;
                             }
                         }
-                        branches.push(current);
-                        d3.select("#branch").append("option").text(current);
+                        // branches.push(current);
+                        // d3.select("#branch").append("option").text(current);
                         $.ajax({
                             url: host + "/tool/db/branch",
                             data: {"branch": current, "model_name": $("#model").val(),"original_branch":originalBranch},
                             type: 'post',
                             async: true,
                             success: function (result) {
-                                branches.push(newBranch);
-                                d3.select("#branch").append("option").text(newBranch);
+                                branches.push(current);
+                                d3.select("#branch").append("option").text(current);
                             }
                         });
                     });
@@ -399,7 +399,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
     function setSelected(removeList) {
         if (removeList != "") {
-            var remove_list = JSON.parse(JSON.parse(removeList));
+            var remove_list = JSON.parse(removeList);
             $("#dataframe").find("tbody tr").each(function (i, n) {
                 if (remove_list[$(n).children().eq(1).html()] != undefined) {
                     $(n).children().eq(0).iCheck('check');
@@ -409,7 +409,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
     function clearAndSet(removeList) {
-        var remove_list = JSON.parse(JSON.parse(removeList));
+        var remove_list = JSON.parse(removeList);
         $("#dataframe").find("tbody tr").each(function (i, n) {
             $(n).children().eq(0).iCheck('uncheck');
             if (remove_list[$(n).children().eq(1).html()] != undefined) {
@@ -422,7 +422,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         output: outputDateMap,
         changeTd: changeTd,
         getTable: getTable,
-        saveAll: exportDataWithIV
+        saveAll: exportDataWithIV,
+        exportData:exportData
     }
 });
 

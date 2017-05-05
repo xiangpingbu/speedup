@@ -18,7 +18,9 @@ def es_req(key):
     response = requests.get(url)
     return responseto(data=json.loads(response.text))
 
-
+'''
+创建新的分支,将会复制原有的分支的内容
+'''
 @app.route(base + "/branch", methods=['POST'])
 def new_branch():
     model_name = request.form.get("model_name")
@@ -27,8 +29,16 @@ def new_branch():
 
     result = vs.load_binning_record(model_name,original_branch)
 
+    list = []
 
-    return responseto(data=vs.create_branch(model_name, branch))
+    for record in result:
+        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"].replace("\\","")]
+        list.append(obj)
+
+    if vs.copy_branch(model_name, branch,original_branch):
+        vs.save_binning_record(list)
+        return responseto(data=True)
+    return responseto(data=False)
 
 
 '''
