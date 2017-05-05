@@ -89,19 +89,15 @@
         <psiLineChart v-if="!loading" :id="'psi_' + mid" :dataSet="dataMap['psi_' + mid]"></psiLineChart>
       </div>
     </div>
+  </div>
 
-    <!-- <div class="pure-u-1-2">
-      <div class="chart-card" @click="viewChart(psiId[0], 'psi')">
+  <div class="pure-g">
+    <div class="pure-u-1-2">
+      <div class="chart-card" @click = "viewChart('api', 'stat')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="psiId[0]" :dataSet="dataMap[psiId[0]]" :variable="varMap[psiId[0]]"></psiLineChart>
+        <statChart v-if="!loading" id="api" :dataSet="dataMap['api']"></statChart>
       </div>
     </div>
-    <div class="pure-u-1-2">
-      <div class="chart-card" @click="viewChart(psiId[1], 'psi')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="psiId[1]" :dataSet="dataMap[psiId[1]]" :variable="varMap[psiId[1]]"></psiLineChart>
-      </div>
-    </div> -->
   </div>
 </div>
 </template>
@@ -111,6 +107,7 @@ import topbar from '@/components/TopBar.vue'
 import lineChart from '@/components/lineChart.vue'
 import barChart from '@/components/barChart.vue'
 import psiLineChart from '@/components/psiChart.vue'
+import statChart from '@/components/statChart.vue'
 // import * as d3 from 'd3'
 // import axios from 'axios'
 import ConfigInfo from '@/config/config.js'
@@ -174,52 +171,59 @@ export default {
       })
     })
 
+    var apiUrl = ConfigInfo.url_prefix + this.type[3] + '_' + 'api'
+    var apiPromise = getData.getResponse(apiUrl)
+    apiPromise.then((response) => {
+      var res = getData.parseStatData(response.data)
+      this.dataMap['api'] = res.newJsonData
+    })
+
     // store id lists for top bar
     localStorage.setItem('numIds', JSON.stringify(this.id))
     localStorage.setItem('countIds', JSON.stringify(this.countId))
 
-    // this.countId.forEach((d) => {
-    //   this.nameMap[d] = ConfigInfo[d]
-    // })
+    // set count chart nameMap
+    this.countId.forEach((d) => {
+      this.nameMap[d] = ConfigInfo[d]
+    })
 
-    // set personal_live_join nameMap
-    this.nameMap[this.countId[0]] = {
-      '1,': '父母',
-      '2,': '配偶及子女',
-      '1,2,': '父母、配偶及子女',
-      '4,': '其他',
-      '3,': '朋友',
-      '2,4,': '配偶及子女、其他',
-      '1,4,': '父母、其他',
-      '1,2,4,': '父母、配偶子女、其他',
-      'others': '不属于以上情况'
-    }
-
-    this.nameMap[this.countId[1]] = {
-      '1': '硕士及以上',
-      '2': '本科',
-      '3': '专科',
-      '4': '其他',
-      'others': '不属于以上情况'
-    }
-
-    this.nameMap[this.countId[2]] = {
-      '1': '男',
-      '2': '女',
-      'others': '其他'
-    }
-
-    this.nameMap[this.countId[3]] = {
-      '1': '自有商业按揭房',
-      '2': '自有无按揭购房',
-      '3': '自有公积金按揭购房',
-      '4': '自建房',
-      '5': '租房',
-      '6': '亲戚住房',
-      '7': '宿舍',
-      '8': '其他',
-      'others': '不属于以上情况'
-    }
+    // this.nameMap[this.countId[0]] = {
+    //   '1,': '父母',
+    //   '2,': '配偶及子女',
+    //   '1,2,': '父母、配偶及子女',
+    //   '4,': '其他',
+    //   '3,': '朋友',
+    //   '2,4,': '配偶及子女、其他',
+    //   '1,4,': '父母、其他',
+    //   '1,2,4,': '父母、配偶子女、其他',
+    //   'others': '不属于以上情况'
+    // }
+    //
+    // this.nameMap[this.countId[1]] = {
+    //   '1': '硕士及以上',
+    //   '2': '本科',
+    //   '3': '专科',
+    //   '4': '其他',
+    //   'others': '不属于以上情况'
+    // }
+    //
+    // this.nameMap[this.countId[2]] = {
+    //   '1': '男',
+    //   '2': '女',
+    //   'others': '其他'
+    // }
+    //
+    // this.nameMap[this.countId[3]] = {
+    //   '1': '自有商业按揭房',
+    //   '2': '自有无按揭购房',
+    //   '3': '自有公积金按揭购房',
+    //   '4': '自建房',
+    //   '5': '租房',
+    //   '6': '亲戚住房',
+    //   '7': '宿舍',
+    //   '8': '其他',
+    //   'others': '不属于以上情况'
+    // }
     // console.log(this.nameMap.personal_live_join)
     // console.log(this.$route.params.model)
 
@@ -231,8 +235,8 @@ export default {
     return {
       id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
       countId: ['personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
-      psiId: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
-      type: ['percentile', 'count', 'psi'],
+      psiId: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization', 'personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
+      type: ['percentile', 'count', 'psi', 'stat'],
       dataMap: [],
       nameMap: [],
       subChartEnabled: false,
@@ -271,7 +275,8 @@ export default {
     topbar,
     lineChart,
     barChart,
-    psiLineChart
+    psiLineChart,
+    statChart
   }
 }
 </script>

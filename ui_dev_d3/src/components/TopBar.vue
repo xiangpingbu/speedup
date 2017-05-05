@@ -22,7 +22,7 @@
                 <a href="#">LineCharts</a>
                 <ul>
                   <li v-for="id in numIds" class="pure-menu-item">
-                    <router-link :to="'/dash/'+id" class="pure-menu-link">{{id}}</router-link>
+                    <router-link :to="'/'+model+'/'+id" class="pure-menu-link">{{id}}</router-link>
                     <!-- <a :href="'#/dash/'+id" class="pure-menu-link">{{id}}</a> -->
                   </li>
                 </ul>
@@ -31,7 +31,7 @@
                 <a href="#">BarCharts</a>
                 <ul>
                   <li v-for="id in countIds" class="pure-menu-item">
-                    <router-link :to="'/dash/'+id" class="pure-menu-link">{{id}}</router-link>
+                    <router-link :to="'/'+model+'/'+id" class="pure-menu-link">{{id}}</router-link>
                   </li>
                 </ul>
               </li>

@@ -166,3 +166,12 @@ export function parsePsiData (json) {
   })
   return {newJsonData}
 }
+
+export function parseStatData (json) {
+  var tt = json.data.hits.hits
+  var newJsonData = []
+  tt.forEach(function (d) {
+    newJsonData.push(d._source)
+  })
+  return {newJsonData}
+}
