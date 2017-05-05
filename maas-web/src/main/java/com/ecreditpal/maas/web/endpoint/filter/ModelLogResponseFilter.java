@@ -2,7 +2,7 @@ package com.ecreditpal.maas.web.endpoint.filter;
 
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ResponseInfo;
-import com.ecreditpal.maas.common.utils.JsonUtil;
+import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -51,9 +51,9 @@ public class ModelLogCommitFilter implements ContainerResponseFilter {
 
         LOGGER.debug("Commiting the LookupEventMessage to kafka topic {}",
                 KAFKA_LOOKUP_EVENT_TOPIC);
-            WorkDispatcher.getInstance().modelExecute(new Thread(){
-                @Override
-                public void run() {
+//            WorkDispatcher.getInstance().modelExecute(new Thread(){
+//                @Override
+//                public void run() {
                     try {
                         String key = lookupEvent.getRequestInfo().getRequestPath().toString();
                         if (StringUtils.isEmpty(key)) {
@@ -66,9 +66,9 @@ public class ModelLogCommitFilter implements ContainerResponseFilter {
                                 "Kafka service is temporarily unavailable. Failed to commit the lookup event message {}",
                                 lookupEvent, e);
                     }
-                };
+//                };
 
-    });
+//    });
     }
 
 }

@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.common.utils;
+package com.ecreditpal.maas.common.utils.json;
 
 import com.ecreditpal.maas.common.utils.json.JsonSerializeException;
 import com.fasterxml.jackson.core.JsonParser;
