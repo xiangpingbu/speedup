@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Slf4j
 @Api(value = "users", description = "Endpoint for rest service")
-@Path("/")
+@Path("/api")
 public class RestServiceEndpoint {
 
     @Context
@@ -44,7 +44,7 @@ public class RestServiceEndpoint {
         //得到请求参数
         Map<String, String> map = FilterUtil.getRequestForm(request,providers);
         //获得apiCode对应的模型
-        ModelService service = ServiceContainer.getModelService(apiCode);
+         ModelService service = ServiceContainer.getModelService(apiCode);
 
         return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
     }
