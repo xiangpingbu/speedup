@@ -40,7 +40,7 @@ public class ConfigurationManager {
             cc.addConfiguration(new SystemConfiguration());
             //判断是否为本地
             String productConfigDir = cc.getString("config.dir");
-            String propertiesPath;
+            String propertiesPath = null;
             String rootPath = null;
             if (productConfigDir == null) {
                 //从本地获取配置文件
@@ -48,7 +48,7 @@ public class ConfigurationManager {
                 propertiesPath = rootPath + "/maas-web/target/classes";
             } else {
                 //从服务器的目录获取配置文件
-                propertiesPath = productConfigDir + "/application.properties";
+                propertiesPath = productConfigDir;
             }
 
             log.info("loading  property in directory {}.", propertiesPath);
