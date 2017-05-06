@@ -18,6 +18,7 @@
 
     <bean id="modelResReloadTask" class="com.ecreditpal.maas.model.reload.ResReload"/>
     <task:scheduled-tasks>
-        <task:scheduled ref="modelResReloadTask" method="execute" cron="0/30 * * * * ?"/>
+        <task:scheduled ref="modelResReloadTask" method="execute" cron="0 0/5 * * * ?"/>
+                                                                        <!--0 0/5 * * * ?-->
     </task:scheduled-tasks>
 </beans>
