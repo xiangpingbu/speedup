@@ -178,4 +178,4 @@ target = 'bad_4w'
 train = train[0:1000]
 
 result = get_logit_backward(train, target, in_vars=[], in_p_value=0.05, in_max_loop=100)
-print result.params
+#print result.params
