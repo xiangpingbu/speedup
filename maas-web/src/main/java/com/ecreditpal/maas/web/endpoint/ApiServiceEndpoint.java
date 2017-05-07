@@ -70,13 +70,13 @@ public class ApiServiceEndpoint {
 //            user.setName("sona");
 //            user.setAge("23");
 //            user.setSex("female");
-//        }
         return user;
     }
 
 
     @POST
     @Path("/user")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Returns user details", notes = "Returns a user detail by json", response = User.class)
     @ApiResponses(value = {
