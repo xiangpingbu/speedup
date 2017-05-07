@@ -19,7 +19,7 @@ require.config({
     }
 });
 
-var host = "http://192.168.31.68:8091";
+var host = "http://localhost:8091";
 
 
 require(['jquery', "tool", "tool_button","tool_variable_select"],

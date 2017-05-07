@@ -143,10 +143,10 @@ filtering = false的一项,指定除了.properties和logback.xml文件外的所�
 ## web模块部分
 web模块由下面几部分组成
 ### maas对ecreditpal的接口
-```
+
 这是一个模型服务,实现了ModelService接口,通过@Model标签注册
 
-```
+```java
 @Model(apiCode = "M111")
 public class XybService implements ModelService {
 
@@ -163,9 +163,10 @@ public class XybService implements ModelService {
     }
 }
 ```
+
 ServiceContainer会搜索com.ecreditpal.maas.service目录下所有的class,观察该class有没有被@Model标记,如果被标记了,那么将它的apicode和这个modelService关联在一起.并纳入ServiceContainer的管理.
 
-```
+```java
 public class ServiceContainer {
     private static Map<String, ModelService> map = Maps.newHashMap();
 
@@ -198,8 +199,7 @@ public class ServiceContainer {
 
 只要调用方提供apiCode,就能够通过该code得到指定的模型服务,并提供结果
 
-
-```
+```java
 @POST
     @Path("/{apiCode}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -238,7 +238,7 @@ flask作为web框架,部署在gunicorn服务器上,结合gevent提高服务端�
 
 接下去就可读取了,maas的各个模块的信息,进而获得每个模块下的所有配置文件,这样就可以直接通过文件名获取配置文件的绝对路径
 
-```
+```java
 static {
         try {
             logger.info("loading system properties ...");
@@ -303,7 +303,7 @@ getString(key:"mgc.txt",default:"/xx/xx/xx/mgc.txt")
 
 *xyb_model_variables.xml*
 
-```
+```xml
 <VariableConfiguration>
     <Model>XYBModel</Model>
     <Variable name="CreditUtilizationVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
@@ -329,7 +329,7 @@ getString(key:"mgc.txt",default:"/xx/xx/xx/mgc.txt")
 
 SAX解析xml.
 
-```
+```java
 public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
         sb = new StringBuilder();
 

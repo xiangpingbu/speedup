@@ -5,9 +5,11 @@ Created on Wed Mar 15 17:29:53 2017
 @author: Admin
 """
 
-import pandas as pd
-import statsmodels.api as sm
+
+
 from Model_Selection_Macro import *
+
+
 # attributes selection
 import json
 
@@ -20,7 +22,8 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     train_x = train[woe_var_list]
 
     result = logit_backward(train_x, train_y, vars=in_vars, p_value=in_p_value, max_loop=in_max_loop)
-    """
+    #print result.params
+
     data = {}
 
     model_analysis = {}
@@ -48,12 +51,14 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     #woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
     woe_var_list.append(target)
     train_woe_data = train[woe_var_list]
-    model_para_list = result.params.tolist()
+    model_para_list = result.params.index.tolist()
     marginal_var_result = get_marginal_var(train_woe_data, target, model_para_list)
     data['marginal_var'] = marginal_var_result
 
+    print data
     return data
-    """
+
+
 
 def logit_backward(x, y, vars=[], p_value=0.05, max_loop=100):
     count = 0
@@ -119,13 +124,7 @@ def negative_coef_to_drop(mdlresult):
         return None
 
 
-def logit_base_model(x, y):
-    print '<MDL start>'
-    logit = sm.Logit(y, x)
-    result = logit.fit()
-    #print result.summary2()
-    #print result.params
-    return result
+
 
 
 
@@ -135,47 +134,40 @@ def get_marginal_var(train_woe_data, target, model_para_list):
     return marginal_var_result
 
 
-# remove high correlation variables
-'''
-def check_corr(x, y, corr_cap=0.75):
-    print 'checking corration'
-    base_col = set(x.columns)
-    corr = x.corr()
-    base_col = base_col.difference(set(['Intercept', 'intercept']))
-    base_col_list = list(base_col)
-    corr_pair = []
-    df_f = pd.DataFrame(y)
-    df_f.columns = ['target']
-    df = pd.concat([x, df_f], axis=1)
-    iv_dict = {}
-    for i in base_col_list:
-        uniqV = len(x[i].value_counts())
-        iv_dict[i] = getIV(df, i, 'target', 'num', uniqV)
-
-    base_col_list = list(base_col)
-    for i in range(len(base_col_list)):
-        for j in range(i + 1, len(base_col_list)):
-            if abs(corr[base_col_list[i]][base_col_list[j]] >= corr_cap):
-                # compare IV
-                if (iv_dict[base_col_list[i]] >= iv_dict[base_col_list[j]]):
-                    to_add = base_col_list[i]
-                    to_remove = base_col_list[j]
-                else:
-                    to_add = base_col_list[j]
-                    to_remove = base_col_list[i]
-
-                # choose big one into set and remove lower one
-                base_col = base_col.difference(set([to_remove]))
-                base_col = base_col.union(set([to_add]))
-    print 'Done with ckecking corration!'
-
-    return list(base_col)
-'''
-
 train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
-
-train = train[0:1000]
-
-result = get_logit_backward(train, target, in_vars=[], in_p_value=0.05, in_max_loop=100)
+selected = [u'cell_operator_woe',
+            u'province_woe',
+            u'cell_loc_woe',
+            u'cell_operator_zh_woe',
+            u'信用评分_1_woe',
+            u'contacts_class1_cnt_woe',
+            u'phone_gray_score_woe',
+            u'芝麻信用_woe',
+            u'花呗金额_woe',
+            u'公司性质_woe',
+            u'call_in_cnt_woe',
+            u'居住情况_woe',
+            u'call_cnt_woe',
+            u'total_amount_woe',
+            u'学历_woe',
+            u'call_in_time_woe',
+            u'call_out_cnt_woe',
+            u'工作年限_woe',
+            u'手机入网时间_woe',
+            u'net_flow_woe',
+            u'公司规模_woe',
+            u'性别_woe',
+            u'代付工资月薪_woe',
+            u'age_woe',
+            u'宜信借款金额范围_woe',
+            u'最近两月是否其他平台借款成功_woe',
+            u'借款拼单状态_woe',
+            u'宜信审批结果_woe',
+            u'宜信状态（正常、逾期）_woe',
+            u'年龄_woe',
+            u'婚姻状况_woe',
+            u'子女情况_woe',
+            u'中高级职称_woe']
+result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
 #print result.params

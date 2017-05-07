@@ -128,6 +128,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         ol.append("li").append("span").append("a").attr("id", "saveAll").text("保存所有");
         ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
         ol.append("li").append("span").append("a").attr("id", "selectAll").attr("value", 0).text("选取所有");
+        ol.append("li").append("span").append("a").attr("id","export").text("导出");
 
         $("#initBar").bind("click", function () {
             init();
@@ -180,7 +181,28 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 $(".apply-checks").iCheck("uncheck");
                 $("#selectAll").attr("value", "0");
             }
-        })
+        });
+
+        $("#export").bind("click",function () {
+          var data =  tool_button.exportData();
+
+            $("#downConfig").remove();
+            var form = $("<form>");//定义一个form表单
+            form.attr("id", "downConfig");
+            form.attr("style", "display:none");
+            form.attr("target", "");
+            form.attr("method", "post");
+            form.attr("action", host + "/tool/export");
+            var input1 = $("<input>");
+            input1.attr("type", "hidden");
+            input1.attr("name", "data");
+
+            input1.attr("value", JSON.stringify(data));
+            form.append(input1);
+            $("body").append(form);//将表单放置在web中
+
+            form.submit();//表单提交
+        });
     }
 
     function initBar(result) {

@@ -41,7 +41,7 @@ public class XYBModelTest {
         Map<String, Object> map = Maps.newHashMap();
         map.put("creditLimit", 1);  //信用卡过去三个月查询次数
         map.put("creditQueryTimes", 1);
-
+        System.out.println(System.getProperty("user.dir"));
 
         map.put("creditUtilization", 0); //已经使用的总额度
         map.put("personalEducation", 1);//个人学历,2为本科

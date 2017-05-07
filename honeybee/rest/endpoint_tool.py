@@ -32,9 +32,7 @@ def file_init():
     return [train, test]
 
 
-# df_list = file_init()
-# df_train = file_init()
-# df_test = file_init()
+
 model_name = "model_train_selected"
 df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 #df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
@@ -62,7 +60,7 @@ def init():
     # else:
     #     var_service.create_branch(model, branch, target, remove_list, selected_list)
 
-    remove_list_json = json.loads(json.loads(result[0]["remove_list"]))
+    remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
     for o in remove_list_json :
         remove_list.append(o)
@@ -358,7 +356,10 @@ def upload():
                 df_test = pd.read_excel(file, encoding="utf-8")
             elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file, encoding="utf-8")
-                # df_train['bad_7mon_60'] = df_train['bad_4w']
+                if filename.find("_")>0:
+                    model_name = filename.split("_")[0]
+                else:
+                    model_name = "anonymous"
     return responseto(data="success")
 
 
@@ -740,8 +741,15 @@ def variable_select():
     data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
     return data
 
-def generate_response(var_name, df, iv):
-    """
+'''
+导出变量配置
+'''
+@app.route(base+"/export",methods=['POST'])
+def export_variables():
+    data = request.form.get("data")
+    response = make_response(data)
+    return responseFile(response,"variable_config.json")
+'''
     adjust方法产生的数据转换成dict.
 
     Parameters:
@@ -772,8 +780,8 @@ def generate_response(var_name, df, iv):
         {..},
         {..}]
 }
-    """
-
+    '''
+def generate_response(var_name, df, iv):
     #data = {var_name: []}
     data = collections.OrderedDict()
     var_content = collections.OrderedDict()

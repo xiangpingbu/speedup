@@ -51,7 +51,7 @@ public class SpringWithSwagger extends ResourceConfig {
                 myRestPackage);
 
         register(MultiPartFeature.class);
-//        register(JacksonJsonProvider.class);
+        register(JacksonJsonProvider.class);
         register(ModelLogFilter.class);
         register(new AbstractBinder() {
             @Override
