@@ -158,12 +158,6 @@
             </dependency>
 
             <dependency>
-                <groupId>redis.clients</groupId>
-                <artifactId>jedis</artifactId>
-                <version>2.9.0</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-json-jackson</artifactId>
                 <version>${jersey.version}</version>
@@ -181,6 +175,13 @@
                 <artifactId>jetty-webapp</artifactId>
                 <version>9.2.15.v20160210</version>
             </dependency>
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>2.9.0</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -267,9 +268,9 @@
                 </exclusions>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>org.apache.kafka</groupId>-->
-                <!--<artifactId>kafka-clients</artifactId>-->
-                <!--<version>0.10.2.0</version>-->
+            <!--<groupId>org.apache.kafka</groupId>-->
+            <!--<artifactId>kafka-clients</artifactId>-->
+            <!--<version>0.10.2.0</version>-->
             <!--</dependency>-->
 
             <dependency>

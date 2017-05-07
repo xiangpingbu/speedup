@@ -24,9 +24,9 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "users", description = "Endpoint for rest service")
+@Api(value = "apis", description = "Endpoint for api service")
 @Path("/api")
-public class RestServiceEndpoint {
+public class ApiServiceEndpoint {
 
     @Context
     HttpServletRequest request;
@@ -77,7 +77,6 @@ public class RestServiceEndpoint {
 
     @POST
     @Path("/user")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Returns user details", notes = "Returns a user detail by json", response = User.class)
     @ApiResponses(value = {
@@ -85,9 +84,9 @@ public class RestServiceEndpoint {
             @ApiResponse(code = 404, message = "User with given username does not exist"),
             @ApiResponse(code = 500, message = "Internal server error")}
     )
-    public XYBModelBean getUser2(@ApiParam(name = "userName", value = "Alphanumeric login to the application", required = true) XYBModelBean bean) {
+    public String getUser2(@ApiParam(name = "userName", value = "Alphanumeric login to the application", required = true) String s) {
         log.info("123");
-        return bean;
+        return s;
     }
 
     @POST

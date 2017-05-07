@@ -16,9 +16,9 @@ public class ResReload implements  Subject {
     //loaded model will be put into this map;
     private static Map<String, Register> registers = new ConcurrentHashMap<>();
 
-    static {
-        autoLoad();
-    }
+//    static {
+//        autoLoad();
+//    }
 
     public ResReload() {
     }

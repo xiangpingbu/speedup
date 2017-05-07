@@ -40,7 +40,7 @@ public class XybEndpoint {
             @ApiParam(value = "loanDay", required = false) @FormParam("loanDay") String loanDay,
             @ApiParam(value = "clientGender", required = false) @FormParam("clientGender") String clientGender,
             @Context LookupEventMessage lookupEventMessage
-            ) throws Exception {
+    ) throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(12);
 
         map.put("creditQueryTimes", creditQueryTimes);
@@ -61,10 +61,8 @@ public class XybEndpoint {
         XYBModel xybModel = new XYBModel();
         String score = xybModel.run(map).toString();
 
-        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(),score,XYBModel.XYBModelVariables.getModel());
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
-
-
 
         return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }

@@ -2,6 +2,7 @@ package com.ecreditpal.maas.web.endpoint.filter;
 
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
+import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.constants.KafkaConstants;
 import com.ecreditpal.maas.common.kafka.KafkaProducerException;
 import com.ecreditpal.maas.common.kafka.MaasKafkaProducer;
@@ -51,24 +52,23 @@ public class ModelLogCommitFilter implements ContainerResponseFilter {
 
         LOGGER.debug("Commiting the LookupEventMessage to kafka topic {}",
                 KAFKA_LOOKUP_EVENT_TOPIC);
-//            WorkDispatcher.getInstance().modelExecute(new Thread(){
-//                @Override
-//                public void run() {
                     try {
                         String key = lookupEvent.getRequestInfo().getRequestPath().toString();
                         if (StringUtils.isEmpty(key)) {
                             key = "ecreditpal/rest";
                         }
-                        MaasKafkaProducer.getInstance(KAFKA_LOOKUP_EVENT_TOPIC).produce(KAFKA_LOOKUP_EVENT_TOPIC, key,
-                                lookupEvent);
+                        ModelLog ModelLog = lookupEvent.getModelLog();
+
+                        if (ModelLog != null) {
+                            MaasKafkaProducer.getInstance(KAFKA_LOOKUP_EVENT_TOPIC).produce(KAFKA_LOOKUP_EVENT_TOPIC, key,
+                                    lookupEvent);
+                        }
                     } catch (KafkaProducerException e) {
                         LOGGER.error(
                                 "Kafka service is temporarily unavailable. Failed to commit the lookup event message {}",
                                 lookupEvent, e);
                     }
-//                };
 
-//    });
     }
 
 }
