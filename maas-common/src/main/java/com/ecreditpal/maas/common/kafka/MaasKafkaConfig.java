@@ -117,7 +117,7 @@ public class MaasKafkaConfig {
     /**
      * 用于配置send数据或partitionFor函数得到对应的leader时，最大的等待时间，默认值为60秒。
      */
-    private String maxBlockMs = "5000";
+    private String maxBlockMs = "60000";
     private final static String MAX_BLOCK_MS = "max.block.ms";
 
 

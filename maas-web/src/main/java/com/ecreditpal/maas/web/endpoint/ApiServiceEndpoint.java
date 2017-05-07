@@ -24,9 +24,9 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "users", description = "Endpoint for rest service")
+@Api(value = "apis", description = "Endpoint for api service")
 @Path("/api")
-public class RestServiceEndpoint {
+public class ApiServiceEndpoint {
 
     @Context
     HttpServletRequest request;

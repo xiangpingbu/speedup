@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @version 1.0 on 2017/3/10.
  */
 public class Result<D> implements Serializable {
-    private boolean success;
+    private Boolean success;
     private String code;
     private String message;
     private D data;
@@ -25,18 +25,18 @@ public class Result<D> implements Serializable {
 
     public static <D> Result<D> wrapErrorResult(String errorCode, String message) {
         Result<D> result = new Result<D>();
-        result.success = false;
+        result.success = Boolean.FALSE;
         result.code = errorCode;
         result.message = message;
         return result;
     }
 
 
-    public boolean isSuccess() {
+    public Boolean isSuccess() {
         return success;
     }
 
-    public void setSuccess(boolean success) {
+    public void setSuccess(Boolean success) {
         this.success = success;
     }
 

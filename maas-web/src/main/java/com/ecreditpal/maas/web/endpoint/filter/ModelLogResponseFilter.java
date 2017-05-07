@@ -3,6 +3,7 @@ package com.ecreditpal.maas.web.endpoint.filter;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ResponseInfo;
 import com.ecreditpal.maas.common.utils.json.JsonUtil;
+import com.ecreditpal.maas.model.bean.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +43,11 @@ public class ModelLogResponseFilter
 
         builder.setResponseCode(
                 responseContext.getStatusInfo().getStatusCode());
-        if (null != responseContext.getEntity()) {
+        if (null != responseContext.getEntity() && !(responseContext.getEntity() instanceof Result)) {
             try {
                 builder.setResponseBody(
                         JsonUtil.toJson(responseContext.getEntity()));
+
             } catch (Throwable e) {
                 log.error("Fail to read the response", e);
             }
