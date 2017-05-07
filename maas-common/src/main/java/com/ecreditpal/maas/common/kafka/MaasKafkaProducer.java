@@ -23,7 +23,6 @@ public class MaasKafkaProducer {
     private final static Logger log = LoggerFactory.getLogger(MaasKafkaProducer.class);
     private Producer<Object, Object> producer;
     private Random random = new SecureRandom();
-    private Map<String, String> map = Maps.newHashMap();
     private static Map<String, MaasKafkaProducer> producers = Maps.newHashMap();
 
     private static final Object lock = new Object();
@@ -35,6 +34,7 @@ public class MaasKafkaProducer {
                 if ((maasKafkaProducer = producers.get(topic)) == null) {
                     MaasKafkaConfig maasKafkaConfig =
                             (MaasKafkaConfig) ConfigurationManager.getConfiguration().getProperty(configName);
+                    maasKafkaConfig.setTopic(topic);
                     maasKafkaProducer = new MaasKafkaProducer(maasKafkaConfig);
                     producers.put(topic, maasKafkaProducer);
                 }
@@ -44,7 +44,7 @@ public class MaasKafkaProducer {
     }
 
     public static MaasKafkaProducer getInstance(String topic) {
-        return getInstance(topic,"defaultKafkaConfig");
+        return getInstance(topic,MaasKafkaConfig.DEFAULT_CONFIG);
     }
 
     public MaasKafkaProducer(MaasKafkaConfig maasKafkaConfig) {

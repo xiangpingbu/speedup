@@ -19,16 +19,21 @@
 
         <dependency>
             <groupId>com.ecreditpal</groupId>
-            <artifactId>mass-schedule</artifactId>
+            <artifactId>maas-schedule</artifactId>
             <version>1.0.0</version>
         </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.ecreditpal</groupId>-->
+            <!--<artifactId>maas-schedule</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
 
         <!--这个jar 文件包含Spring MVC 框架相关的所有类。包括框架的Servlets，Web MVC框架，控制器和视图支持。-->
         <!--当然，如果你的应用使用了独立的MVC 框架，则无需这个JAR 文件里的任何类。-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${spring-version}</version>
         </dependency>
 
         <dependency>
@@ -62,10 +67,10 @@
         </dependency>
 
         <!--使内嵌jetty支持jsp-->
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jsp</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.jetty</groupId>-->
+            <!--<artifactId>jetty-jsp</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -112,6 +117,7 @@
                                     <includes>
                                         <include>**/*.properties</include>
                                         <include>logback.xml</include>
+                                        <exclude>logback-test.xml</exclude>
                                     </includes>
                                 </resource>
                                 <resource>

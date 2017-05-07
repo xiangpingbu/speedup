@@ -18,20 +18,32 @@ def es_req(key):
     response = requests.get(url)
     return responseto(data=json.loads(response.text))
 
-
+'''
+创建新的分支,将会复制原有的分支的内容
+'''
 @app.route(base + "/branch", methods=['POST'])
 def new_branch():
     model_name = request.form.get("model_name")
     branch = request.form.get("branch")
+    original_branch = request.form.get("original_branch")
 
-    return responseto(data=vs.create_branch(model_name, branch))
+    result = vs.load_binning_record(model_name,original_branch)
+
+    list = []
+
+    for record in result:
+        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"].replace("\\","")]
+        list.append(obj)
+
+    if vs.copy_branch(model_name, branch,original_branch):
+        vs.save_binning_record(list)
+        return responseto(data=True)
+    return responseto(data=False)
 
 
 '''
 @pre-init步骤提交该分支的信息
 '''
-
-
 @app.route(base + "/branch/commit-branch", methods=['POST'])
 def commit_branch():
     model_name = request.form.get("model_name")
@@ -45,8 +57,6 @@ def commit_branch():
 '''
 @pre-init切换分支
 '''
-
-
 @app.route(base + "/branch/checkout", methods=['GET'])
 def checkout():
     model_name = request.values.get("model_name")
@@ -68,7 +78,7 @@ def save():
     list = []
     for key, val in dict.items():
         now = datetime.now()
-        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"]),now,now]
+        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"])]
         list.append(obj)
     if vs.save_binning_record(list) is not True:
         return responseto(success=False)

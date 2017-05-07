@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.common.utils;
 
+import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.beans.BeanInfo;
@@ -8,6 +9,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author lifeng
@@ -16,7 +18,6 @@ import java.util.Map;
 @Slf4j
 public class ConvertUtil {
     /**
-     *
      * @param clz javabean的class信息
      * @param map map对象
      * @param <T> 泛型
@@ -37,7 +38,21 @@ public class ConvertUtil {
                 if (map.containsKey(propertyName)) {
                     // 下面一句可以 try 起来，这样当一个属性赋值失败的时候就不会影响其他属性赋值。
                     Object value = map.get(propertyName);
+                    Class c = descriptor.getPropertyType();
 
+                    switch (c.getName()) {
+                        case "java.lang.Integer":
+                            value = Integer.valueOf(value.toString());
+                            break;
+                        case "java.lang.Double":
+                            value = Double.valueOf(value.toString());
+                            break;
+                        case "java.lang.Long":
+                            value = Long.valueOf(value.toString());
+                            break;
+                        default:
+                            value = value.toString();
+                    }
                     Object[] args = new Object[1];
                     args[0] = value;
                     try {
@@ -48,10 +63,19 @@ public class ConvertUtil {
                 }
             }
             return obj;
-        }catch (Exception e) {
-            log.error("error copying a javabean from map",e);
+        } catch (Exception e) {
+            log.error("error copying a javabean from map", e);
         }
         return null;
     }
+
+    public static void main(String[] args) {
+        Properties properties = new Properties();
+        properties.setProperty("acks", "1");
+
+        convertMap(MaasKafkaConfig.class, properties);
+
+    }
+
 
 }

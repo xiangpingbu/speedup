@@ -54,11 +54,21 @@ def responseto(data=None, message=None, success=True, **kwargs):
     return resp
 
 
-def responseFile(response):
+def responsePandas(response):
     # 跨域设置
     response.headers['Access-Control-Allow-Origin'] = '*'
     # response.headers["Content-Disposition"] = "attachment; filename=" + file_name
     response.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
+    response.headers[
+        "Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
+    return response
+
+def responseFile(response,filename):
+    # 跨域设置
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    # response.headers["Content-Disposition"] = "attachment; filename=" + file_name
+    response.headers["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
+    response.headers["Content-Disposition"] = "attachment; filename="+filename
     response.headers[
         "Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie,Cache-Control"
     return response

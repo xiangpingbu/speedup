@@ -5,14 +5,13 @@ import avro.shaded.com.google.common.collect.Lists;
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
-import com.ecreditpal.maas.schedule.Register;
-import com.ecreditpal.maas.schedule.ResReload;
+import com.ecreditpal.maas.model.reload.Register;
+import com.ecreditpal.maas.model.reload.ResReload;
 import com.ecreditpal.maas.model.variables.Variable;
 
 import com.ecreditpal.maas.model.variables.VariableConfiguration;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.avro.generic.GenericRecord;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
 import org.dmg.pmml.PMML;
@@ -20,7 +19,6 @@ import org.jpmml.evaluator.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
