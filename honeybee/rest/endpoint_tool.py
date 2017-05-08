@@ -34,12 +34,12 @@ def file_init():
 
 
 model_name = "model_train_selected"
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-#df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-#df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
+# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
 safely_apply = False
 apply_result = None
 
@@ -300,7 +300,7 @@ def apply():
 
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
-    return responseFile(response)
+    return responsePandas(response)
 
 
 def isNum(v):

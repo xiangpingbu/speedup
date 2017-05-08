@@ -4,6 +4,7 @@ import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import com.ecreditpal.maas.model.bean.Data;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.*;
@@ -21,9 +22,8 @@ public class PmmlEndpoint {
 
     @POST
     @Path("/generate")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_XML)
-    public Data getUserText() {
+    public Data generatePmml() {
         Data data = new Data();
         data.setNumber(22);
 
