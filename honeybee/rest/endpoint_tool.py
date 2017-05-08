@@ -17,6 +17,8 @@ from flask import send_file
 from service import variable_service as vs
 import sys
 from util import model_function
+import requests
+from common.constant import  const
 
 
 base = '/tool'
@@ -460,8 +462,8 @@ def column_config():
             columnBinning["length"] = len(columnBinning["binCategory"])
         result.append(pmml.__dict__)
         columnNum += 1
-    print json.dumps(result)
-    return ""
+    r = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=json.dumps(result))
+    return responseFile(make_response(r.text),"column_config.json")
 
 
 def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):

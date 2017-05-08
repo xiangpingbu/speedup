@@ -39,17 +39,18 @@ require(['jquery', "tool", "tool_button","tool_variable_select"],
             $(".spinner").css('display', 'none');
             var url = window.location.href;
             var ut = url.split("#")[1];
-            if (!ut || ut.length == 0) {
+            if (!ut || ut.length === 0) {
                 display("upload");
                 // $('#upload').css("display", "block");
-            } else if (ut == 'uploaded') {
+            } else if (ut === 'uploaded') {
                 display("dataframe");
                 tool_button.getTable();
-            } else if (ut == 'bar') {
+            } else if (ut === 'bar') {
                 display("analyze");
                 $("#analyze").html("");
                 tool.initHead();
-            } else if (ut == 'select') {
+                tool_button.commitBranch();
+            } else if (ut === 'select') {
                 display("variableSelect");
                 tool_variable_select.variableSelect();
             }

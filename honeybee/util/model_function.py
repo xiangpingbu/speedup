@@ -22,7 +22,7 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     train_x = train[woe_var_list]
 
     result = logit_backward(train_x, train_y, vars=in_vars, p_value=in_p_value, max_loop=in_max_loop)
-    #print result.params
+    #print result.params-
 
     data = {}
 
