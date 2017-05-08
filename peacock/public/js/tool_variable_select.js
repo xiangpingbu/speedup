@@ -9,6 +9,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function variableSelect(isVariableSelect) {
         var url;
         var data = {};
+        data.target = localStorage.getItem("target");
         var selected_variable = [];
         //如果进入isVariableSelect环节,将从该环节的页面获取数据
         //否则将从getBar环节获取数据
