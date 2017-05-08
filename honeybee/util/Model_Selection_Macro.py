@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-
+import numpy as np
+import statsmodels.api as sm
+import random
 
 def LogisticReg_KS(df, target, para_list):
     import statsmodels.api as sm
     ############# re-train the model #####################
-    logit = sm.Logit(df[target], df[para_list])
-    result_temp = logit.fit()
+    print para_list
+    result_temp = logit_base_model(df[para_list], df[target])
+    #logit = sm.Logit(df[target], df[para_list])
+    #result_temp = logit.fit()
+    if result_temp is None:
+        return [None, None]
     p = result_temp.summary2()
     p_value = p.tables[1][u'P>|z|'][-1]
     #    result_temp.summary()
@@ -132,3 +138,26 @@ def ks_group(data, bad, score, group_num, reverse):
     # 7      726      747    42    520    562  12.38    7.47%  19.42
     # 8      748      772    30    507    537  16.90    5.59%  10.72
     # 9      773      848    14    532    546  38.00    2.56%  -0.00
+
+def logit_base_model(x, y, try_cnt=1):
+    print '<MDL start>'
+    print 'try count: ',try_cnt
+    if try_cnt > 10:
+        print 'exceed 10 tries, stop !'
+        return None
+    try:
+        logit = sm.Logit(y, x)
+        result = logit.fit()
+        return result
+    except np.linalg.LinAlgError:
+        s_x = variable_order_shuffle(x)
+        return logit_base_model(s_x, y, try_cnt+1)
+    except Exception, e:
+        print e
+        return None
+
+def variable_order_shuffle(df):
+    c_list = df.columns.tolist()
+    random.shuffle(c_list)
+    new_df = df[c_list]
+    return new_df

@@ -35,12 +35,11 @@ def file_init():
 
 model_name = "model_train_selected"
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-# df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
-df_train = None
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+# df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
-df_test = None
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
 safely_apply = False
 apply_result = None
 
@@ -355,7 +354,7 @@ def upload():
             print filename
             if filename.find("test") >0:
                 df_test = pd.read_excel(file, encoding="utf-8")
-            elif filename.find("train") >0:
+            elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file, encoding="utf-8")
                 if filename.find("_")>0:
                     model_name = filename.split("_")[0]
