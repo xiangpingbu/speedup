@@ -7,8 +7,9 @@ binNumIndex = 0;
 cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
+originalBranch = null;
 
-//var host = "http://192.168.31.68:8091";
+// var host = "http://192.168.31.68:8091";
 var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
@@ -20,7 +21,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 form.attr("style", "display:none");
                 form.attr("target", "");
                 form.attr("method", "post");
-                form.attr("action", host+"/tool/apply");
+                form.attr("action", host + "/tool/apply");
                 var input1 = $("<input>");
                 input1.attr("type", "hidden");
                 input1.attr("name", "data");
@@ -28,15 +29,17 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 // var data ={
                 //     "data": JSON.stringify(exportData())
                 // };
-
-                input1.attr("value", JSON.stringify(exportData()));
+                o = {};
+                o.data = exportData();
+                o.target = localStorage.getItem("target");
+                input1.attr("value", JSON.stringify(o));
                 form.append(input1);
                 $("body").append(form);//将表单放置在web中
 
                 form.submit();//表单提交
 
                 // $.ajax({
-                //     url: "http://localhost:8091/tool/apply",
+                //     url: host+"/tool/apply",
                 //     type: 'post',
                 //     data: {
                 //         "data": JSON.stringify(exportData())
@@ -82,23 +85,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         });
     }
 
-    // $("#prev").click(function () {
-    //     getTable();
-    // });
-
     /**
      * 预处理数据并获取表格
      */
     function getTable() {
         $("#dataframe").html("");
         $.ajax({
-            url: host+"/tool/parse",
+            url: host + "/tool/parse",
             type: 'get',
             async: true,
             success: function (result) {
-                addLabel("#dataframe", "model",false);
-                addLabel("#dataframe", "branch",false);
-                addLabel("#dataframe", "target",true);
+                addLabel("#dataframe", "model", false);
+                addLabel("#dataframe", "branch", false);
+                addLabel("#dataframe", "target", true);
 
                 $("#branch-commit").click(function () {
                     var remove_list = {};
@@ -108,14 +107,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     /**
                      * 将被选中的variable添加到removeList中
                      */
-                    $("#dataframe").find("tbody .checked").each(function (i,n) {
+                    $("#dataframe").find("tbody .checked").each(function (i, n) {
                         remove_list[$(n).parents("tr").children().eq(1).html()] = i;
                     });
-                    $(this).attr("disabled","disabled");
+                    $(this).attr("disabled", "disabled");
                     $.ajax({
-                        url: host+"/tool/db/branch/commit-branch",
+                        url: host + "/tool/db/branch/commit-branch",
                         type: 'post',
-                        data:{remove_list:JSON.stringify(remove_list),target:target,branch:branch,model_name:model_name},
+                        data: {
+                            remove_list: JSON.stringify(remove_list),
+                            target: target,
+                            branch: branch,
+                            model_name: model_name
+                        },
                         async: true,
                         success: function (result) {
                             $("#branch-commit").removeAttr("disabled");
@@ -144,37 +148,42 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 }
                 d3.select("#model").append("option").text(data["current_model"]);
 
-                $("#branch").on("select2:closing", function (e) {
-                   var current = $(this).val();
-                    for (let obj of branches) {
-                        //当该分支已经存在时
-                        if (current == obj) {
-                            $.ajax({
-                                url: host+"/tool/db/branch/checkout",
-                                data:{"branch":current,"model_name":$("#model").val()},
-                                type: 'get',
-                                async: false,
-                                success: function (result) {
-                                    clearAndSet(result.data.remove_list);
-                                    $('#target').val(result.data.model_target).trigger("change")
-                                }
-                            });
-                            return;
+
+                $("#branch").on("select2:open", function (e) {
+                    originalBranch = $(this).val();
+                    console.log(originalBranch);
+                })
+                    .on("select2:closing", function (e) {
+                        var current = $(this).val();
+                        for (let obj of branches) {
+                            //当该分支已经存在时
+                            if (current == obj) {
+                                $.ajax({
+                                    url: host + "/tool/db/branch/checkout",
+                                    data: {"branch": current, "model_name": $("#model").val()},
+                                    type: 'get',
+                                    async: false,
+                                    success: function (result) {
+                                        clearAndSet(result.data.remove_list);
+                                        $('#target').val(result.data.model_target).trigger("change")
+                                    }
+                                });
+                                return;
+                            }
                         }
-                    }
-                    branches.push(current);
-                    d3.select("#branch").append("option").text(current);
-                    $.ajax({
-                        url: host+"/tool/db/branch",
-                        data:{"branch":current,"model_name":$("#model").val()},
-                        type: 'post',
-                        async: true,
-                        success: function (result) {
-                            branches.push(newBranch);
-                            d3.select("#branch").append("option").text(newBranch);
-                        }
+                        // branches.push(current);
+                        // d3.select("#branch").append("option").text(current);
+                        $.ajax({
+                            url: host + "/tool/db/branch",
+                            data: {"branch": current, "model_name": $("#model").val(),"original_branch":originalBranch},
+                            type: 'post',
+                            async: true,
+                            success: function (result) {
+                                branches.push(current);
+                                d3.select("#branch").append("option").text(current);
+                            }
+                        });
                     });
-                });
 
 
                 //head处加入一列,用于控制标签的全选
@@ -207,21 +216,20 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 $('#target').val(data["target"]).trigger("change");
 
 
-
                 $('.i-checks').iCheck({
                     checkboxClass: 'icheckbox_square-green',
                     radioClass: 'iradio_square-green',
                 });
 
 
-                setSelected(data.remove_list,b[0]);
+                setSelected(data.remove_list, b[0]);
 
                 /**
                  * 点击头部按钮可以全选或者反选.
                  */
                 $('#head-checks')
                     .iCheck({
-                        checkboxClass: 'icheckbox_square-green',
+                        checkboxClass: 'icheckbox_square-green hhhh',
                         radioClass: 'iradio_square-green',
                     })
                     .on('ifChecked', function (event) {
@@ -248,7 +256,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         });
     }
 
-
+    /**
+     * pre init 触发事件
+     */
     $("#init").click(function () {
         $('#preDefine').html("");
         init();
@@ -257,7 +267,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
     $("#columnConfig").click(function () {
         $.ajax({
-            url: host+"/tool/column-config",
+            url: host + "/tool/column-config",
             type: 'post',
             data: {
                 "data": JSON.stringify(exportData())
@@ -274,7 +284,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     });
 
 
-    function addLabel(parent, labelName,isLast) {
+    function addLabel(parent, labelName, isLast) {
         var varSelect = d3.select(parent)
             .append("div")
             .attr("class", "table-line");
@@ -297,13 +307,12 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 .style("display", "inline-block").append("button")
                 .attr("class", "btn btn-primary")
                 .attr("id", "branch-commit")
-                .style("margin-left","20px")
+                .style("margin-left", "20px")
                 .text("commit")
         }
 
         $("#" + labelName).select2({tags: true});
     }
-
 
 
     function exportDataWithIV() {
@@ -313,7 +322,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             var name = $('#merge_' + i).attr("name");
             var innerObj = {};
             innerObj.var_table = [];
-            innerObj.iv = $("#"+name).text();
+            innerObj.iv = $("#" + name).text();
             data[name] = innerObj;
 
             var childTrs = $('#tbody_' + i).children("tr");
@@ -329,16 +338,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     var maxBound = tds.get(maxBoundIndex).innerHTML;
                     innerDate["max"] = max;
                     innerDate["min"] = min;
-                    innerDate["min_bound"] = minBound;
-                    innerDate["max_bound"] = maxBound;
+                    innerDate["min_boundary"] = minBound;
+                    innerDate["max_boundary"] = maxBound;
                 } else {
-                    var ca = tds.get(categoricalIndex).innerHTML;
-
-                    innerDate[name] = ca.split('|');
+                    innerDate[name] = tds.get(categoricalIndex).innerHTML;
                 }
                 var binNum = $(childTrs.get(innerRow)).children("td").get(binNumIndex).innerHTML;
                 innerDate["woe"] = tds.get(tds.length - 2).innerHTML;
-                innerDate["binNum"] = binNum;
+                innerDate["bad_rate"] = tds.get(tds.length - 3).innerHTML;
+                innerDate["total_perc"] = tds.get(tds.length - 4).innerHTML;
+                innerDate["total"] = tds.get(tds.length - 5).innerHTML;
+                innerDate["goods"] = tds.get(tds.length - 6).innerHTML;
+                innerDate["bads"] = tds.get(tds.length - 7).innerHTML;
+                innerDate["bin_num"] = binNum;
                 innerDate["type"] = category_t;
             }
         }
@@ -368,8 +380,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     var maxBound = tds.get(maxBoundIndex).innerHTML;
                     innerDate["max"] = max;
                     innerDate["min"] = min;
-                    innerDate["min_bound"] = minBound;
-                    innerDate["max_bound"] = maxBound;
+                    innerDate["min_boundary"] = minBound;
+                    innerDate["max_boundary"] = maxBound;
                 } else {
                     var ca = tds.get(categoricalIndex).innerHTML;
 
@@ -386,9 +398,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
     function setSelected(removeList) {
-        if (removeList != "")
-        {
-            var remove_list = JSON.parse(JSON.parse(removeList));
+        if (removeList != "") {
+            var remove_list = JSON.parse(removeList);
             $("#dataframe").find("tbody tr").each(function (i, n) {
                 if (remove_list[$(n).children().eq(1).html()] != undefined) {
                     $(n).children().eq(0).iCheck('check');
@@ -398,8 +409,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
     function clearAndSet(removeList) {
-        var remove_list = JSON.parse(JSON.parse(removeList));
-        $("#dataframe").find("tbody tr").each(function (i,n) {
+        var remove_list = JSON.parse(removeList);
+        $("#dataframe").find("tbody tr").each(function (i, n) {
             $(n).children().eq(0).iCheck('uncheck');
             if (remove_list[$(n).children().eq(1).html()] != undefined) {
                 $(n).children().eq(0).iCheck('check');
@@ -410,7 +421,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     return {
         output: outputDateMap,
         changeTd: changeTd,
-        getTable: getTable
+        getTable: getTable,
+        saveAll: exportDataWithIV,
+        exportData:exportData
     }
 });
 

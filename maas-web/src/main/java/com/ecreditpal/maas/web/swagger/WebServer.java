@@ -1,7 +1,9 @@
 package com.ecreditpal.maas.web.swagger;
 
 import com.ecreditpal.maas.common.IPBasedRateLimiter;
+import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import com.ecreditpal.maas.common.utils.file.FileUtil;
 import org.apache.commons.configuration.Configuration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -19,13 +21,17 @@ public class WebServer {
         context.setContextPath("/");
         context.setDescriptor(configuration.getString("maas.web","./maas-web/src/main/webapp/WEB-INF/web.xml"));
         String webapp = configuration.getString("maas.webapp","./maas-web/src/main/webapp");
+
+        if (configuration.getBoolean("activejdbc.instrumentation")) {
+            MakeInstrumentationUtil.make(FileUtil.getRootPath());
+        }
+
         context.setResourceBase(webapp);
         context.setParentLoaderPriority(true);
 
 
-        server.setHandler(context);
-//        IPBasedRateLimiter.getInstance();
 
+        server.setHandler(context);
         try {
             server.start();
             server.join();

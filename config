@@ -9,3 +9,4 @@ LOG_FILE=/homes/maas/honeybee/log/maas.log
 LOG_FOLDER=/homes/maas/honeybee/log
 ORCA_CONFIG=./conf/gun.py
 ORCA_START=/homes/maas/honeybee/honeybee_server
+PID_FILE=/homes/maas/honeybee/log/maas.pid
