@@ -1,6 +1,6 @@
 <template>
 <div>
-  <topbar :numIds="id" :countIds="countId"></topbar>
+  <topbar :numIds="id" :countIds="countId" :psiIds="psiId"></topbar>
   <div class="pure-g">
 
     <div class="pure-u-1-1">
@@ -84,21 +84,28 @@
   </div> -->
   <div class="pure-g">
     <div class="pure-u-1-3" v-for="mid in psiId">
-      <div class="chart-card" @click="viewChart('psi_' + mid, 'psi')">
+      <div class="chart-card" @click="viewChart(mid, 'psi')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="'psi_' + mid" :dataSet="dataMap['psi_' + mid]"></psiLineChart>
+        <psiLineChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]"></psiLineChart>
       </div>
     </div>
-  </div>
 
-  <div class="pure-g">
-    <div class="pure-u-1-2">
+    <div class="pure-u-2-3">
       <div class="chart-card" @click = "viewChart('api', 'stat')">
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
         <statChart v-if="!loading" id="api" :dataSet="dataMap['api']"></statChart>
       </div>
     </div>
   </div>
+
+  <!-- <div class="pure-g">
+    <div class="pure-u-2-3">
+      <div class="chart-card" @click = "viewChart('api', 'stat')">
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <statChart v-if="!loading" id="api" :dataSet="dataMap['api']"></statChart>
+      </div>
+    </div>
+  </div> -->
 </div>
 </template>
 
@@ -132,7 +139,7 @@ export default {
     })
     // get psi urls
     this.psiId.forEach((d) => {
-      var urlStr = ConfigInfo.url_prefix + this.type[2] + '_' + d
+      var urlStr = ConfigInfo.url_prefix + d
       PsiPromiseList.push(getData.getResponse(urlStr))
     })
 
@@ -167,7 +174,7 @@ export default {
     Promise.all(PsiPromiseList).then((response) => {
       response.forEach((d, i) => {
         var res = getData.parsePsiData(d.data)
-        this.dataMap['psi_' + this.psiId[i]] = res.newJsonData
+        this.dataMap[this.psiId[i]] = res.newJsonData
       })
     })
 
@@ -181,6 +188,7 @@ export default {
     // store id lists for top bar
     localStorage.setItem('numIds', JSON.stringify(this.id))
     localStorage.setItem('countIds', JSON.stringify(this.countId))
+    localStorage.setItem('psiIds', JSON.stringify(this.psiId))
 
     // set count chart nameMap
     this.countId.forEach((d) => {
@@ -235,12 +243,12 @@ export default {
     return {
       id: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization'],
       countId: ['personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
-      psiId: ['score', 'age', 'credit_query_times', 'credit_limit', 'personal_year_income', 'credit_utilization', 'personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
+      psiId: ['psi_score', 'psi_age', 'psi_credit_query_times', 'psi_credit_limit', 'psi_personal_year_income', 'psi_credit_utilization', 'psi_personal_live_join', 'psi_personal_education', 'psi_client_gender', 'psi_personal_live_case'],
       type: ['percentile', 'count', 'psi', 'stat'],
       dataMap: [],
       nameMap: [],
-      subChartEnabled: false,
       varMap: [],
+      subChartEnabled: false,
       loading: true
     }
   },

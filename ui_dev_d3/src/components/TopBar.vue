@@ -35,7 +35,13 @@
                   </li>
                 </ul>
               </li>
-              <li><a href="#">PSI</a></li>
+              <li><a href="#">PSI</a>
+                <ul>
+                  <li v-for="id in psiIds" class="pure-menu-item">
+                    <router-link :to="'/'+model+'/'+id" class="pure-menu-link">{{id}}</router-link>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
           <li><a href="#">Work</a></li>
@@ -65,7 +71,7 @@
 <script>
 export default {
   name: 'topbar',
-  props: ['numIds', 'countIds'],
+  props: ['numIds', 'countIds', 'psiIds'],
   computed: {
     model () {
       return this.$route.params.model

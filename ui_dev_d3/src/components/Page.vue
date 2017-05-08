@@ -25,6 +25,7 @@ export default {
   created () {
     this.numIds = JSON.parse(localStorage.getItem('numIds'))
     this.countIds = JSON.parse(localStorage.getItem('countIds'))
+    this.psiIds = JSON.parse(localStorage.getItem('psiIds'))
     // this.numIds = this.$store.state.charts
     // console.log(this.$store.state.charts)
     this.update()
@@ -61,6 +62,7 @@ export default {
     return {
       numIds: [],
       countIds: [],
+      psiIds: [],
       // id: this.$route.params.id,
       type: '',
       dataSet: [],

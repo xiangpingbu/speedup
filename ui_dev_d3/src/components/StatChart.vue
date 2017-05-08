@@ -19,19 +19,6 @@ export default {
   props: ['id', 'dataSet', 'subChartEnabled', 'variable', 'nameMap'],
   created () {
     this.$nextTick(() => {
-      // generate data for charts
-      // var newDataFields = []
-      // var jsonMap = {}
-      // this.dataSet.forEach(function (d) {
-      //   var keyList = d3.keys(d)
-      //   keyList.forEach(function (key) {
-      //     var newObj = jsonMap[key]
-      //     if (!newObj) {
-      //       newDataFields.push(key)
-      //       jsonMap[key] = 1
-      //     }
-      //   })
-      // })
       // newDataFields.splice(newDataFields.indexOf('date'), 1)
       this.dataSet.sort(sortDate)
       var newDataFields = d3.keys(this.dataSet[0])
@@ -63,28 +50,7 @@ export default {
         // json input to c3 chart
         jsonData = d3.values(newMap)
       })
-
-      // set legend 'others', including 'missing' & invalid input
-      // var names = d3.keys(this.nameMap)
-      // var sums = []
-      // this.dataSet.forEach((d) => {
-      //   d['hits'] = 0
-      //   var sum = 0
-      //   d3.keys(d).forEach((value) => {
-      //     if (!names.includes(value) && (value !== 'date')) {
-      //       d.others += d[value]
-      //     }
-      //
-      //     if ((value !== 'date') && (value !== 'others')) {
-      //       sum += d[value]
-      //     }
-      //   })
-      //   sums.push(sum)
-      //
-      //   if (d.others === 0) {
-      //     delete d['hits']
-      //   }
-      // })
+      // console.log(this.dataSet)
 
       var chart = c3.generate({
         bindto: '#' + this.id,
@@ -141,7 +107,7 @@ export default {
         axis: {
           x: {
             type: 'timeseries',
-            extent: this.dataSet.length < 5 ? [this.dataSet[0].date, this.dataSet[this.dataSet.length - 1].date] : [this.dataSet[this.dataSet.length - 5].date, this.dataSet[this.dataSet.length - 1].date],
+            extent: jsonData.length < 5 ? [jsonData[0].date, jsonData[jsonData.length - 1].date] : [jsonData[jsonData.length - 5].date, jsonData[jsonData.length - 1].date],
             tick: {
               format: '%Y-%m-%d'
               // culling: {
