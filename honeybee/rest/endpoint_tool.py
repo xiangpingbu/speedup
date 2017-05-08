@@ -17,6 +17,8 @@ from flask import send_file
 from service import variable_service as vs
 import sys
 from util import model_function
+import requests
+from common.constant import  const
 
 
 base = '/tool'
@@ -461,8 +463,8 @@ def column_config():
             columnBinning["length"] = len(columnBinning["binCategory"])
         result.append(pmml.__dict__)
         columnNum += 1
-    print json.dumps(result)
-    return ""
+    r = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=json.dumps(result))
+    return responseFile(make_response(r.text),"column_config.json")
 
 
 def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
@@ -740,7 +742,15 @@ def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
     data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
-    return data
+    return responseto(data=data)
+
+@app.route(base+"/variable_select_manual",methods=['POST'])
+def variable_select():
+    all_list = request.form.get("all_list")
+    selected_list = request.form.get("selected_list")
+    target = request.form.get("target")
+    # data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    return responseto(data="")
 
 '''
 导出变量配置

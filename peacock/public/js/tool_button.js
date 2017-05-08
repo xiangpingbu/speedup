@@ -10,10 +10,10 @@ branches = null;
 originalBranch = null;
 
 // var host = "http://192.168.31.68:8091";
-var host = "http://localhost:8091";
+// var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
-    function outputDateMap() {
+    // function outputDateMap() {
         $("#output").click(function () {
                 $("#downloadform").remove();
                 var form = $("<form>");//定义一个form表单
@@ -51,7 +51,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 // });
             }
         )
-    }
+    // }
 
     function changeTd() {
         $("td[name='woe']").click(function () {
@@ -90,6 +90,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
      */
     function getTable() {
         $("#dataframe").html("");
+        debugger;
         $.ajax({
             url: host + "/tool/parse",
             type: 'get',
@@ -418,12 +419,45 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         });
     }
 
+    /**
+     * 提交分支
+     */
+    function commitBranch() {
+        var remove_list = {};
+        var target = $('#target').val();
+        var branch = $('#branch').val();
+        var model_name = $("#model").val();
+        /**
+         * 将被选中的variable添加到removeList中
+         */
+        $("#dataframe").find("tbody .checked").each(function (i, n) {
+            remove_list[$(n).parents("tr").children().eq(1).html()] = i;
+        });
+        $.ajax({
+            url: host + "/tool/db/branch/commit-branch",
+            type: 'post',
+            data: {
+                remove_list: JSON.stringify(remove_list),
+                target: target,
+                branch: branch,
+                model_name: model_name
+            },
+            async: true,
+            success: function (result) {
+            },
+            error: function () {
+
+            }
+        });
+    }
+
     return {
-        output: outputDateMap,
+        // output: outputDateMap,
         changeTd: changeTd,
         getTable: getTable,
         saveAll: exportDataWithIV,
-        exportData:exportData
+        exportData:exportData,
+        commitBranch:commitBranch
     }
 });
 

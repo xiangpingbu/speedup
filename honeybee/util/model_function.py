@@ -146,7 +146,7 @@ def get_marginal_var(train_woe_data, target, model_para_list):
     return marginal_var_result
 
 
-train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
+# train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
 selected = [u'cell_operator',
             u'province',
@@ -168,4 +168,4 @@ selected = [u'cell_operator',
             u'工作年限',
             u'手机入网时间',
             u'中高级职称']
-result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
+# result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)

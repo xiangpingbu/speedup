@@ -140,12 +140,9 @@ public class MaasKafkaConfig {
         configs.put(SCHEMA_REGISTRY_URL, schemaRegistryUrl);
         configs.put(MAX_BLOCK_MS, maxBlockMs);
 
-
-
 //        configs.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 //        configs.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         return configs;
-
     }
 
 }
