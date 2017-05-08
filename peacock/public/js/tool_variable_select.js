@@ -9,21 +9,31 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     function variableSelect(isVariableSelect) {
         var url;
         var data = {};
+        var selected_variable = [];
         //如果进入isVariableSelect环节,将从该环节的页面获取数据
         //否则将从getBar环节获取数据
         if (isVariableSelect) {
+            var all_list = [];
+            data.selected_list = selected_variable;
+            data.all_list = all_list;
             url = host +"/tool/variable_select_manual";
             $(".selected-body.checked").each(function () {
                 selected_variable.push($(this).find(".selected-body-checks").attr("name"))
             });
-
             $(".backup-body.checked").each(function () {
                 selected_variable.push($(this).find(".backup-body-checks").attr("name"))
             });
+            $(".selected-body").each(function () {
+                all_list.push($(this).find(".selected-body-checks").attr("name"))
+            });
+            $(".backup-body").each(function () {
+                all_list.push($(this).find(".backup-body-checks").attr("name"))
+            });
+
         } else {
             $(".variable_apply.checked").each(function () {
-                var selected_variable = [];
                 selected_variable.push($(this).find(".apply-checks").attr("name"));
+                data.var_list = selected_variable;
                 url = host +"/tool/variable_select";
             });
 
@@ -31,12 +41,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
 
         $.ajax({
-            url: host + "/tool/variable_select",
+            url: url,
             type: 'post',
-            data: {
-                "var_list": selected_variable.join(","),
-                "target": localStorage.getItem("target")
-            },
+            data: data,
             async: true,
             success: function (result) {
                 // adjustTable(result, id, initList, name);
