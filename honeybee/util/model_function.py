@@ -40,12 +40,25 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     data['model_analysis'] = model_analysis
 
     selected_var = {}
-    selected_var['coef'] = result.params
-    selected_var['pvalues'] = result.pvalues
-    selected_var['bse'] = result.bse
-    selected_var['z'] = result.tvalues
-    selected_var['conf_int'] = result.conf_int()
-    data['selected_var'] = selected_var
+    params = result.params
+    pvalues = result.pvalues
+    bse = result.bse
+    tvalues = result.tvalues
+    conf_int = result.conf_int()
+    selected_var = pd.DataFrame([params, pvalues, bse, tvalues, conf_int[0], conf_int[1]])
+    selected_var = selected_var.transpose()
+    selected_var.columns = ['params','pvalues','bse', 'tvalues', 'conf_int0', 'conf_int1']
+    selected_var['combine'] = selected_var.apply(lambda v: ','.join(str(x) for x in v.tolist()), axis=1)
+    name = selected_var.index.tolist()
+    combine = selected_var['combine'].tolist()
+    var_result = zip(name, combine)
+    #selected_var['coef'] = result.params
+    #selected_var['pvalues'] = result.pvalues
+    #selected_var['bse'] = result.bse
+    #selected_var['z'] = result.tvalues
+    #selected_var['conf_int'] = result.conf_int()
+
+    data['selected_var'] = var_result
 
 
     #woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
@@ -53,9 +66,12 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
     train_woe_data = train[woe_var_list]
     model_para_list = result.params.index.tolist()
     marginal_var_result = get_marginal_var(train_woe_data, target, model_para_list)
-    data['marginal_var'] = marginal_var_result
+    marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
+    margin_name = marginal_var_result['var_name']
+    margin_combine = marginal_var_result['combine'].tolist()
+    margin_result = zip(margin_name, margin_combine)
+    data['marginal_var'] = margin_result
 
-    print data
     return data
 
 
@@ -122,10 +138,6 @@ def negative_coef_to_drop(mdlresult):
         return aa.index[0]
     else:
         return None
-
-
-
-
 
 
 def get_marginal_var(train_woe_data, target, model_para_list):
