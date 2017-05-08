@@ -12,7 +12,7 @@ import statsmodels.api as sm
 
 
 
-def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
+def logit_backward(x, y, vars=[], p_value=0.05, max_loop=100):
     count = 0
     # decide variables list
     if (len(vars) <= 0):
@@ -38,25 +38,23 @@ def logit_backward(x, y, vars=[], varpatter='_woe', p_value=0.05, max_loop=100):
         # print pv['p_value'].idxmax()
         temp_dict = pv.ix[pv['p_value'].idxmax()]
         # dfrm.ix[dfrm['A'].idxmax()]
-
+        var_to_drop = negative_coef_to_drop(result)
 
         if (temp_dict['p_value'] < p_value):
             # all pvalue are good to go
 
-            # to drop positive woe coef
-            var_to_drop = positive_coef_to_drop(result, varpatter=varpatter)
+            # to drop negative woe coef
+            var_to_drop = negative_coef_to_drop(result)
             if (var_to_drop == None):
                 print "<MDL SELECTION> DONE"
                 next = False
             else:
-                print '<RMV VAR> %s' % str(var_to_drop)
+                print '<RMV VAR> %s' % (var_to_drop)
                 del X[var_to_drop]
 
-
-                # return result
         else:
-            print '<RMV VAR> %s' % str(temp_dict.var_name)
-            del X[str(temp_dict.var_name)]
+            print '<RMV VAR> %s' % (temp_dict.var_name)
+            del X[temp_dict.var_name]
 
         count = count + 1
         if (count > max_loop):
@@ -109,7 +107,7 @@ train_woe_data = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/train_woe_da
 train_y = train_woe_data[['bad_7mon_60']]
 train_x = train_woe_data.drop(['apply_id', 'bad_7mon_60'], axis=1)
 
-result = logit_backward(train_x, train_y, vars=[], varpatter='_woe', p_value=0.01, max_loop=100)
+result = logit_backward(train_x, train_y, vars=['hello'], p_value=0.01, max_loop=100)
 
 
 # remove high correlation variables
