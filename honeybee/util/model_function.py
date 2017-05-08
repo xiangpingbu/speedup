@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 15 17:29:53 2017
-
 @author: Admin
 """
 
@@ -145,7 +144,7 @@ def get_marginal_var(train_woe_data, target, model_para_list):
     marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list)
     return marginal_var_result
 
-
+"""
 train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
 selected = [u'cell_operator',
@@ -169,49 +168,4 @@ selected = [u'cell_operator',
             u'手机入网时间',
             u'中高级职称']
 result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
-
-
-train_woe_data = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/train_woe_data.xlsx')
-
-train_y = train_woe_data[['bad_7mon_60']]
-train_x = train_woe_data.drop(['apply_id', 'bad_7mon_60'], axis=1)
-
-result = logit_backward(train_x, train_y, vars=[], varpatter='_woe', p_value=0.01, max_loop=100)
-
-
-# remove high correlation variables
-'''
-def check_corr(x, y, corr_cap=0.75):
-    print 'checking corration'
-    base_col = set(x.columns)
-    corr = x.corr()
-    base_col = base_col.difference(set(['Intercept', 'intercept']))
-    base_col_list = list(base_col)
-    corr_pair = []
-    df_f = pd.DataFrame(y)
-    df_f.columns = ['target']
-    df = pd.concat([x, df_f], axis=1)
-    iv_dict = {}
-    for i in base_col_list:
-        uniqV = len(x[i].value_counts())
-        iv_dict[i] = getIV(df, i, 'target', 'num', uniqV)
-
-    base_col_list = list(base_col)
-    for i in range(len(base_col_list)):
-        for j in range(i + 1, len(base_col_list)):
-            if abs(corr[base_col_list[i]][base_col_list[j]] >= corr_cap):
-                # compare IV
-                if (iv_dict[base_col_list[i]] >= iv_dict[base_col_list[j]]):
-                    to_add = base_col_list[i]
-                    to_remove = base_col_list[j]
-                else:
-                    to_add = base_col_list[j]
-                    to_remove = base_col_list[i]
-
-                # choose big one into set and remove lower one
-                base_col = base_col.difference(set([to_remove]))
-                base_col = base_col.union(set([to_add]))
-    print 'Done with ckecking corration!'
-
-    return list(base_col)
-'''
+"""
