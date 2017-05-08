@@ -141,7 +141,7 @@ def ks_group(data, bad, score, group_num, reverse):
 
 def logit_base_model(x, y, try_cnt=1):
     print '<MDL start>'
-    print 'try count: ',try_cnt
+    print 'try count: ', try_cnt
     if try_cnt > 10:
         print 'exceed 10 tries, stop !'
         return None
