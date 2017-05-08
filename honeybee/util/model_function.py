@@ -14,14 +14,17 @@ from Model_Selection_Macro import *
 import json
 
 
-def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_value=0.01, in_max_loop=100):
+def get_logit_backward(train, target, in_vars=[], in_p_value=0.01, in_max_loop=100):
 
     train_y = train[[target]]
-    woe_var_list = in_vars
-    #woe_var_list = [x for x in train.columns if x.endswith(in_varpatter)]
+    #woe_var_list = in_vars
+    woe_var_list = [x+'_woe' for x in in_vars]
+    woe_var_list_with_target = [x for x in woe_var_list]
+    woe_var_list_with_target.append(target)
     train_x = train[woe_var_list]
+    train_x_with_target = train[woe_var_list_with_target]
 
-    result = logit_backward(train_x, train_y, vars=in_vars, p_value=in_p_value, max_loop=in_max_loop)
+    result = logit_backward(train_x, train_y, vars=woe_var_list, p_value=in_p_value, max_loop=in_max_loop)
     #print result.params
 
     data = {}
@@ -63,9 +66,9 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
 
     #woe_var_list = [x for x in train_x.columns if x.endswith('woe')]
     woe_var_list.append(target)
-    train_woe_data = train[woe_var_list]
+    #train_woe_data = train[woe_var_list]
     model_para_list = result.params.index.tolist()
-    marginal_var_result = get_marginal_var(train_woe_data, target, model_para_list)
+    marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list)
     marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
     margin_name = marginal_var_result['var_name']
     margin_combine = marginal_var_result['combine'].tolist()
@@ -78,9 +81,6 @@ def get_logit_backward(train, target, in_vars=[], in_varpatter='_woe', in_p_valu
 
 def logit_backward(x, y, vars=[], p_value=0.05, max_loop=100):
     count = 0
-    # decide variables list
-    if (len(vars) <= 0):
-        vars = x.columns
 
     if (len(vars) <= 0):
         print '<ERROR>: no variable to select'
@@ -146,40 +146,26 @@ def get_marginal_var(train_woe_data, target, model_para_list):
     return marginal_var_result
 
 
-# train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
+train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
-selected = [u'cell_operator_woe',
-            u'province_woe',
-            u'cell_loc_woe',
-            u'cell_operator_zh_woe',
-            u'信用评分_1_woe',
-            u'contacts_class1_cnt_woe',
-            u'phone_gray_score_woe',
-            u'芝麻信用_woe',
-            u'花呗金额_woe',
-            u'公司性质_woe',
-            u'call_in_cnt_woe',
-            u'居住情况_woe',
-            u'call_cnt_woe',
-            u'total_amount_woe',
-            u'学历_woe',
-            u'call_in_time_woe',
-            u'call_out_cnt_woe',
-            u'工作年限_woe',
-            u'手机入网时间_woe',
-            u'net_flow_woe',
-            u'公司规模_woe',
-            u'性别_woe',
-            u'代付工资月薪_woe',
-            u'age_woe',
-            u'宜信借款金额范围_woe',
-            u'最近两月是否其他平台借款成功_woe',
-            u'借款拼单状态_woe',
-            u'宜信审批结果_woe',
-            u'宜信状态（正常、逾期）_woe',
-            u'年龄_woe',
-            u'婚姻状况_woe',
-            u'子女情况_woe',
-            u'中高级职称_woe']
-# result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
-#print result.params
+selected = [u'cell_operator',
+            u'province',
+            u'cell_loc',
+            u'cell_operator_zh',
+            u'信用评分_1',
+            u'contacts_class1_cnt',
+            u'phone_gray_score',
+            u'芝麻信用',
+            u'花呗金额',
+            u'公司性质',
+            u'call_in_cnt',
+            u'居住情况',
+            u'call_cnt',
+            u'total_amount',
+            u'学历',
+            u'call_in_time',
+            u'call_out_cnt',
+            u'工作年限',
+            u'手机入网时间',
+            u'中高级职称']
+result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
