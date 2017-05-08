@@ -741,7 +741,10 @@ def variable_select():
 
     var_list = request.form.get("var_list")
     target = request.form.get("target")
+
     data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    if data is None:
+        return responseto(success=False)
     return responseto(data=data)
 
 @app.route(base+"/variable_select_manual",methods=['POST'])
