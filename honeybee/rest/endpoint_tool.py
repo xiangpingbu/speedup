@@ -16,6 +16,7 @@ from io import BytesIO
 from flask import send_file
 from service import variable_service as vs
 import sys
+from util import model_function
 
 
 base = '/tool'
@@ -31,17 +32,16 @@ def file_init():
     return [train, test]
 
 
-# df_list = file_init()
-# df_train = file_init()
-# df_test = file_init()
+
 model_name = "model_train_selected"
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-df_train = pd.read_excel("/Users/lifeng/Desktop/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-#df_test = None
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
 safely_apply = False
+apply_result = None
 
 
 @app.route(base + "/init", methods=['POST'])
@@ -60,7 +60,7 @@ def init():
     # else:
     #     var_service.create_branch(model, branch, target, remove_list, selected_list)
 
-    remove_list_json = json.loads(json.loads(result[0]["remove_list"]))
+    remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
     for o in remove_list_json :
         remove_list.append(o)
@@ -271,94 +271,26 @@ def divide_manually():
     return responseto(data=data)
 
 
-'''
->>>>>>> upstream/master
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
-    data = request.form.get('data')
-    target = request.form.get('target')
-    if target is None:
-        target = "bad_4w"
-    dict = json.loads(data)
-    df_test.append(df_train)
-    test = df_test.drop(target, 1)
-    # vars = df_test.columns
-    keys = dict.keys()
-    test_copy = test.copy()
-    # 初始化列
-    for v in keys:
-        test[v + "_woe"] = ""
+    req = request.form.get('data')
+    var_dict = json.loads(req)
 
-    #有时间的话，转化为panda dataframe 操作 with lambda function
-    for index, row in test_copy.iterrows():
-        for column in dict:
-            bins = dict[column]
-            if bins is not None:
-                for obj in bins:
-                    # 根据category_t的布尔值区分类别,如果为false为numerical
-                    if obj["type"] == "Numerical":
-                        # 比对区间,获得woe的值
-                        bin_min = float(obj["min_bound"])
-                        bin_max = float(obj["max_bound"])
-                        bin_val = float(row[column])
-                        if bin_max == bin_min and bin_val == bin_min:
-                            test.loc[index, [column + "_woe"]] = obj["woe"]
-                            break
-                        elif bin_min <= bin_val < bin_max:
-                            test.loc[index, [column + "_woe"]] = obj["woe"]
-                            break
-                        elif obj["max_bound"] == 'nan' and str(row[column]) == 'nan':
-                            test.loc[index, [column + "_woe"]] = obj["woe"]
-                            break
-                        elif obj['min_bound'] == 'nan' and bin_val < bin_max:
-                            test.loc[index, [column + "_woe"]] = obj["woe"]
-                            break
-                    else:
-                        # categorical,直接进行匹配
-                        if str(row[column]) in obj[column]:
-                            test.loc[index, [column + "_woe"]] = obj["woe"]
-                            break
-    # test.to_excel("df_iv.xlsx", ",", header=True, index=False)
+    data = var_dict["data"]
 
-
-
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-
-    test.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
-    workbook = writer.book
-    worksheet = writer.sheets["Sheet_1"]
-    format = workbook.add_format()
-    format.set_bg_color('#eeeeee')
-    worksheet.set_column(0, 9, 28)
-    writer.close()
-    output.seek(0)
-    response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
-    global safely_apply
-    safely_apply = True
-    return responseFile(response)
-'''
-
-@app.route(base + "/apply", methods=['POST'])
-def apply():
-    """将train数据得到的woe与test数据进行匹配"""
-    data = request.form.get('data')
-    target = request.form.get('target')
-    if target is None:
-        target = "bad_4w"
-    var_dict = json.loads(data)
-    df_test.append(df_train)
-    df_woe_append = df_test.drop(target, 1)
-    var_list = var_dict.keys()
+    df = df_test.append(df_train)
+    var_list = data.keys()
 
     for var_name in var_list:
-        df_woe_append[var_name+'_woe'] = df_woe_append[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, var_dict))
+        df[var_name+'_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
 
-
+    global apply_result,safely_apply
+    apply_result = df
+    safely_apply = True
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df_woe_append.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
+    df.to_excel(writer, startrow=0, merge_cells=False, sheet_name="Sheet_1")
     workbook = writer.book
     worksheet = writer.sheets["Sheet_1"]
     format = workbook.add_format()
@@ -368,7 +300,7 @@ def apply():
 
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
-    return responseFile(response)
+    return responsePandas(response)
 
 
 def isNum(v):
@@ -399,7 +331,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
                 return float(row['woe'])
             elif min_boundary <= var_value < max_boundary:
                 return float(row['woe'])
-        return 'Wrong!'
+        return 0.0
     else:
         for row in var_content:
             if var_value in row[var_name]:
@@ -424,7 +356,10 @@ def upload():
                 df_test = pd.read_excel(file, encoding="utf-8")
             elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file, encoding="utf-8")
-                # df_train['bad_7mon_60'] = df_train['bad_4w']
+                if filename.find("_")>0:
+                    model_name = filename.split("_")[0]
+                else:
+                    model_name = "anonymous"
     return responseto(data="success")
 
 
@@ -654,6 +589,7 @@ out格式
  }
 }
 '''
+
 def get_divide_caterotical_bound(out, name):
     bound = []
     for key, list in out.items():
@@ -797,9 +733,23 @@ def merge():
     #data = get_merged(var_name, df, min_val)
     return responseto(data = data)
 
+@app.route(base+"/variable_select",methods=['POST'])
+def variable_select():
 
-def generate_response(var_name, df, iv):
-    """
+    var_list = request.form.get("var_list")
+    target = request.form.get("target")
+    data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    return data
+
+'''
+导出变量配置
+'''
+@app.route(base+"/export",methods=['POST'])
+def export_variables():
+    data = request.form.get("data")
+    response = make_response(data)
+    return responseFile(response,"variable_config.json")
+'''
     adjust方法产生的数据转换成dict.
 
     Parameters:
@@ -830,8 +780,8 @@ def generate_response(var_name, df, iv):
         {..},
         {..}]
 }
-    """
-
+    '''
+def generate_response(var_name, df, iv):
     #data = {var_name: []}
     data = collections.OrderedDict()
     var_content = collections.OrderedDict()

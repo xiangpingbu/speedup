@@ -6,6 +6,7 @@ import com.ecreditpal.maas.web.endpoint.filter.InjectLookupEventMessageFactory;
 import com.ecreditpal.maas.web.endpoint.filter.ModelLogCommitFilter;
 import com.ecreditpal.maas.web.endpoint.filter.ModelLogFilter;
 import com.ecreditpal.maas.web.endpoint.filter.ModelLogResponseFilter;
+import com.ecreditpal.maas.web.endpoint.interceptor.ExceptionHandler;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.wordnik.swagger.config.ConfigFactory;
 import com.wordnik.swagger.config.ScannerFactory;
@@ -15,6 +16,7 @@ import com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader;
 import com.wordnik.swagger.reader.ClassReaders;
 import org.apache.commons.configuration.Configuration;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.jaxb.internal.JaxbStringReaderProvider;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -51,7 +53,8 @@ public class SpringWithSwagger extends ResourceConfig {
                 myRestPackage);
 
         register(MultiPartFeature.class);
-//        register(JacksonJsonProvider.class);
+        register(ExceptionHandler.class);
+        register(JacksonJsonProvider.class);
         register(ModelLogFilter.class);
         register(new AbstractBinder() {
             @Override

@@ -3,7 +3,7 @@
 # TEST数据库信息
 DB_TEST_HOST = "127.0.0.1"
 DB_TEST_PORT = 3306
-DB_TEST_DBNAME = "wool"
+DB_TEST_DBNAME = "maas_tool"
 DB_TEST_USER = "root"
 DB_TEST_PASSWORD = "Cisco123"
 

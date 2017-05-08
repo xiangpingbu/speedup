@@ -1,17 +1,10 @@
 package com.ecreditpal.maas.common.kafka;
 
-import com.ecreditpal.maas.common.utils.ConvertUtil;
 import com.google.common.collect.Maps;
-import kafka.server.KafkaConfig;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author lifeng
@@ -20,8 +13,15 @@ import java.util.Properties;
 @Setter
 @Getter
 public class MaasKafkaConfig {
+    public final static String DEFAULT_CONFIG = "defaultKafkaConfig";
+    public final static String TRACKING_CONFIG = "trackingKafkaConfig";
+
+    /**
+     * kafka各个服务节点
+     */
     private String bootstrapSevers = "localhost:9092";
     private final static String BOOTSTRAP_SEVERS_NAME = "bootstrap.servers";
+
 
     private String topic = "kafka_lookup_event";
     public final static String TOPIC_NAME = "topic";

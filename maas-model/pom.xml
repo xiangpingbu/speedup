@@ -18,12 +18,6 @@
             <version>1.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.ecreditpal</groupId>
-            <artifactId>mass-schedule</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <!--<dependency>-->
             <!--<groupId>com.ecreditpal</groupId>-->
             <!--<artifactId>maas</artifactId>-->
@@ -98,6 +92,20 @@
                                 </resource>
                             </resources>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.javalite</groupId>
+                <artifactId>activejdbc-instrumentation</artifactId>
+                <version>1.4.13</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
