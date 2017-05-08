@@ -13,7 +13,7 @@ originalBranch = null;
 // var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
-    function outputDateMap() {
+    // function outputDateMap() {
         $("#output").click(function () {
                 $("#downloadform").remove();
                 var form = $("<form>");//定义一个form表单
@@ -51,7 +51,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 // });
             }
         )
-    }
+    // }
 
     function changeTd() {
         $("td[name='woe']").click(function () {
@@ -452,7 +452,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
     return {
-        output: outputDateMap,
+        // output: outputDateMap,
         changeTd: changeTd,
         getTable: getTable,
         saveAll: exportDataWithIV,

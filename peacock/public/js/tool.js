@@ -101,7 +101,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         var branch = $("#branch").val();
         var model_name = $("#model").val();
         var target = $("#target").val();
-        if (branch !== null && model_name !== null) {
+        if (branch != null && model_name != null) {
             localStorage.setItem("branch", branch);
             localStorage.setItem("model_name", model_name);
             localStorage.setItem("target", target);

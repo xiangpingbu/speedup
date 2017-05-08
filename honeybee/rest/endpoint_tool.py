@@ -742,7 +742,15 @@ def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
     data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
-    return data
+    return responseto(data=data)
+
+@app.route(base+"/variable_select_manual",methods=['POST'])
+def variable_select():
+    all_list = request.form.get("all_list")
+    selected_list = request.form.get("selected_list")
+    target = request.form.get("target")
+    # data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    return responseto(data="")
 
 '''
 导出变量配置

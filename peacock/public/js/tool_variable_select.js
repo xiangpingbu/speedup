@@ -2,11 +2,33 @@
  * Created by lifeng on 2017/4/27.
  */
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
-    function variableSelect() {
-        var selected_variable = [];
-        $(".variable_apply.checked").each(function () {
-            selected_variable.push($(this).find(".apply-checks").attr("name"));
-        });
+    /**
+     *
+     * @param isVariableSelect 是否进入variableSelect环节
+     */
+    function variableSelect(isVariableSelect) {
+        var url;
+        var data = {};
+        //如果进入isVariableSelect环节,将从该环节的页面获取数据
+        //否则将从getBar环节获取数据
+        if (isVariableSelect) {
+            url = host +"/tool/variable_select_manual";
+            $(".selected-body.checked").each(function () {
+                selected_variable.push($(this).find(".selected-body-checks").attr("name"))
+            });
+
+            $(".backup-body.checked").each(function () {
+                selected_variable.push($(this).find(".backup-body-checks").attr("name"))
+            });
+        } else {
+            $(".variable_apply.checked").each(function () {
+                var selected_variable = [];
+                selected_variable.push($(this).find(".apply-checks").attr("name"));
+                url = host +"/tool/variable_select";
+            });
+
+        }
+
 
         $.ajax({
             url: host + "/tool/variable_select",
@@ -17,7 +39,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             },
             async: true,
             success: function (result) {
-                adjustTable(result, id, initList, name);
+                // adjustTable(result, id, initList, name);
 
                 $("#variableSelect").html("");
                 // d3.select("#variableSelect").append()
@@ -44,11 +66,12 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 var i = 0;
                 for (let key in data["model_analysis"]) {
                     var tr;
-                    if (i % 2 === 0) {
+                    if (i % 2 == 0) {
                         tr = tbody.append("tr");
                     }
-                    tr.append("th").text("model");
+                    tr.append("th").text(key);
                     tr.append("td").text(data["model_analysis"][key]);
+                    i++;
                 }
                 // var tr = tbody.append("tr");
                 // tr.append("th").text("model");
@@ -90,23 +113,27 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     .attr("class", "selected-head-checks")
                     .attr("name", "input[]");
                 tr.append("td").text("name");
-                tr.append("td").text("Coef");
-                tr.append("td").text("Std.Err");
-                tr.append("td").text("z");
-                tr.append("td").text("P>|z|");
-                for (let o in data["selected_var"]){
+                tr.append("td").text("params");
+                tr.append("td").text("pvalues");
+                tr.append("td").text("bse");
+                tr.append("td").text("tvalues");
+                tr.append("td").text("conf_int0");
+                tr.append("td").text("conf_int1");
+                for (let obj in data["selected_var"]){
                     tr = tbody.append("tr");
                     select = tr.append("td");
                     //body的checkbox
+                    var variable = data["selected_var"][obj][0];
+                    var  name = variable.substring(0,variable.indexOf("_woe"));
                     select.append("div").append("input")
                         .attr("type", "checkbox")
                         .attr("class", "selected-body-checks")
-                        .attr("name", "input[]");
-                    tr.append("td").text("11");
-                    tr.append("td").text("11");
-                    tr.append("td").text("11");
-                    tr.append("td").text("11");
-                    tr.append("td").text("11");
+                        .attr("name", name);
+                    tr.append("td").text(name);
+                    var columns = data["selected_var"][obj][1].split(",");
+                    for (let i in columns) {
+                        tr.append("td").text(columns[i]);
+                    }
                 }
 
 
@@ -126,23 +153,37 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     .attr("class", "backup-head-checks")
                     .attr("name", "input[]");
                 tr.append("td").text("name");
-                tr.append("td").text("Coef");
-                tr.append("td").text("Std.Err");
-                tr.append("td").text("z");
-                tr.append("td").text("P>|z|");
+                tr.append("td").text("ks");
+                tr.append("td").text("pvalues");
+                // tr = tbody.append("tr");
+                // select = tr.append("td");
+                // //body的checkbox
+                // select.append("div").append("input")
+                //     .attr("type", "checkbox")
+                //     .attr("class", "backup-body-checks")
+                //     .attr("name", "input[]");
+                // tr.append("td").text("11");
+                // tr.append("td").text("11");
+                // tr.append("td").text("11");
+                // tr.append("td").text("11");
+                // tr.append("td").text("11");
+                for (let obj in data["marginal_var"]){
+                    tr = tbody.append("tr");
+                    select = tr.append("td");
+                    //body的checkbox
+                     variable = data["marginal_var"][obj][0];
+                     name = variable.substring(0,variable.indexOf("_woe"));
+                    select.append("div").append("input")
+                        .attr("type", "checkbox")
+                        .attr("class", "backup-body-checks")
+                        .attr("name", name);
+                    tr.append("td").text(name);
+                    var columns = data["marginal_var"][obj][1].split(",");
+                    for (let i in columns) {
+                        tr.append("td").text(columns[i]);
+                    }
+                }
 
-                tr = tbody.append("tr");
-                select = tr.append("td");
-                //body的checkbox
-                select.append("div").append("input")
-                    .attr("type", "checkbox")
-                    .attr("class", "backup-body-checks")
-                    .attr("name", "input[]");
-                tr.append("td").text("11");
-                tr.append("td").text("11");
-                tr.append("td").text("11");
-                tr.append("td").text("11");
-                tr.append("td").text("11");
 
                 $('.selected-body-checks').iCheck({
                     checkboxClass: 'icheckbox_square-green selected-body'
@@ -169,10 +210,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
 
                 $("#execute").bind("click", function () {
-                    var selectList = [];
-                    $("#dataframe").find("tbody .checked").each(function (i, n) {
-                        selectList[$(n).parents("tr").children().eq(1).html()] = i;
-                    });
+                    variableSelect(true);
                 })
 
             }
