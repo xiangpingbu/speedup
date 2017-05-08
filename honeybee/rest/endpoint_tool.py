@@ -34,6 +34,7 @@ def file_init():
 
 
 model_name = "model_train_selected"
+
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
