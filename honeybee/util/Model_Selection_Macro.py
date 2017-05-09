@@ -4,10 +4,11 @@ import numpy as np
 import statsmodels.api as sm
 import random
 
-def LogisticReg_KS(df, target, para_list):
+
+def LogisticReg_KS(df, target, para_list, ks_group_num):
     import statsmodels.api as sm
     ############# re-train the model #####################
-    print para_list
+    #print para_list
     result_temp = logit_base_model(df[para_list], df[target])
     #logit = sm.Logit(df[target], df[para_list])
     #result_temp = logit.fit()
@@ -21,18 +22,18 @@ def LogisticReg_KS(df, target, para_list):
     df['prob_bad'] = result_temp.predict(df[para_list])
     ###################### calculate KS ##############################
     #    ks_group(train_woe_data,target, 'prob_bad', 20, True)
-    ks = ks_group(df, target, 'prob_bad', 20, True).ks.max()
+    ks = ks_group(df, target, 'prob_bad', ks_group_num, True).ks.max()
     #####################################################################
     return [ks, p_value]
 
 
-def Marginal_Selection(df, target, model_para_list):
+def Marginal_Selection(df, target, model_para_list, ks_group_num):
     all_para_list = df.columns.tolist()
     step2_list = [x for x in all_para_list if x not in model_para_list and x not in [target, 'apply_id']]
     result = pd.DataFrame()
     for var in step2_list:
         model_para_list_add = model_para_list + [var]
-        [ks_temp, p_value] = LogisticReg_KS(df, target, model_para_list_add)
+        [ks_temp, p_value] = LogisticReg_KS(df, target, model_para_list_add, ks_group_num)
         result_temp = pd.DataFrame({"var_name": var, "KS": ks_temp, "P_Value": p_value}, index=["0"])
         result = result.append(result_temp)
     result.sort_values('KS', ascending=False, inplace=True)
@@ -50,9 +51,10 @@ def ks_group(data, bad, score, group_num, reverse):
     data = data.dropna()
     #    data.bad = data[bad]
     #    data.score = data[score]
+
     data['bad'] = data[bad]
     data['score'] = data[score]
-
+    data = data[['bad','score']]
     #               bad        score
     # count  5522.000000  5522.000000
     # mean      0.197573   693.466135
@@ -63,11 +65,14 @@ def ks_group(data, bad, score, group_num, reverse):
     # 75%       0.000000   735.000000
     # max       1.000000   848.00000078
 
+    data = equal_size_bin(data, group_num, reverse)
+
     data['good'] = 1 - data.bad
 
     # DEFINE 10 BUCKETS WITH EQUAL SIZE
 
-    data['bucket'] = pd.qcut(data.score, group_num)
+
+
 
     # GROUP THE DATA FRAME BY BUCKETS
 
@@ -139,6 +144,7 @@ def ks_group(data, bad, score, group_num, reverse):
     # 8      748      772    30    507    537  16.90    5.59%  10.72
     # 9      773      848    14    532    546  38.00    2.56%  -0.00
 
+
 def logit_base_model(x, y, try_cnt=1):
     print '<MDL start>'
     print 'try count: ', try_cnt
@@ -156,8 +162,31 @@ def logit_base_model(x, y, try_cnt=1):
         print e
         return None
 
+
 def variable_order_shuffle(df):
     c_list = df.columns.tolist()
     random.shuffle(c_list)
     new_df = df[c_list]
     return new_df
+
+
+def equal_size_bin(df_score, group_num, reverse=False):
+    l = len(df_score)
+    step = l/group_num
+    df_sort = df_score.sort_values(['score'], ascending = [~reverse])
+    df_sort['row_count'] = range(0, l)
+    df_sort['bucket'] = df_sort['row_count'].apply(lambda r: r/step)
+
+    return df_sort
+
+
+def scr_ranking_bin(scr, bin=10, ascending=False):
+    sorted_array=sorted(list(scr),reverse=~(ascending))
+    n=len(sorted_array)
+    step=n/bin
+
+    result=[]
+    for i in range(step-1,n,step):
+        result.append(sorted_array[i])
+
+    return result
