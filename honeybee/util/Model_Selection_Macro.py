@@ -30,6 +30,8 @@ def LogisticReg_KS(df, target, para_list, ks_group_num):
 def Marginal_Selection(df, target, model_para_list, ks_group_num):
     all_para_list = df.columns.tolist()
     step2_list = [x for x in all_para_list if x not in model_para_list and x not in [target, 'apply_id']]
+    if len(step2_list) == 0:
+        return None
     result = pd.DataFrame()
     for var in step2_list:
         model_para_list_add = model_para_list + [var]
