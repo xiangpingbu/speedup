@@ -161,5 +161,5 @@ export default {
 </script>
 
 <style lang='css'>
-  @import '../css/c3.css';
+  @import '../assets/css/c3.css';
 </style>

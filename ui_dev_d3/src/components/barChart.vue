@@ -10,21 +10,21 @@ import * as d3 from 'd3'
 import * as c3 from 'c3'
 
 // sort data by date
-function sortDate (a, b) {
+function sortDate(a, b) {
   return a.date > b.date ? 1 : a.date < b.date ? -1 : 0
 }
 
 export default {
   name: 'barChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable', 'nameMap'],
-  created () {
+  created() {
     this.$nextTick(() => {
       // generate data for charts
       var newDataFields = []
       var jsonMap = {}
-      this.dataSet.forEach(function (d) {
+      this.dataSet.forEach(function(d) {
         var keyList = d3.keys(d)
-        keyList.forEach(function (key) {
+        keyList.forEach(function(key) {
           var newObj = jsonMap[key]
           if (!newObj) {
             newDataFields.push(key)
@@ -80,7 +80,7 @@ export default {
             format: (v, id, i, j) => {
               var tv = d3.values(this.dataSet[i])
               tv.forEach((d, index) => {
-                if (typeof (d) !== 'number') {
+                if (typeof(d) !== 'number') {
                   tv.splice(index, 1)
                 }
               })
@@ -132,10 +132,10 @@ export default {
         },
         zoom: {
           enabled: this.subChartEnabled,
-          onzoomstart: function (event) {
+          onzoomstart: function(event) {
             console.log('onzoomstart', event)
           },
-          onzoomend: function (domain) {
+          onzoomend: function(domain) {
             console.log('onzoomend', domain)
           }
         },
@@ -164,5 +164,5 @@ export default {
 </script>
 
 <style lang='css'>
-  @import '../css/c3.css';
+  @import '../assets/css/c3.css';
 </style>
