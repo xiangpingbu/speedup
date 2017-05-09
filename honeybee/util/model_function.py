@@ -13,6 +13,7 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
     train_y = train[[target]]
     woe_var_list = [x+'_woe' for x in selected_list]
     train_x = train[woe_var_list]
+    train_x['intercept'] = 1.0
     result = logit_base_model(train_x, train_y)
     if result is None:
         return None
@@ -21,15 +22,15 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
 
     model_analysis = {}
     model_analysis['target'] = target
-    model_analysis['nobs'] = result.nobs
-    model_analysis['df_model'] = result.model.df_model
-    model_analysis['df_resid'] = result.model.df_resid
-    model_analysis['prsquared'] = result.prsquared
-    model_analysis['aic'] = result.aic
-    model_analysis['bic'] = result.bic
-    model_analysis['likelyhood'] = result.llf
-    model_analysis['llnull'] = result.llnull
-    model_analysis['llr'] = result.llr_pvalue
+    model_analysis['nobs'] = str(result.nobs)
+    model_analysis['df_model'] = 'logit'
+    model_analysis['df_resid'] = str(result.model.df_resid)
+    model_analysis['prsquared'] = str(result.prsquared)
+    model_analysis['aic'] = str(result.aic)
+    model_analysis['bic'] = str(result.bic)
+    model_analysis['likelyhood'] = str(result.llf)
+    model_analysis['llnull'] = str(result.llnull)
+    model_analysis['llr'] = str(result.llr_pvalue)
     data['model_analysis'] = model_analysis
 
     params = result.params
@@ -60,7 +61,6 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
         data['marginal_var'] = margin_result
     else:
         data['marginal_var'] = None
-    print data
     return data
 
 
