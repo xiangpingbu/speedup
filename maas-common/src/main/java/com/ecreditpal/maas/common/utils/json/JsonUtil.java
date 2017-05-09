@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.*;
 public class JsonUtil {
 
     public static final ObjectMapper MAPPER = new ObjectMapper();
+    private static Gson gson = new Gson();
 
     static {
         MAPPER.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -73,16 +76,12 @@ public class JsonUtil {
     }
 
     //将json 对象转为Map
-    public static Map json2Map(String jsondata){
+    public static <T>Map<String,T> json2Map(String jsondata){
 
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String,Object> map = new HashMap<>();
+//        ObjectMapper mapper = new ObjectMapper();
+//        HashMap<String,String> map = new HashMap<>();
 
-        try {
-            map=mapper.readValue(jsondata, HashMap.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return map;
+        return gson.fromJson(jsondata,new TypeToken<HashMap<String,T>>() {
+            }.getType());
     }
 }

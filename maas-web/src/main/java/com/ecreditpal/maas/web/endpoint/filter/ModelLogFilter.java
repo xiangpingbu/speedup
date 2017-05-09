@@ -6,6 +6,7 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.RequestInfo;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.UserInfo;
 import com.ecreditpal.maas.common.utils.TaskIdHelper;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import org.glassfish.jersey.message.internal.MediaTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -130,19 +132,20 @@ public class ModelLogFilter implements ContainerRequestFilter {
      * @return String`
      */
     private String multiValMapToStr(final MultivaluedMap<String, String> maps) {
-        StringBuilder strBuilder = new StringBuilder(512);
+//        StringBuilder strBuilder = new StringBuilder(512);
+        Map<String,String> map = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : maps.entrySet()) {
             if (CREDENTIAL_PATTERN.matcher(entry.getKey()).matches()) {
                 continue;
             }
-
-            strBuilder.append(entry.getKey());
-            strBuilder.append(":{");
-            strBuilder.append(String.join(",", entry.getValue()));
-            strBuilder.append("};");
+            map.put(entry.getKey(),entry.getValue().get(0));
+//            strBuilder.append(entry.getKey());
+//            strBuilder.append(":{");
+//            strBuilder.append(String.join(",", entry.getValue()));
+//            strBuilder.append("};");
         }
 
-        return strBuilder.toString();
+        return JsonUtil.toJson(map);
     }
 
     public static boolean shouldApplyLookupEventMessageFilter(

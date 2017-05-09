@@ -48,6 +48,9 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             async: true,
             success: function (result) {
                 // adjustTable(result, id, initList, name);
+                if (!result.success) {
+                    alert("invalid variable select,please change the variable");
+                }
 
                 $("#variableSelect").html("");
                 // d3.select("#variableSelect").append()
