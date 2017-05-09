@@ -282,7 +282,8 @@ def apply():
 
     data = var_dict["data"]
 
-    df = df_test.append(df_train)
+    # df = df_test.append(df_train)
+    df = df_train
     var_list = data.keys()
 
     for var_name in var_list:
@@ -736,6 +737,9 @@ def merge():
     #data = get_merged(var_name, df, min_val)
     return responseto(data = data)
 
+'''
+apply完成后,第一次进入时的变量选择
+'''
 @app.route(base+"/variable_select",methods=['POST'])
 def variable_select():
 
@@ -747,6 +751,9 @@ def variable_select():
         return responseto(success=False)
     return responseto(data=data)
 
+'''
+手动选择变量
+'''
 @app.route(base+"/variable_select_manual",methods=['POST'])
 def variable_select_manual():
     all_list = request.form.get("all_list")

@@ -138,7 +138,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     select = tr.append("td");
                     //body的checkbox
                     var variable = data["selected_var"][obj][0];
-                    var  name = variable.substring(0,variable.indexOf("_woe"));
+                    var index = variable.indexOf("_woe") >0 ?variable.indexOf("_woe"):variable.length;
+                    var  name = variable.substring(0,index);
                     select.append("div").append("input")
                         .attr("type", "checkbox")
                         .attr("class", "selected-body-checks")

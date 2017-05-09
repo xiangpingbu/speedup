@@ -13,6 +13,7 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
     train_y = train[[target]]
     woe_var_list = [x+'_woe' for x in selected_list]
     train_x = train[woe_var_list]
+    train_x['intercept'] = 1.0
     result = logit_base_model(train_x, train_y)
     if result is None:
         return None
@@ -21,15 +22,15 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
 
     model_analysis = {}
     model_analysis['target'] = target
-    model_analysis['nobs'] = result.nobs
-    model_analysis['df_model'] = result.model.df_model
-    model_analysis['df_resid'] = result.model.df_resid
-    model_analysis['prsquared'] = result.prsquared
-    model_analysis['aic'] = result.aic
-    model_analysis['bic'] = result.bic
-    model_analysis['likelyhood'] = result.llf
-    model_analysis['llnull'] = result.llnull
-    model_analysis['llr'] = result.llr_pvalue
+    model_analysis['nobs'] = str(result.nobs)
+    model_analysis['df_model'] = 'logit'
+    model_analysis['df_resid'] = str(result.model.df_resid)
+    model_analysis['prsquared'] = str(result.prsquared)
+    model_analysis['aic'] = str(result.aic)
+    model_analysis['bic'] = str(result.bic)
+    model_analysis['likelyhood'] = str(result.llf)
+    model_analysis['llnull'] = str(result.llnull)
+    model_analysis['llr'] = str(result.llr_pvalue)
     data['model_analysis'] = model_analysis
 
     params = result.params
@@ -52,13 +53,14 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
 
     model_para_list = result.params.index.tolist()
     marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list, ks_group_num)
-    marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
-    margin_name = marginal_var_result['var_name']
-    margin_combine = marginal_var_result['combine'].tolist()
-    margin_result = zip(margin_name, margin_combine)
-    data['marginal_var'] = margin_result
-
-    print data
+    if marginal_var_result is not None:
+        marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
+        margin_name = marginal_var_result['var_name']
+        margin_combine = marginal_var_result['combine'].tolist()
+        margin_result = zip(margin_name, margin_combine)
+        data['marginal_var'] = margin_result
+    else:
+        data['marginal_var'] = None
     return data
 
 
