@@ -52,12 +52,14 @@ def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
 
     model_para_list = result.params.index.tolist()
     marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list, ks_group_num)
-    marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
-    margin_name = marginal_var_result['var_name']
-    margin_combine = marginal_var_result['combine'].tolist()
-    margin_result = zip(margin_name, margin_combine)
-    data['marginal_var'] = margin_result
-
+    if marginal_var_result is not None:
+        marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
+        margin_name = marginal_var_result['var_name']
+        margin_combine = marginal_var_result['combine'].tolist()
+        margin_result = zip(margin_name, margin_combine)
+        data['marginal_var'] = margin_result
+    else:
+        data['marginal_var'] = None
     print data
     return data
 

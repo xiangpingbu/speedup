@@ -282,7 +282,8 @@ def apply():
 
     data = var_dict["data"]
 
-    df = df_test.append(df_train)
+    #df = df_test.append(df_train)
+    df = df_train
     var_list = data.keys()
 
     for var_name in var_list:
