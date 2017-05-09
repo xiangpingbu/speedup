@@ -37,12 +37,12 @@ def file_init():
 
 model_name = "model_train_selected"
 
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-#df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-#df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
+# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
 safely_apply = False
 apply_result = None
 
@@ -742,18 +742,18 @@ def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
 
-    data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
+    data = model_function.get_logit_backward(apply_result,target,20,var_list.split(","))
     if data is None:
         return responseto(success=False)
     return responseto(data=data)
 
 @app.route(base+"/variable_select_manual",methods=['POST'])
-def variable_select():
+def variable_select_manual():
     all_list = request.form.get("all_list")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
-    #data = model_function.get_logit_backward(apply_result,target,var_list.split(","))
-    return responseto(data="")
+    data = model_function.get_logit_manual(apply_result,all_list.split(","),selected_list.split(","),target,20)
+    return responseto(data=data)
 
 '''
 导出变量配置
