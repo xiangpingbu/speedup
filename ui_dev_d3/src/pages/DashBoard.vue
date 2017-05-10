@@ -3,13 +3,6 @@
   <topbar :numIds="id" :countIds="countId" :psiIds="psiId"></topbar>
   <div class="pure-g">
 
-    <div class="pure-u-1-1">
-      <div class="chart-card" @click="viewChart(id[0], 'line')" name='score'>
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[0]" :dataSet="dataMap[id[0]]" :variable="varMap[id[0]]"></lineChart>
-      </div>
-    </div>
-
     <div class="pure-u-1-2">
       <!-- <img v-show="loading" src="../assets/1392662591224_1140x0.gif"> -->
       <div class="chart-card" @click="viewChart(id[1], 'line')" name='age'>
@@ -21,6 +14,13 @@
       <div class="chart-card" @click="viewChart(id[2], 'line')" name='credit_query_times'>
         <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
         <lineChart v-if="!loading" :id="id[2]" :dataSet="dataMap[id[2]]" :variable="varMap[id[2]]"></lineChart>
+      </div>
+    </div>
+    
+    <div class="pure-u-1-1">
+      <div class="chart-card" @click="viewChart(id[0], 'line')" name='score'>
+        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
+        <lineChart v-if="!loading" :id="id[0]" :dataSet="dataMap[id[0]]" :variable="varMap[id[0]]"></lineChart>
       </div>
     </div>
   </div>
@@ -271,7 +271,7 @@ export default {
 
       // localStorage.clear()
       this.$router.push({
-        name: 'Page',
+        name: 'page',
         params: {
           id
         }
@@ -290,4 +290,5 @@ export default {
 </script>
 
 <style lang="css">
+@import '../assets/css/c3.css';
 </style>

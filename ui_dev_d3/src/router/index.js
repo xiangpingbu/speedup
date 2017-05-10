@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/pages/Home'
 import DashBoard from '@/pages/DashBoard'
 import Page from '@/pages/Page'
 
@@ -11,16 +10,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: Home
-    },
-    {
-      path: '/:model',
-      name: 'DashBoard',
+      name: 'dashboard',
       component: DashBoard
     },
     {
-      path: '/:model/:id',
-      name: 'Page',
+      path: '/model/:id',
+      name: 'page',
       component: Page
     }
   ]

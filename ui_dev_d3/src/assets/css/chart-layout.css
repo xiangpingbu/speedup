@@ -1,10 +1,12 @@
 .chart-card {
   position: relative;
-  background-color: #1f1d1d;
+  /*background-color: rgba(66, 66, 66, .2);*/
+  background-color: #202b31;
   /*background-color: #191970;*/
   margin: 10px;
   padding: 5px;
-  border: 1px solid #292929;
+  /*border: 1px solid #292929;*/
+  border: 1px solid #28343a;
   font-size: 1.1rem;
   text-align: center;
 }
@@ -15,7 +17,7 @@
   left: 0;
   bottom: 10%;
   content: ' ';
-  background: #1f1d1d;
+  background: #202b31;
   width: 85px;
   height: 20px;
 }
@@ -25,7 +27,7 @@
   right: 0;
   bottom: 10%;
   content: ' ';
-  background: #1f1d1d;
+  background: #202b31;
   width: 44px;
   height: 20px;
 }
@@ -37,7 +39,7 @@
 
 .panel-container {
   margin: 10px;
-  background-color: #1f1d1d;
+  background-color: #202b31;
   position: relative;
   border: 1px solid #292929;
 }

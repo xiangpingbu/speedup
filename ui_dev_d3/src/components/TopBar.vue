@@ -1,7 +1,7 @@
 <template>
 <div class="header">
   <router-link to="/">MAAS Visualization</router-link>
-  <router-link :to="model" class="fr">Back to DashBoard</router-link>
+  <router-link to="/" class="fr">To DashBoard</router-link>
 
   <!-- <li v-for="id in ids" class="pure-menu-item"><a :href="'#/dash/'+id" class="pure-menu-link">{{id}}</a></li> -->
 
@@ -28,9 +28,9 @@ export default {
 
 <style scoped>
 .header {
-  background: #292929;
-  color: #fff;
-  padding: 15px 10px;
-  margin-bottom: 10px;
+  background: rgba(88, 88, 88, .2);
+  padding: 1rem .75rem;
+  margin-bottom: .75rem;
+  /*border-bottom: 1px solid #28343a;*/
 }
 </style>

@@ -5,7 +5,7 @@
 
 .c3 path, .c3 line {
   fill: none;
-  stroke: #3c3c3c;
+  stroke: #28343a;
   stroke-width: 1.5px;
 }
 
@@ -44,7 +44,7 @@
 
 /*-- Grid --*/
 .c3-grid line {
-  stroke: #3c3c3c; }
+  stroke: #28343a; }
 
 .c3-grid text {
   fill: #fff; }
