@@ -77,10 +77,6 @@ public class JsonUtil {
 
     //将json 对象转为Map
     public static <T>Map<String,T> json2Map(String jsondata){
-
-//        ObjectMapper mapper = new ObjectMapper();
-//        HashMap<String,String> map = new HashMap<>();
-
         return gson.fromJson(jsondata,new TypeToken<HashMap<String,T>>() {
             }.getType());
     }
