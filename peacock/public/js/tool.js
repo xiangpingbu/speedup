@@ -2,7 +2,7 @@ var height = 500,
     width = 500,
     margin = 25;
 
-var host = "http:/localhost:8091";
+// var host = "http:/localhost:8091";
 
 var controlMap = {};
 
@@ -70,12 +70,10 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
      */
     function init() {
         //注册右下方按钮的点击事件
-        tool_button.output();
         //提醒等待的样式
         $(".spinner").css('display', 'block');
         //图形部分位于analyze的div中,初始化前需要将原有数据清空
         $("#analyze").html("");
-
         initHead();
 
         // var div = content.append("div");
@@ -113,7 +111,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             target = localStorage.getItem("target");
         }
 
-        if (target == null || target == '') {
+        if (target === null || target === '') {
             alert("target is null");
         }
 

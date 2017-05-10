@@ -75,8 +75,23 @@ def del_binnbing_record(model_name, model_branch):
     return False
 
 
-def load_binning_record(model_name, model_branch):
+'''
+读取分bin后的数据
+'''
+def load_binning_record(model_name, model_branch,variables=None):
     sql = "select id,model_name,model_branch,variable_name,variable_iv,binning_record " \
           "from tool_model_content where model_name= %s and model_branch = %s and is_deleted = 0"
-    result = util.query(sql, (model_name, model_branch))
+
+    paramList = [model_name, model_branch]
+
+    if variables is not None:
+        s  = " and variable_name IN (%s)"
+        in_p = ', '.join((map(lambda x: '%s', variables)))
+        s = s % in_p
+        sql += s
+        paramList.extend(variables)
+
+    result = util.query(sql, paramList)
     return result
+
+

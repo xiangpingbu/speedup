@@ -78,7 +78,7 @@ def save():
     list = []
     for key, val in dict.items():
         now = datetime.now()
-        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"])]
+        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=FD)]
         list.append(obj)
     if vs.save_binning_record(list) is not True:
         return responseto(success=False)

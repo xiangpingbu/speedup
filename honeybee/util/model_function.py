@@ -1,19 +1,70 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 15 17:29:53 2017
+
 @author: Admin
 """
-
-
 
 from Model_Selection_Macro import *
 
 
-# attributes selection
-import json
+def get_logit_manual(train, all_list, selected_list, target, ks_group_num):
+
+    train_y = train[[target]]
+    woe_var_list = [x+'_woe' for x in selected_list]
+    train_x = train[woe_var_list]
+    train_x['intercept'] = 1.0
+    result = logit_base_model(train_x, train_y)
+    if result is None:
+        return None
+
+    data = {}
+
+    model_analysis = {}
+    model_analysis['target'] = target
+    model_analysis['nobs'] = str(result.nobs)
+    model_analysis['df_model'] = 'logit'
+    model_analysis['df_resid'] = str(result.model.df_resid)
+    model_analysis['prsquared'] = str(result.prsquared)
+    model_analysis['aic'] = str(result.aic)
+    model_analysis['bic'] = str(result.bic)
+    model_analysis['likelyhood'] = str(result.llf)
+    model_analysis['llnull'] = str(result.llnull)
+    model_analysis['llr'] = str(result.llr_pvalue)
+    data['model_analysis'] = model_analysis
+
+    params = result.params
+    pvalues = result.pvalues
+    bse = result.bse
+    tvalues = result.tvalues
+    conf_int = result.conf_int()
+    selected_var = pd.DataFrame([params, pvalues, bse, tvalues, conf_int[0], conf_int[1]])
+    selected_var = selected_var.transpose()
+    selected_var.columns = ['params', 'pvalues', 'bse', 'tvalues', 'conf_int0', 'conf_int1']
+    selected_var['combine'] = selected_var.apply(lambda v: ','.join(str(x) for x in v.tolist()), axis=1)
+    name = selected_var.index.tolist()
+    combine = selected_var['combine'].tolist()
+    var_result = zip(name, combine)
+    data['selected_var'] = var_result
+
+    all_var_list_with_target = [x+'_woe' for x in all_list]
+    all_var_list_with_target.append(target)
+    train_x_with_target = train[all_var_list_with_target]
+
+    model_para_list = result.params.index.tolist()
+    marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list, ks_group_num)
+    if marginal_var_result is not None:
+        marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
+        margin_name = marginal_var_result['var_name']
+        margin_combine = marginal_var_result['combine'].tolist()
+        margin_result = zip(margin_name, margin_combine)
+        data['marginal_var'] = margin_result
+    else:
+        data['marginal_var'] = None
+    return data
 
 
-def get_logit_backward(train, target, in_vars=[], in_p_value=0.01, in_max_loop=100):
+def get_logit_backward(train, target, ks_group_num, in_vars=[], in_p_value=0.01, in_max_loop=100):
 
     train_y = train[[target]]
     #woe_var_list = in_vars
@@ -24,6 +75,8 @@ def get_logit_backward(train, target, in_vars=[], in_p_value=0.01, in_max_loop=1
     train_x_with_target = train[woe_var_list_with_target]
 
     result = logit_backward(train_x, train_y, vars=woe_var_list, p_value=in_p_value, max_loop=in_max_loop)
+    if result is None:
+        return None
     #print result.params
 
     data = {}
@@ -67,12 +120,15 @@ def get_logit_backward(train, target, in_vars=[], in_p_value=0.01, in_max_loop=1
     woe_var_list.append(target)
     #train_woe_data = train[woe_var_list]
     model_para_list = result.params.index.tolist()
-    marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list)
-    marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
-    margin_name = marginal_var_result['var_name']
-    margin_combine = marginal_var_result['combine'].tolist()
-    margin_result = zip(margin_name, margin_combine)
-    data['marginal_var'] = margin_result
+    marginal_var_result = get_marginal_var(train_x_with_target, target, model_para_list, ks_group_num)
+    if marginal_var_result is not None:
+        marginal_var_result['combine'] = marginal_var_result[['KS', 'P_Value']].apply(lambda v: ','.join(str(x) for x in v), axis=1)
+        margin_name = marginal_var_result['var_name']
+        margin_combine = marginal_var_result['combine'].tolist()
+        margin_result = zip(margin_name, margin_combine)
+        data['marginal_var'] = margin_result
+    else:
+        data['marginal_var'] = None
 
     return data
 
@@ -126,7 +182,6 @@ def logit_backward(x, y, vars=[], p_value=0.05, max_loop=100):
     return result
 
 
-
 def negative_coef_to_drop(mdlresult):
     #
     aa = mdlresult.params.copy()
@@ -139,15 +194,16 @@ def negative_coef_to_drop(mdlresult):
         return None
 
 
-def get_marginal_var(train_woe_data, target, model_para_list):
+def get_marginal_var(train_woe_data, target, model_para_list, ks_group_num):
 
-    marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list)
+    marginal_var_result = Marginal_Selection(train_woe_data, target, model_para_list, ks_group_num)
     return marginal_var_result
 
-"""
-train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
+
+# train = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
 target = 'bad_4w'
-selected = [u'cell_operator',
+'''
+all_list = [u'cell_operator',
             u'province',
             u'cell_loc',
             u'cell_operator_zh',
@@ -167,5 +223,19 @@ selected = [u'cell_operator',
             u'工作年限',
             u'手机入网时间',
             u'中高级职称']
-result = get_logit_backward(train, target, in_vars=selected, in_p_value=0.05, in_max_loop=100)
-"""
+'''
+all_list = [u'cell_operator',
+            u'province',
+            u'cell_loc',
+            u'cell_operator_zh',
+            u'信用评分_1',
+            u'花呗金额',
+            u'call_out_cnt']
+selected_list = [u'cell_operator',
+                 u'province',
+                 u'cell_loc',
+                 u'cell_operator_zh',
+                 u'信用评分_1',
+                 u'花呗金额']
+ks_group_num = 20
+# result = get_logit_manual(train, all_list, selected_list, target, ks_group_num)
