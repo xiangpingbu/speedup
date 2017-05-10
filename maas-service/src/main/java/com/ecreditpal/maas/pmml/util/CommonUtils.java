@@ -16,6 +16,7 @@
 package com.ecreditpal.maas.pmml.util;
 
 
+import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.pmml.container.obj.ColumnConfig;
 import com.ecreditpal.maas.pmml.container.obj.ModelConfig;
 import com.ecreditpal.maas.pmml.container.obj.ModelTrainConf.ALGORITHM;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -55,17 +57,15 @@ public final class CommonUtils {
     /**
      * Load ModelConfig from local json ModelConfig.json file.
      */
-    public static ModelConfig loadModelConfig() throws IOException {
-        return loadModelConfig(Constants.LOCAL_MODEL_CONFIG_JSON, RawSourceData.SourceType.LOCAL);
+    public static ModelConfig loadModelConfig(String path) throws IOException {
+        return loadModelConfig(path, RawSourceData.SourceType.LOCAL);
     }
 
     /**
      * Load model configuration from the path and the source type.
      *
-     * @throws IOException
-     *             if any IO exception in parsing json.
-     * @throws IllegalArgumentException
-     *             if {@code path} is null or empty, if sourceType is null.
+     * @throws IOException              if any IO exception in parsing json.
+     * @throws IllegalArgumentException if {@code path} is null or empty, if sourceType is null.
      */
     public static ModelConfig loadModelConfig(String path, RawSourceData.SourceType sourceType) throws IOException {
         return loadJSON(path, sourceType, ModelConfig.class);
@@ -74,20 +74,22 @@ public final class CommonUtils {
     /**
      * Load column configuration list.
      *
-     * @throws IOException
-     *             if any IO exception in parsing json.
+     * @throws IOException if any IO exception in parsing json.
      */
     public static List<ColumnConfig> loadColumnConfigList() throws IOException {
-        return loadColumnConfigList(Constants.LOCAL_COLUMN_CONFIG_JSON, RawSourceData.SourceType.LOCAL);
+        return loadColumnConfigList(Constants.LOCAL_COLUMN_CONFIG_JSON, RawSourceData.SourceType.HDFS);
+    }
+
+    public static List<ColumnConfig> loadColumnConfigList(String jsonConfig) {
+        ColumnConfig[] configs = JsonUtil.fromJson(jsonConfig, ColumnConfig[].class);
+        return  configs != null?Arrays.asList(configs):null;
     }
 
     /**
      * Load column configuration list.
      *
-     * @throws IOException
-     *             if any IO exception in parsing json.
-     * @throws IllegalArgumentException
-     *             if {@code path} is null or empty, if sourceType is null.
+     * @throws IOException              if any IO exception in parsing json.
+     * @throws IllegalArgumentException if {@code path} is null or empty, if sourceType is null.
      */
     public static List<ColumnConfig> loadColumnConfigList(String path, RawSourceData.SourceType sourceType) throws IOException {
         return Arrays.asList(loadJSON(path, sourceType, ColumnConfig[].class));
@@ -96,10 +98,8 @@ public final class CommonUtils {
     /**
      * Load JSON instance
      *
-     * @throws IOException
-     *             if any IO exception in parsing json.
-     * @throws IllegalArgumentException
-     *             if {@code path} is null or empty, if sourceType is null.
+     * @throws IOException              if any IO exception in parsing json.
+     * @throws IllegalArgumentException if {@code path} is null or empty, if sourceType is null.
      */
     public static <T> T loadJSON(String path, RawSourceData.SourceType sourceType, Class<T> clazz) throws IOException {
         checkPathAndMode(path, sourceType);
@@ -118,13 +118,10 @@ public final class CommonUtils {
      * <p/>
      * !!! Warning: reader instance should be closed by caller.
      *
-     * @param path
-     *            - file path
-     * @param sourceType
-     *            - local/hdfs
-     * @throws IOException
-     *             - if any I/O exception in processing
+     * @param path       - file path
+     * @param sourceType - local/hdfs
      * @return buffered reader with <code>{@link Constants#DEFAULT_CHARSET}</code>
+     * @throws IOException - if any I/O exception in processing
      */
     public static BufferedReader getReader(String path, RawSourceData.SourceType sourceType) throws IOException {
         try {
@@ -147,12 +144,9 @@ public final class CommonUtils {
     /**
      * Return header column list from header file.
      *
-     * @throws IOException
-     *             if any IO exception in reading file.
-     * @throws IllegalArgumentException
-     *             if sourceType is null, if pathHeader is null or empty, if delimiter is null or empty.
-     * @throws RuntimeException
-     *             if first line of pathHeader is null or empty.
+     * @throws IOException              if any IO exception in reading file.
+     * @throws IllegalArgumentException if sourceType is null, if pathHeader is null or empty, if delimiter is null or empty.
+     * @throws RuntimeException         if first line of pathHeader is null or empty.
      */
     public static String[] getHeaders(String pathHeader, String delimiter, RawSourceData.SourceType sourceType) throws IOException {
         return getHeaders(pathHeader, delimiter, sourceType, false);
@@ -161,12 +155,9 @@ public final class CommonUtils {
     /**
      * Return header column array from header file.
      *
-     * @throws IOException
-     *             if any IO exception in reading file.
-     * @throws IllegalArgumentException
-     *             if sourceType is null, if pathHeader is null or empty, if delimiter is null or empty.
-     * @throws RuntimeException
-     *             if first line of pathHeader is null or empty.
+     * @throws IOException              if any IO exception in reading file.
+     * @throws IllegalArgumentException if sourceType is null, if pathHeader is null or empty, if delimiter is null or empty.
+     * @throws RuntimeException         if first line of pathHeader is null or empty.
      */
     public static String[] getHeaders(String pathHeader, String delimiter, RawSourceData.SourceType sourceType, boolean isFull)
             throws IOException {
@@ -226,8 +217,7 @@ public final class CommonUtils {
     /**
      * Get relative column name from pig header. For example, one column is a::b, return b. If b, return b.
      *
-     * @throws NullPointerException
-     *             if parameter raw is null.
+     * @throws NullPointerException if parameter raw is null.
      */
     public static String getRelativePigHeaderColumnName(String raw) {
         int position = raw.lastIndexOf(Constants.PIG_COLUMN_SEPARATOR);
@@ -238,10 +228,8 @@ public final class CommonUtils {
      * Given a column value, return bin list index. Return 0 for Category because of index 0 is started from
      * NEGATIVE_INFINITY.
      *
-     * @throws IllegalArgumentException
-     *             if input is null or empty.
-     * @throws NumberFormatException
-     *             if columnVal does not contain a parsable number.
+     * @throws IllegalArgumentException if input is null or empty.
+     * @throws NumberFormatException    if columnVal does not contain a parsable number.
      */
     public static int getBinNum(ColumnConfig columnConfig, String columnVal) {
         if (columnConfig.isCategorical()) {
@@ -270,10 +258,8 @@ public final class CommonUtils {
      * Return the real bin number for one value. As the first bin value is NEGATIVE_INFINITY, invalid index is 0, not
      * -1.
      *
-     * @param binBoundary
-     *            bin boundary list which should be sorted.
-     * @throws IllegalArgumentException
-     *             if binBoundary is null or empty.
+     * @param binBoundary bin boundary list which should be sorted.
+     * @throws IllegalArgumentException if binBoundary is null or empty.
      */
     @SuppressWarnings("unused")
     private static int getNumericBinNum(List<Double> binBoundary, double value) {
@@ -292,8 +278,7 @@ public final class CommonUtils {
      * Common split function to ignore special character like '|'. It's better to return a list while many calls in our
      * framework using string[].
      *
-     * @throws IllegalArgumentException
-     *             {@code raw} and {@code delimiter} is null or empty.
+     * @throws IllegalArgumentException {@code raw} and {@code delimiter} is null or empty.
      */
     public static String[] split(String raw, String delimiter) {
         return splitAndReturnList(raw, delimiter).toArray(new String[0]);
@@ -302,8 +287,7 @@ public final class CommonUtils {
     /**
      * Common split function to ignore special character like '|'.
      *
-     * @throws IllegalArgumentException
-     *             {@code raw} and {@code delimiter} is null or empty.
+     * @throws IllegalArgumentException {@code raw} and {@code delimiter} is null or empty.
      */
     public static List<String> splitAndReturnList(String raw, String delimiter) {
         if (StringUtils.isEmpty(raw) || StringUtils.isEmpty(delimiter)) {
@@ -320,10 +304,8 @@ public final class CommonUtils {
     /**
      * Get target column.
      *
-     * @throws IllegalArgumentException
-     *             if columnConfigList is null or empty.
-     * @throws IllegalStateException
-     *             if no target column can be found.
+     * @throws IllegalArgumentException if columnConfigList is null or empty.
+     * @throws IllegalStateException    if no target column can be found.
      */
     public static Integer getTargetColumnNum(List<ColumnConfig> columnConfigList) {
         if (CollectionUtils.isEmpty(columnConfigList)) {
@@ -342,18 +324,33 @@ public final class CommonUtils {
     }
 
 
-    /**
-     * Load neural network models from specified file path
-     *
-     * @param modelsPath
-     *            - a file or directory that contains .nn files
-     * @return - a list of @BasicML
-     * @throws IOException
-     *             - throw exception when loading model files
-     */
-    public static List<BasicML> loadBasicModels(final String modelsPath, final ALGORITHM alg) throws IOException {
-        if (modelsPath == null || alg == null || ALGORITHM.DT.equals(alg)) {
+    public static List<BasicML> loadSpecificBasicModels(final String params, final ALGORITHM alg) throws IOException {
+        if (params == null || alg == null || ALGORITHM.DT.equals(alg)) {
             throw new IllegalArgumentException("The model path shouldn't be null");
+        }
+        List<BasicML> models = new ArrayList<BasicML>(1);
+
+        if (ALGORITHM.NN.equals(alg)) {
+            InputStream is = new ByteArrayInputStream(params.getBytes());
+            models.add(BasicML.class.cast(EncogDirectoryPersistence.loadObject(is)));
+        } else if (ALGORITHM.LR.equals(alg)) {
+            models.add(LR.loadFromString(params));
+        }
+        return models;
+    }
+
+/**
+ * Load neural network models from specified file path
+ *
+ * @param modelsPath
+ * - a file or directory that contains .nn files
+ * @return - a list of @BasicML
+ * @throws IOException
+ * - throw exception when loading model files
+ */
+public static List<BasicML> loadBasicModels(final String modelsPath,final ALGORITHM alg)throws IOException{
+        if(modelsPath==null||alg==null||ALGORITHM.DT.equals(alg)){
+        throw new IllegalArgumentException("The model path shouldn't be null");
         }
 
         // we have to register PersistBasicFloatNetwork for loading such models
@@ -362,115 +359,115 @@ public final class CommonUtils {
             PersistorRegistry.getInstance().add(new PersistBasicFloatNetwork());
         }*/
 
-        File modelsPathDir = new File(modelsPath);
+        File modelsPathDir=new File(modelsPath);
 
-        File[] modelFiles = modelsPathDir.listFiles(new FilenameFilter() {
+        File[]modelFiles=modelsPathDir.listFiles(new FilenameFilter(){
 
-            public boolean accept(File dir, String name) {
-                return name.endsWith("." + alg.name().toLowerCase());
-            }
+public boolean accept(File dir,String name){
+        return name.endsWith("."+alg.name().toLowerCase());
+        }
         });
 
-        if (modelFiles != null) {
-            // sort file names
-            Arrays.sort(modelFiles, new Comparator<File>() {
-                public int compare(File from, File to) {
-                    return from.getName().compareTo(to.getName());
-                }
-            });
-
-            List<BasicML> models = new ArrayList<BasicML>(modelFiles.length);
-            for (File nnf : modelFiles) {
-                InputStream is = null;
-                try {
-                    is = new FileInputStream(nnf);
-                    if (ALGORITHM.NN.equals(alg)) {
-                        models.add(BasicML.class.cast(EncogDirectoryPersistence.loadObject(is)));
-                    } else if (ALGORITHM.LR.equals(alg)) {
-                        models.add(LR.loadFromStream(is));
-                    }
-                } finally {
-                    IOUtils.closeQuietly(is);
-                }
-            }
-
-            return models;
-        } else {
-            throw new IOException(String.format("Failed to list files in %s", modelsPathDir.getAbsolutePath()));
+        if(modelFiles!=null){
+        // sort file names
+        Arrays.sort(modelFiles,new Comparator<File>(){
+public int compare(File from,File to){
+        return from.getName().compareTo(to.getName());
         }
-    }
+        });
 
-
-    public static boolean isDesicionTreeAlgorithm(String alg) {
-        return "RF".equalsIgnoreCase(alg) || "GBT".equalsIgnoreCase(alg);
-    }
-
-    /**
-     * Get bin index by binary search. The last bin in <code>binBoundary</code> is missing value bin.
-     */
-    public static int getBinIndex(List<Double> binBoundary, Double dVal) {
-        assert binBoundary != null && binBoundary.size() > 0;
-        assert dVal != null;
-        int binSize = binBoundary.size();
-
-        int low = 0;
-        int high = binSize - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            Double midVal = binBoundary.get(mid);
-            int cmp = midVal.compareTo(dVal);
-
-            if (cmp < 0) {
-                low = mid + 1;
-            } else if (cmp > 0) {
-                high = mid - 1;
-            } else {
-                return mid; // key found
-            }
+        List<BasicML> models=new ArrayList<BasicML>(modelFiles.length);
+        for(File nnf:modelFiles){
+        InputStream is=null;
+        try{
+        is=new FileInputStream(nnf);
+        if(ALGORITHM.NN.equals(alg)){
+        models.add(BasicML.class.cast(EncogDirectoryPersistence.loadObject(is)));
+        }else if(ALGORITHM.LR.equals(alg)){
+        models.add(LR.loadFromStream(is));
+        }
+        }finally{
+        IOUtils.closeQuietly(is);
+        }
         }
 
-        return low == 0 ? 0 : low - 1;
-    }
-
-
-    /**
-     * Return one HashMap Object contains keys in the first parameter, values in the second parameter. Before calling
-     * this method, you should be aware that headers should be unique.
-     *
-     * @throws IllegalArgumentException
-     *             if lengths of two arrays are not the same.
-     * @throws NullPointerException
-     *             if header or data is null.
-     */
-    public static Map<String, String> getRawDataMap(String[] header, String[] data) {
-        if (header.length != data.length) {
-            throw new IllegalArgumentException(String.format("Header/Data mismatch: Header length %s, Data length %s",
-                    header.length, data.length));
+        return models;
+        }else{
+        throw new IOException(String.format("Failed to list files in %s",modelsPathDir.getAbsolutePath()));
+        }
         }
 
-        Map<String, String> rawDataMap = new HashMap<String, String>(header.length);
-        for (int i = 0; i < header.length; i++) {
-            rawDataMap.put(header[i], data[i]);
+
+public static boolean isDesicionTreeAlgorithm(String alg){
+        return"RF".equalsIgnoreCase(alg)||"GBT".equalsIgnoreCase(alg);
+        }
+
+/**
+ * Get bin index by binary search. The last bin in <code>binBoundary</code> is missing value bin.
+ */
+public static int getBinIndex(List<Double> binBoundary,Double dVal){
+        assert binBoundary!=null&&binBoundary.size()>0;
+        assert dVal!=null;
+        int binSize=binBoundary.size();
+
+        int low=0;
+        int high=binSize-1;
+
+        while(low<=high){
+        int mid=(low+high)>>>1;
+        Double midVal=binBoundary.get(mid);
+        int cmp=midVal.compareTo(dVal);
+
+        if(cmp< 0){
+        low=mid+1;
+        }else if(cmp>0){
+        high=mid-1;
+        }else{
+        return mid; // key found
+        }
+        }
+
+        return low==0?0:low-1;
+        }
+
+
+/**
+ * Return one HashMap Object contains keys in the first parameter, values in the second parameter. Before calling
+ * this method, you should be aware that headers should be unique.
+ *
+ * @throws IllegalArgumentException
+ *             if lengths of two arrays are not the same.
+ * @throws NullPointerException
+ *             if header or data is null.
+ */
+public static Map<String, String> getRawDataMap(String[]header,String[]data){
+        if(header.length!=data.length){
+        throw new IllegalArgumentException(String.format("Header/Data mismatch: Header length %s, Data length %s",
+        header.length,data.length));
+        }
+
+        Map<String, String> rawDataMap=new HashMap<String, String>(header.length);
+        for(int i=0;i<header.length;i++){
+        rawDataMap.put(header[i],data[i]);
         }
         return rawDataMap;
-    }
+        }
 
 
-    /**
-     * Return map entries sorted by value.
-     */
-    public static <K, V extends Comparable<V>> List<Entry<K, V>> getEntriesSortedByValues(Map<K, V> map) {
-        List<Entry<K, V>> entries = new LinkedList<Entry<K, V>>(map.entrySet());
+/**
+ * Return map entries sorted by value.
+ */
+public static<K, V extends Comparable<V>> List<Entry<K, V>>getEntriesSortedByValues(Map<K, V> map){
+        List<Entry<K, V>>entries=new LinkedList<Entry<K, V>>(map.entrySet());
 
-        Collections.sort(entries, new Comparator<Entry<K, V>>() {
-            public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-                return o1.getValue().compareTo(o2.getValue());
-            }
+        Collections.sort(entries,new Comparator<Entry<K, V>>(){
+public int compare(Entry<K, V> o1,Entry<K, V> o2){
+        return o1.getValue().compareTo(o2.getValue());
+        }
         });
 
         return entries;
-    }
+        }
 
 
-}
+        }

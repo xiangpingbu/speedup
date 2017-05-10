@@ -24,52 +24,47 @@ import java.util.List;
  * @author xibu
  */
 public class ExportModelProcessor extends BasicModelProcessor implements Processor {
-
-    public static final String PMML = "pmml";
-    public static final String COLUMN_STATS = "columnstats";
-
-    /**
-     * log object
-     */
     private final static Logger log = LoggerFactory.getLogger(ExportModelProcessor.class);
 
+
+    public static final String PMML_STR = "pmml";
+    public static final String COLUMN_STATS = "columnstats";
     private String type;
     private boolean isConcise;
-    private String modelPath="/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlData/models";
+    private String columnConfigStr;
+    private String modelConfigPath;
+    private String params;
+    private PMML pmml;
 
-    public ExportModelProcessor(String type, boolean isConcise) {
+    public ExportModelProcessor(String type, boolean isConcise,String columnConfigStr,String modelConfigPath,String params) {
         this.type = type;
         this.isConcise = isConcise;
+        this.columnConfigStr = columnConfigStr;
+        this.params = params;
+        this.modelConfigPath = modelConfigPath;
     }
 
     public int run() throws Exception {
-        setUp();
 
         int status = 0;
-        File pmmls = new File("/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlResult/");
-        FileUtils.forceMkdir(pmmls);
-
         if (StringUtils.isBlank(type)) {
-            type = PMML;
+            type = PMML_STR;
         }
 
-        if (type.equalsIgnoreCase(PMML)) {
+        if (type.equalsIgnoreCase(PMML_STR)) {
             log.info("Convert models into {} format", type);
 
-            ModelConfig modelConfig = CommonUtils.loadModelConfig();
-            List<ColumnConfig> columnConfigList = CommonUtils.loadColumnConfigList();
+            ModelConfig modelConfig = CommonUtils.loadModelConfig(modelConfigPath);
+            List<ColumnConfig> columnConfigList = CommonUtils.loadColumnConfigList(columnConfigStr);
 
-            List<BasicML> models = CommonUtils.loadBasicModels(modelPath,
+            List<BasicML> models = CommonUtils.loadSpecificBasicModels(params,
                    ALGORITHM.valueOf(modelConfig.getAlgorithm().toUpperCase()));
 
             PMMLTranslator translator = PMMLConstructorFactory.produce(modelConfig, columnConfigList, this.isConcise);
 
             for (int index = 0; index < models.size(); index++) {
-                log.info("\t start to generate " + "/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlResult" + File.separator + modelConfig.getModelSetName()
-                        + Integer.toString(index) + ".pmml");
-                PMML pmml = translator.build(models.get(index));
-                PMMLUtils.savePMML(pmml,
-                        "/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlResult" + File.separator + modelConfig.getModelSetName() + Integer.toString(index) + ".pmml");
+                log.info("start to generate {}.pmml",modelConfig.getModelSetName()+Integer.toString(index));
+                pmml = translator.build(models.get(index));
             }
         } else {
             log.error("Unsupported output format - {}", type);
@@ -83,4 +78,7 @@ public class ExportModelProcessor extends BasicModelProcessor implements Process
         return status;
     }
 
+    public PMML getPmml() {
+        return pmml;
+    }
 }

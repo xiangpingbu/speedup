@@ -13,7 +13,6 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         var selected_variable = [];
         //如果进入isVariableSelect环节,将从该环节的页面获取数据
         //否则将从getBar环节获取数据
-        debugger;
         if (isVariableSelect) {
             var all_list = [];
 
@@ -64,12 +63,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 content.append("h1").text("variable Select");
 
                 var ol = content.append("ol").attr("class", "breadcrumb");
-                ol.append("li").append("span").append("a").attr("id", "execute").text("保存数据");
-                // var ol = content.append("ol").attr("class", "breadcrumb");
-                // ol.append("li").append("span").text(model_name);
-                // ol.append("li").append("strong").text(branch);
-                // ol.append("li").append("span").append("a").attr("id", "saveAll").text("保存所有");
-                // ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
+                ol.append("li").append("span").append("a").attr("id", "execute").text("人工筛选");
+                ol.append("li").append("span").append("a").attr("id", "columnConfig").text("column_config");
 
                 var div = selectArea.append("div").attr("class", "ibox-content");
                 div.append("div").text("模型信息");
@@ -87,35 +82,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     tr.append("td").text(data["model_analysis"][key]);
                     i++;
                 }
-                // var tr = tbody.append("tr");
-                // tr.append("th").text("model");
-                // tr.append("td").text("loGit");
-                // tr.append("th").text("Pseudo R-squared");
-                // tr.append("td").text("0.041");
-                //
-                // tr = tbody.append("tr");
-                // tr.append("th").text("Depandent Variable");
-                // tr.append("td").text("data[model_analysis].target");
-                // tr.append("th").text("AIC");
-                // tr.append("td").text("data[model_analysis].aic");
-                // tr = tbody.append("tr");
-                // tr.append("th").text("nobs");
-                // tr.append("td").text("data[model_analysis].nobs");
-                // tr.append("th").text("BIC");
-                // tr.append("td").text("data[model_analysis].bic");
-                // tr = tbody.append("tr");
-                // tr.append("th").text("df_resid");
-                // tr.append("td").text("data[model_analysis].df_resid");
-                // tr.append("th").text("likelyhood");
-                // tr.append("td").text("data[model_analysis].likelyhood");
-                // tr = tbody.append("tr");
-                // tr.append("th").text("llnull");
-                // tr.append("td").text("data[model_analysis].llnull");
-                // tr.append("th").text("llr");
-                // tr.append("td").text("data[model_analysis].llr");
                 //必选项
                 div.append("div").text("必选项");
-                table = div.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
+                table = div.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable")
+                    .attr("id","variableSelected");
                 tbody = table.append("tbody").attr("id", "tbody-selected");
                 var thead = table.append("thead");
                 tr = thead.append("tr");
@@ -170,18 +140,6 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 tr.append("td").text("name");
                 tr.append("td").text("ks");
                 tr.append("td").text("pvalues");
-                // tr = tbody.append("tr");
-                // select = tr.append("td");
-                // //body的checkbox
-                // select.append("div").append("input")
-                //     .attr("type", "checkbox")
-                //     .attr("class", "backup-body-checks")
-                //     .attr("name", "input[]");
-                // tr.append("td").text("11");
-                // tr.append("td").text("11");
-                // tr.append("td").text("11");
-                // tr.append("td").text("11");
-                // tr.append("td").text("11");
                 for (let obj in data["marginal_var"]){
                     tr = tbody.append("tr");
                     select = tr.append("td");
@@ -226,6 +184,52 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
                 $("#execute").bind("click", function () {
                     variableSelect(true);
+                });
+
+                $("#columnConfig").bind("click", function () {
+                    var params = [];
+                    $("#variableSelected").find("tbody tr").find("td:eq(2)").each(function (){
+                        params.push($(this).text())
+                    });
+                   var list = [];
+                    $(".selected-body").each(function () {
+                        list.push($(this).find(".selected-body-checks").attr("name"))
+                    });
+
+                    $("#columnConfigform").remove();
+                    var form = $("<form>");//定义一个form表单
+                    form.attr("id", "columnConfigform");
+                    form.attr("style", "display:none");
+                    form.attr("target", "");
+                    form.attr("method", "post");
+                    form.attr("action", host + "/tool/column_config");
+                    var input1 = $("<input>");
+                    input1.attr("type", "hidden");
+                    input1.attr("name", "data");
+
+                    // var data ={
+                    //     "data": JSON.stringify(exportData())
+                    // };
+                    var o = {};
+                    o.params = params.join(",");
+                    o.list = list.join(",");
+                    o.model_branch = localStorage.getItem("branch");
+                    o.model_name = localStorage.getItem("model_name");
+                    input1.attr("value", JSON.stringify(o));
+                    form.append(input1);
+                    $("body").append(form);//将表单放置在web中
+
+                    form.submit();//表单提交
+                    
+                    // $.ajax({
+                    //     url: host + "/tool/column_config",
+                    //     type: 'post',
+                    //     data: {list: list.join(",")},
+                    //     async: true,
+                    //     success:function (result) {
+                    //
+                    //     }
+                    // });
                 })
 
             }

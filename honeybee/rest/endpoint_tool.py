@@ -19,6 +19,7 @@ import sys
 from util import model_function
 import requests
 from common.constant import  const
+from util.ZipFile import *
 
 
 base = '/tool'
@@ -42,7 +43,8 @@ df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
+# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
+df_test = None
 safely_apply = False
 apply_result = None
 
@@ -283,7 +285,7 @@ def apply():
     data = var_dict["data"]
 
     # df = df_test.append(df_train)
-    df = df_train
+    df = df_train.copy()
     var_list = data.keys()
 
     for var_name in var_list:
@@ -396,7 +398,7 @@ def parse():
     return responseto(data=data_map)
 
 
-@app.route(base + "/column-config", methods=['POST'])
+@app.route(base + "/column_config", methods=['POST'])
 def column_config():
     """
     将配置完成的variable数据转化一定格式的json数据
@@ -405,16 +407,29 @@ def column_config():
     Parameters:
         data: variable的的行列信息
     """
-    data = request.form.get('data')
-    dataMap = json.loads(data)
-    result = []
-    columnNum = 1
-    for key, list in dataMap.items():
-        pmml = Pmml()
-        pmml.columnNum = columnNum
+    req = request.form.get('data')
+    var_dict = json.loads(req)
 
-        first_bin = list[0]
-
+    list = var_dict['list']
+    model_name = var_dict['model_name']
+    model_branch = var_dict['model_branch']
+    params = var_dict["params"]
+    result = sort_variable(list.split(","),vs.load_binning_record(model_name,model_branch,list.split(",")))
+    data = []
+    mem_zip_file = MemoryZipFile()
+    for variable in result:
+        # list = result.copy
+        records = json.loads(variable["binning_record"],encoding="utf8")
+        first_row = records[0]
+        #如果type为true,那么为Numrical
+        type = first_row["type"] == 'Numerical'
+        #如果bin_num为0,那么这一行woe值为missing值
+        if first_row["bin_num"] == '0' and type:
+            missing_woe = first_row["woe"]
+            del records[0]
+        else:
+            missing_woe = 0
+        variable_name = variable["variable_name"]
         columnBinning = {"binCountNeg": [],
                          "binCountPos": [],
                          "binWeightedPos": [],
@@ -422,17 +437,18 @@ def column_config():
                          "binAvgScore": [],
                          "binWeightedNeg": [],
                          "binPosRate": []}
+        pmml = Pmml()
         pmml.columnFlag = None
         pmml.finalSelect = True
-        pmml.columnName = key
+        pmml.columnName = variable_name
         pmml.columnBinning = columnBinning
 
-        type = first_bin["category_t"] == "False"
 
         if type:
             pmml.columnType = "N"
             columnBinning["binBoundary"] = ["-Infinity"]
             columnBinning["binCategory"] = None
+            #0指代invalid的值
             columnBinning["binCountWoe"] = [0]
         else:
             pmml.columnType = "C"
@@ -440,32 +456,49 @@ def column_config():
             columnBinning["binBoundary"] = None
             columnBinning["binCountWoe"] = [0, 0]
 
+
         index = 0
-        for val in list:
+        for val in records:
             columnBinning["binCountNeg"].append(1)
             columnBinning["binCountPos"].append(2)
 
             if type:
-                if index != len(list) - 1:
-                    columnBinning["binBoundary"].append(float(val["min_bound"]))
-
+                columnBinning["binBoundary"].append(float(val["min_boundary"]))
                 columnBinning["binCountWoe"].append(float(val["woe"]))
-
+                if index == len(records)-1:
+                    columnBinning["binCountWoe"].append(float(missing_woe))
             else:
                 # categorical的woe值
-                for cate in val[key]:
-                    columnBinning["binCategory"].insert(0, cate)
-                    columnBinning["binCountWoe"].insert(0, float(val["woe"]))
+                # for cate in records:
+                columnBinning["binCategory"].insert(0, val[variable_name.decode('utf-8')])
+                columnBinning["binCountWoe"].insert(0, float(val["woe"]))
             index += 1
 
         if type:
             columnBinning["length"] = len(columnBinning['binBoundary'])
         else:
             columnBinning["length"] = len(columnBinning["binCategory"])
-        result.append(pmml.__dict__)
-        columnNum += 1
-    r = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=json.dumps(result))
-    return responseFile(make_response(r.text),"column_config.json")
+        data.append(pmml.__dict__)
+
+    column_config = json.dumps(data,ensure_ascii=False)
+    post_data = {"column_config":json.dumps(data,ensure_ascii=False),
+                     "params":params}
+    pmml_xml =requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
+    mem_zip_file.append_content('column_config/column_config.json',column_config)
+    mem_zip_file.append_content('column_config/model.pmml',pmml_xml)
+
+    # return responseFile(make_response(mem_zip_file),"config.zip")
+    return send_file(mem_zip_file.read(),attachment_filename='config.zip',as_attachment=True)
+
+# column_config("model_train_selected","xiaozhuo","管理岗位,call_cnt")
+@app.route(base + "/column_config2", methods=['get'])
+def column_config2():
+    mem_zip_file = MemoryZipFile()
+    mem_zip_file.append_content('column_config/column_config.json',"1")
+    mem_zip_file.append_content('column_config/model.pmml',"2")
+
+
+    return send_file(mem_zip_file.read(),attachment_filename='capsule.zip',as_attachment=True)
 
 
 def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
@@ -742,7 +775,6 @@ apply完成后,第一次进入时的变量选择
 '''
 @app.route(base+"/variable_select",methods=['POST'])
 def variable_select():
-
     var_list = request.form.get("var_list")
     target = request.form.get("target")
 
@@ -831,3 +863,21 @@ def float_nan_to_str_nan(x):
         return str(x)
     else:
         return x
+
+def sort_variable(variables,result):
+    v = {}
+    for index,name in enumerate(variables):
+        v[name.decode('utf-8')] = index
+
+    new_result = []
+    for variable in result:
+        i = v[variable["variable_name"].decode('utf-8')]
+        new_result.insert(i,variable)
+
+    return new_result
+# variables = ["性别","年龄"]
+# result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
+# sort_variable(variables,result)
+
+
+

@@ -86,8 +86,8 @@ public interface Constants {
     public static final String PIG_COLUMN_SEPARATOR = "::";
     public static final String PIG_FULL_COLUMN_SEPARATOR = "_";
 
-    public static final String LOCAL_MODEL_CONFIG_JSON = "/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlData/ModelConfig.json";
-    public static final String LOCAL_COLUMN_CONFIG_JSON = "/Users/xpbu/Documents/Work/repo/maas/maas-service/pmmlData/ColumnConfig.json";
+    public static final String LOCAL_MODEL_CONFIG_JSON = "/Users/lifeng/Work/code/maas/maas-service/pmmlData/ModelConfig.json";
+    public static final String LOCAL_COLUMN_CONFIG_JSON = "/Users/lifeng/Work/code/maas/maas-service/src/main/resources/pmmlData/ColumnConfig.json";
 
     public static final double TOLERANCE = 0.00001d;
 
