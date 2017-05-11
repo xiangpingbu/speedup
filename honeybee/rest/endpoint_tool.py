@@ -458,6 +458,7 @@ def column_config():
 
 
         index = 0
+
         for val in records:
             columnBinning["binCountNeg"].append(1)
             columnBinning["binCountPos"].append(2)
