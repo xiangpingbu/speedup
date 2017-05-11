@@ -39,12 +39,12 @@ def file_init():
 model_name = "model_train_selected"
 
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
-df_test = None
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
+# df_test = None
 safely_apply = False
 apply_result = None
 
@@ -284,8 +284,8 @@ def apply():
 
     data = var_dict["data"]
 
-    # df = df_test.append(df_train)
-    df = df_train.copy()
+    df = df_test.append(df_train)
+    # df = df_train.copy()
     var_list = data.keys()
 
     for var_name in var_list:
@@ -340,7 +340,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
         return 0.0
     else:
         for row in var_content:
-            if var_value in row[var_name]:
+            if str(var_value) in row[var_name]:
                 return float(row['woe'])
         return 0.0
 
