@@ -2,7 +2,9 @@ package com.ecreditpal.maas.web.endpoint;
 
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
+import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Result;
+import com.ecreditpal.maas.model.model.AKDModel;
 import com.ecreditpal.maas.model.model.XYBModel;
 import com.wordnik.swagger.annotations.*;
 
@@ -21,12 +23,12 @@ import java.util.Map;
  */
 @Api(value = "xyb", description = "Endpoint for xyb")
 @Path("/model")
-public class XybEndpoint {
+public class ModelEndpoint {
     @POST
     @Path("/xyb")
     @ApiOperation(value = "XYB Model")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "XYB Model Response", response = Response.class)})
-    public Response getFraudModelScore(
+    public Response getXybModelScore(
             @ApiParam(value = "creditQueryTimes", required = false) @FormParam("creditQueryTimes") String creditQueryTimes,
             @ApiParam(value = "creditLimit", required = false) @FormParam("creditLimit") String creditLimitList,
             @ApiParam(value = "totalUsedLimit", required = false) @FormParam("totalUsedLimit") String totalUsedLimit,
@@ -66,4 +68,35 @@ public class XybEndpoint {
 
         return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
+
+
+    @POST
+    @Path("/akd")
+    @ApiOperation(value = "AKD Model")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "AKD Model Response", response = Response.class)})
+    public Response getAkdModelScore(
+            @ApiParam(value = "degree", required = false) @FormParam("degree") String degree,
+            @ApiParam(value = "cellPhoneAccessTime", required = false) @FormParam("cellPhoneAccessTime") String cellPhoneAccessTime,
+            @ApiParam(value = "contactsClass1Cnt", required = false) @FormParam("contactsClass1Cnt") String contactsClass1Cnt,
+            @ApiParam(value = "gender", required = false) @FormParam("gender") String gender,
+            @ApiParam(value = "companyType", required = false) @FormParam("companyType") String companyType,
+            @ApiParam(value = "age", required = false) @FormParam("age") String age,
+            @ApiParam(value = "netFlow", required = false) @FormParam("netFlow") String netFlow,
+            @ApiParam(value = "marriageStatus", required = false) @FormParam("marriageStatus") String marriageStatus,
+            @Context LookupEventMessage lookupEventMessage
+    ) throws Exception {
+        Map<String,String> map = JsonUtil.json2Map(lookupEventMessage.getRequestInfo().getFormParams().toString());
+
+//        map.put("account", "xinyongbao");
+//        map.put("password", "eHliMjAxNzA0MDc=");
+
+        AKDModel akdModel = new AKDModel();
+        String score = akdModel.run(map).toString();
+
+        ModelLog modelLog = akdModel.ParseVariables(akdModel.getVariableList(), score, AKDModel.AKDModelVariables.getModel());
+        lookupEventMessage.setModelLog(modelLog);
+
+        return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
 }

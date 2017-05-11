@@ -452,12 +452,15 @@ def column_config():
             columnBinning["binCountWoe"] = [0]
         else:
             pmml.columnType = "C"
-            columnBinning["binCategory"] = ["missing", "invalid"]
+            columnBinning["binCategory"] = []
             columnBinning["binBoundary"] = None
-            columnBinning["binCountWoe"] = [0, 0]
+            columnBinning["binCountWoe"] = []
 
 
         index = 0
+        categorical_nan_woe = 0
+        categorical_list = []
+        categorical_woe_list = []
         for val in records:
             columnBinning["binCountNeg"].append(1)
             columnBinning["binCountPos"].append(2)
@@ -470,14 +473,24 @@ def column_config():
             else:
                 # categorical的woe值
                 # for cate in records:
-                columnBinning["binCategory"].insert(0, val[variable_name.decode('utf-8')])
-                columnBinning["binCountWoe"].insert(0, float(val["woe"]))
+                v_list= val[variable_name.decode('utf-8')].split("|")
+                for v in v_list:
+                    if v != 'nan':
+                        columnBinning["binCategory"].append(v)
+                        columnBinning["binCountWoe"].append(val["woe"])
+                    else:
+                        categorical_nan_woe =val['woe']
             index += 1
 
         if type:
             columnBinning["length"] = len(columnBinning['binBoundary'])
         else:
             columnBinning["length"] = len(columnBinning["binCategory"])
+            columnBinning["binCategory"].append("missing")
+            columnBinning["binCountWoe"].append(categorical_nan_woe)
+            columnBinning["binCategory"].append('invalid')
+            columnBinning["binCountWoe"].append(0)
+
         data.append(pmml.__dict__)
 
     column_config = json.dumps(data,ensure_ascii=False)
