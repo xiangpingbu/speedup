@@ -233,7 +233,6 @@
                 </MapValues>
             </DerivedField>
         </LocalTransformations>
-        <RegressionTable intercept="-1.18304640063"><NumericPredictor name="学历_woe" coefficient="0.93715935427"/><NumericPredictor name="手机入网时间_woe" coefficient="0.632481150402"/><NumericPredictor name="contacts_class1_cnt_woe" coefficient="0.917979494912"/><NumericPredictor name="性别_woe" coefficient="0.838828052923"/><NumericPredictor name="公司性质_woe" coefficient="0.905691086131"/><NumericPredictor name="年龄_woe" coefficient="0.831755967664"/>
-        <NumericPredictor name="net_flow_woe" coefficient="0.730788588055"/><NumericPredictor name="婚姻状况_woe" coefficient="0.853075611119"/></RegressionTable>
+        <RegressionTable intercept="-1.14793691262"><NumericPredictor name="学历_woe" coefficient="0.942651441069"/><NumericPredictor name="手机入网时间_woe" coefficient="0.678496433975"/><NumericPredictor name="contacts_class1_cnt_woe" coefficient="0.891831717487"/><NumericPredictor name="性别_woe" coefficient="0.831848626434"/><NumericPredictor name="公司性质_woe" coefficient="0.909083040183"/><NumericPredictor name="年龄_woe" coefficient="0.822558165336"/><NumericPredictor name="net_flow_woe" coefficient="0.895170144489"/><NumericPredictor name="婚姻状况_woe" coefficient="0.943146477263"/></RegressionTable>
     </RegressionModel>
 </PMML>
