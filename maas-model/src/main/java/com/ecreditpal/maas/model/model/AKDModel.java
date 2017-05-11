@@ -30,7 +30,7 @@ import java.util.Map;
 public class AKDModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(AKDModel.class);
     public static String localVariablePath = ConfigurationManager.getConfiguration().getString("akd_model_variables.xml");
-    public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml");
+    public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml", "maas-model/src/main/resources/model_config/akd_model_pmml.pmml");
     public static VariableConfiguration AKDModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
@@ -137,4 +137,7 @@ public class AKDModel extends ModelNew {
         return "AiKaDaiModel";
     }
 
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
 }
