@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -37,32 +38,36 @@ public class SectionVariable extends Variable {
                     String setStr = getParamValue();
                     //type为categorical的区间是独立的字符
                     if ("categorical".equals(getParamType())) {
-                        try {
-                            String[] rangeArray = setStr.split("\\|");
-                            String[] mappings = null;
-                            if (getParamMapping() != null) {
-                                mappings = getParamMapping().split("\\|");
-                            }
+                        if (setStr != null) {
+                            try {
+                                String[] rangeArray = setStr.split("\\|");
+                                String[] mappings = null;
+                                if (getParamMapping() != null) {
+                                    mappings = getParamMapping().split("\\|");
+                                }
 //                    Set<String> set = Sets.newHashSetWithExpectedSize(rangeArray.length);
-                            Map<String, String> map = Maps.newHashMap();
-                            if (mappings == null) {
-                                for (String s : rangeArray) {
-                                    map.put(s, "");
+                                Map<String, String> map = Maps.newHashMap();
+                                if (mappings == null) {
+                                    for (String s : rangeArray) {
+                                        map.put(s, "");
+                                    }
+                                } else {
+                                    for (int i = 0; i < rangeArray.length; i++) {
+                                        map.put(rangeArray[i], mappings[i]);
+                                    }
                                 }
-                            } else {
-                                for (int i = 0; i < rangeArray.length; i++) {
-                                    map.put(rangeArray[i], mappings[i]);
+                                String result = map.get(valStr);
+                                if (result == null) {
+                                    setValue(CATEGORICAL_INVALID);
+                                    return;
                                 }
+                                setValue(result);
+                            } catch (Exception e) {
+                                logger.error("exception occurs while processing the val", e);
+                                setValue(CATEGORICAL_INVALID);
                             }
-                            String result = map.get(valStr);
-                            if (result == null) {
-                                setValue(MISSING);
-                                return;
-                            }
-                            setValue(result);
-                        } catch (Exception e) {
-                            logger.error("exception occurs while processing the val", e);
-                            setValue(CATEGORICAL_INVALID);
+                        } else{
+                            setValue(valStr);
                         }
                     } else if ("numerical".equals(getParamType())) {
                         try {
@@ -140,6 +145,12 @@ public class SectionVariable extends Variable {
 
     private boolean isClosed(String c) {
         return "[".equals(c) || "]".equals(c);
+    }
+
+    public static void main(String[] args) {
+        Map<String,String> map = new HashMap<>();
+        map.put("1","1");
+        System.out.println(map.get("2"));
     }
 
 }
