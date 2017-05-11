@@ -1,26 +1,22 @@
 <template>
 <div>
-  <topbar :numIds="id" :countIds="countId" :psiIds="psiId"></topbar>
+  <Topbar :numIds="id" :countIds="countId" :psiIds="psiId"></Topbar>
   <div class="pure-g">
 
     <div class="pure-u-1-2">
-      <!-- <img v-show="loading" src="../assets/1392662591224_1140x0.gif"> -->
       <div class="chart-card" @click="viewChart(id[1], 'line')" name='age'>
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[1]" :dataSet="dataMap[id[1]]" :variable="varMap[id[1]]"></lineChart>
+        <LineChart :id="id[1]" :dataSet="dataMap[id[1]]" :variable="varMap[id[1]]" />
       </div>
     </div>
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(id[2], 'line')" name='credit_query_times'>
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[2]" :dataSet="dataMap[id[2]]" :variable="varMap[id[2]]"></lineChart>
+        <LineChart :id="id[2]" :dataSet="dataMap[id[2]]" :variable="varMap[id[2]]" />
       </div>
     </div>
     
     <div class="pure-u-1-1">
       <div class="chart-card" @click="viewChart(id[0], 'line')" name='score'>
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[0]" :dataSet="dataMap[id[0]]" :variable="varMap[id[0]]"></lineChart>
+        <LineChart :id="id[0]" :dataSet="dataMap[id[0]]" :variable="varMap[id[0]]" />
       </div>
     </div>
   </div>
@@ -28,20 +24,17 @@
   <div class="pure-g">
     <div class="pure-u-1-3">
       <div class="chart-card" @click="viewChart(id[3], 'line')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[3]" :dataSet="dataMap[id[3]]" :variable="varMap[id[3]]"></lineChart>
+        <LineChart :id="id[3]" :dataSet="dataMap[id[3]]" :variable="varMap[id[3]]" />
       </div>
     </div>
     <div class="pure-u-1-3">
       <div class="chart-card" @click="viewChart(id[4], 'line')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[4]" :dataSet="dataMap[id[4]]" :variable="varMap[id[4]]"></lineChart>
+        <LineChart :id="id[4]" :dataSet="dataMap[id[4]]" :variable="varMap[id[4]]" />
       </div>
     </div>
     <div class="pure-u-1-3">
       <div class="chart-card" @click="viewChart(id[5], 'line')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <lineChart v-if="!loading" :id="id[5]" :dataSet="dataMap[id[5]]" :variable="varMap[id[5]]"></lineChart>
+        <LineChart :id="id[5]" :dataSet="dataMap[id[5]]" :variable="varMap[id[5]]" />
       </div>
     </div>
   </div>
@@ -49,51 +42,45 @@
   <div class="pure-g">
     <div class="pure-u-1-2" v-for="mid in countId">
       <div class="chart-card" @click="viewChart(mid, 'bar')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]"></barChart>
+        <BarChart :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]" />
       </div>
     </div>
   </div>
+  
     <!-- <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[1], 'bar')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="countId[1]" :dataSet="dataMap[countId[1]]" :variable="varMap[countId[1]]" :nameMap="this.nameMap[countId[1]]"></barChart>
+        <BarChart :id="countId[1]" :dataSet="dataMap[countId[1]]" :variable="varMap[countId[1]]" :nameMap="this.nameMap[countId[1]]" />
       </div>
     </div>
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[2], 'bar')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="countId[2]" :dataSet="dataMap[countId[2]]" :variable="varMap[countId[2]]" :nameMap="this.nameMap[countId[2]]"></barChart>
+        <BarChart :id="countId[2]" :dataSet="dataMap[countId[2]]" :variable="varMap[countId[2]]" :nameMap="this.nameMap[countId[2]]" />
       </div>
     </div> -->
 
   <!-- <div class="pure-g">
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[0], 'bar')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]"></barChart>
+        <BarChart :id="countId[0]" :dataSet="dataMap.personal_live_join" :variable="varMap.personal_live_join" :nameMap="this.nameMap[countId[0]]" />
       </div>
     </div>
 
     <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[3], 'bar')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <barChart v-if="!loading" :id="countId[3]" :dataSet="dataMap[countId[3]]" :variable="varMap[countId[3]]" :nameMap="this.nameMap[countId[3]]"></barChart>
+        <BarChart :id="countId[3]" :dataSet="dataMap[countId[3]]" :variable="varMap[countId[3]]" :nameMap="this.nameMap[countId[3]]" />
       </div>
     </div>
   </div> -->
   <div class="pure-g">
     <div class="pure-u-1-3" v-for="mid in psiId">
       <div class="chart-card" @click="viewChart(mid, 'psi')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <psiLineChart v-if="!loading" :id="mid" :dataSet="dataMap[mid]"></psiLineChart>
+        <PsiLineChart :id="mid" :dataSet="dataMap[mid]" />
       </div>
     </div>
 
     <div class="pure-u-2-3">
       <div class="chart-card" @click = "viewChart('api', 'stat')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <statChart v-if="!loading" id="api" :dataSet="dataMap['api']"></statChart>
+        <StatChart id="api" :dataSet="dataMap['api']" />
       </div>
     </div>
   </div>
@@ -101,8 +88,7 @@
   <!-- <div class="pure-g">
     <div class="pure-u-2-3">
       <div class="chart-card" @click = "viewChart('api', 'stat')">
-        <img class="loading-img" v-show = "loading" src="../assets/loading.gif">
-        <statChart v-if="!loading" id="api" :dataSet="dataMap['api']"></statChart>
+        <StatChart id="api" :dataSet="dataMap['api']" />
       </div>
     </div>
   </div> -->
@@ -110,11 +96,11 @@
 </template>
 
 <script>
-import topbar from '@/components/TopBar.vue'
-import lineChart from '@/components/lineChart.vue'
-import barChart from '@/components/barChart.vue'
-import psiLineChart from '@/components/psiChart.vue'
-import statChart from '@/components/statChart.vue'
+import Topbar from '@/components/TopBar.vue'
+import LineChart from '@/components/LineChart.vue'
+import BarChart from '@/components/BarChart.vue'
+import PsiLineChart from '@/components/PsiLineChart.vue'
+import StatChart from '@/components/StatChart.vue'
 // import * as d3 from 'd3'
 // import axios from 'axios'
 import ConfigInfo from '@/config/config.js'
@@ -174,7 +160,10 @@ export default {
     Promise.all(PsiPromiseList).then((response) => {
       response.forEach((d, i) => {
         var res = getData.parsePsiData(d.data)
-        this.dataMap[this.psiId[i]] = res.newJsonData
+        // deep copy
+        const _dataMap = JSON.parse(JSON.stringify(this.dataMap))
+        _dataMap[this.psiId[i]] = res.newJsonData
+        this.dataMap = _dataMap
       })
     })
 
@@ -182,7 +171,10 @@ export default {
     var apiPromise = getData.getResponse(apiUrl)
     apiPromise.then((response) => {
       var res = getData.parseStatData(response.data)
-      this.dataMap['api'] = res.newJsonData
+      // deep copy
+      const _dataMap = JSON.parse(JSON.stringify(this.dataMap))
+      _dataMap['api'] = res.newJsonData
+      this.dataMap = _dataMap
     })
 
     // store id lists for top bar
@@ -235,9 +227,9 @@ export default {
     // console.log(this.nameMap.personal_live_join)
     // console.log(this.$route.params.model)
 
-    setTimeout(() => {
-      this.loading = false
-    }, 1000)
+    // setTimeout(() => {
+    //   this.loading = false
+    // }, 1000)
   },
   data () {
     return {
@@ -245,9 +237,9 @@ export default {
       countId: ['personal_live_join', 'personal_education', 'client_gender', 'personal_live_case'],
       psiId: ['psi_score', 'psi_age', 'psi_credit_query_times', 'psi_credit_limit', 'psi_personal_year_income', 'psi_credit_utilization', 'psi_personal_live_join', 'psi_personal_education', 'psi_client_gender', 'psi_personal_live_case'],
       type: ['percentile', 'count', 'psi', 'stat'],
-      dataMap: [],
-      nameMap: [],
-      varMap: [],
+      dataMap: {},
+      nameMap: {},
+      varMap: {},
       subChartEnabled: false,
       loading: true
     }
@@ -280,15 +272,23 @@ export default {
     }
   },
   components: {
-    topbar,
-    lineChart,
-    barChart,
-    psiLineChart,
-    statChart
+    Topbar,
+    LineChart,
+    BarChart,
+    PsiLineChart,
+    StatChart
   }
 }
 </script>
 
 <style lang="css">
 @import '../assets/css/c3.css';
+.chart-card {
+    transition: all .5s;
+}
+.chart-card:hover {
+    cursor: pointer;
+    box-sizing: border-box;
+    border: 1px solid #444;
+}
 </style>

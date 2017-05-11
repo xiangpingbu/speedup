@@ -7,6 +7,8 @@ import store from './store'
 // import iView from 'iview'
 // import 'iview/dist/styles/iview.css'
 
+import './components/global'
+
 Vue.config.productionTip = false
 
 // Vue.use(iView)

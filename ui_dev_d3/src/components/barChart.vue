@@ -2,12 +2,14 @@
   <div >
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
+    <Loading v-if="!dataSet"/>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3'
 import * as c3 from 'c3'
+import ConfigInfo from '@/config/config.js'
 
 // sort data by date
 function sortDate(a, b) {
@@ -15,14 +17,20 @@ function sortDate(a, b) {
 }
 
 export default {
-  name: 'barChart',
+  name: 'BarChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable', 'nameMap'],
-  created() {
-    this.$nextTick(() => {
+  watch: {
+    'dataSet' (data) {
+      this.draw()
+    }
+  },
+  methods: {
+    draw() {
+      const dataSet = JSON.parse(JSON.stringify(this.dataSet))
       // generate data for charts
       var newDataFields = []
       var jsonMap = {}
-      this.dataSet.forEach(function(d) {
+      dataSet.forEach(function(d) {
         var keyList = d3.keys(d)
         keyList.forEach(function(key) {
           var newObj = jsonMap[key]
@@ -33,15 +41,20 @@ export default {
         })
       })
       newDataFields.splice(newDataFields.indexOf('date'), 1)
-      this.dataSet.sort(sortDate)
-      // console.warn(this.dataSet)
+      dataSet.sort(sortDate)
+      // console.warn(dataSet)
       // console.log(newDataFields)
       // newDataFields.sort(sortNumber)
+
+      const colorMap = {}
+      newDataFields.forEach(function(d, i) {
+        colorMap[d] = ConfigInfo.data_colors[i]
+      })
 
       // set legend 'others', including 'missing' & invalid input
       var names = d3.keys(this.nameMap)
       var sums = []
-      this.dataSet.forEach((d) => {
+      dataSet.forEach((d) => {
         d['others'] = 0
         var sum = 0
         d3.keys(d).forEach((value) => {
@@ -67,8 +80,9 @@ export default {
           right: 50
         },
         data: {
+          colors: colorMap,
           type: 'bar',
-          json: this.dataSet,
+          json: dataSet,
           keys: {
             x: 'date',
             value: names
@@ -78,7 +92,7 @@ export default {
           // order: 'desc',
           labels: {
             format: (v, id, i, j) => {
-              var tv = d3.values(this.dataSet[i])
+              var tv = d3.values(dataSet[i])
               tv.forEach((d, index) => {
                 if (typeof(d) !== 'number') {
                   tv.splice(index, 1)
@@ -111,7 +125,7 @@ export default {
         axis: {
           x: {
             type: 'timeseries',
-            extent: this.dataSet.length < 5 ? [this.dataSet[0].date, this.dataSet[this.dataSet.length - 1].date] : [this.dataSet[this.dataSet.length - 5].date, this.dataSet[this.dataSet.length - 1].date],
+            extent: dataSet.length < 5 ? [dataSet[0].date, dataSet[dataSet.length - 1].date] : [dataSet[dataSet.length - 5].date, dataSet[dataSet.length - 1].date],
             tick: {
               format: '%Y-%m-%d'
               // culling: {
@@ -158,7 +172,7 @@ export default {
       //   tg.push(newDataFields)
       //   chart.groups(tg)
       // }, 2000)
-    })
+    }
   }
 }
 </script>

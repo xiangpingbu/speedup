@@ -1,7 +1,11 @@
 <template>
 <div class="header">
   <router-link to="/">MAAS Visualization</router-link>
-  <router-link to="/" class="fr">To DashBoard</router-link>
+  <span class="fr">
+      <router-link to="/">To DashBoard</router-link>
+      &nbsp;
+      <span @click="reload"><SvgReload /></span>
+  </span>
 
   <!-- <li v-for="id in ids" class="pure-menu-item"><a :href="'#/dash/'+id" class="pure-menu-link">{{id}}</a></li> -->
 
@@ -21,6 +25,12 @@ export default {
   computed: {
     model() {
       return `/${this.$route.params.model}`
+    }
+  },
+  methods: {
+    reload() {
+      // TODO: reload soft
+      location.reload()
     }
   }
 }
