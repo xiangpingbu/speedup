@@ -507,7 +507,7 @@ def column_config():
             columnBinning["length"] = len(columnBinning['binBoundary'])
         else:
             columnBinning["length"] = len(columnBinning["binCategory"])
-        columnBinning["binCategory"].append("missing")
+            columnBinning["binCategory"].append("missing")
             columnBinning["binCountWoe"].append(categorical_nan_woe)
             columnBinning["binCategory"].append('invalid')
             columnBinning["binCountWoe"].append(0)
@@ -520,6 +520,7 @@ def column_config():
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
     mem_zip_file.append_content('column_config/column_config.json',column_config)
     mem_zip_file.append_content('column_config/model.pmml',pmml_xml)
+    mem_zip_file.append_content('column_config/lr',params)
     #return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(),attachment_filename='config.zip',as_attachment=True)
 
