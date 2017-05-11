@@ -3,6 +3,7 @@ package model;
 import com.ecreditpal.maas.common.excel.ExcelContent;
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
+import com.ecreditpal.maas.model.model.AKDModel;
 import com.ecreditpal.maas.model.model.XYBModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -28,7 +29,7 @@ public class AkdModelTest {
         ExcelContent content = rowReader.getRows();
 
         Map<String, Integer> head = content.getHead();
-        XYBModel model = new XYBModel();
+        AKDModel model = new AKDModel();
         List<Integer> scoreList = Lists.newArrayListWithCapacity(50000);
         for (List<String> list : content.getContent()) {
             Map<String, Object> map = Maps.newHashMap();

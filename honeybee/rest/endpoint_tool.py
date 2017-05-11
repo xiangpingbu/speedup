@@ -882,15 +882,17 @@ def sort_variable(variables,result):
     for index,name in enumerate(variables):
         v[name.decode('utf-8')] = index
 
-    new_result = []
+    new_result = [{}] * (len(v)-1)
     for variable in result:
         i = v[variable["variable_name"].decode('utf-8')]
-        new_result.insert(i,variable)
+        new_result[i] = variable
 
     return new_result
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
 # sort_variable(variables,result)
+
+
 
 
 
