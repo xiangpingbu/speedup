@@ -284,11 +284,12 @@ export default {
 <style lang="css">
 @import '../assets/css/c3.css';
 .chart-card {
-    transition: all .5s;
+    /*transition: all .5s;*/
+    border: 1px solid transparent;
 }
 .chart-card:hover {
     cursor: pointer;
     box-sizing: border-box;
-    border: 1px solid #444;
+    /*border: 1px solid #666;*/
 }
 </style>

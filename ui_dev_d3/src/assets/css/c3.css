@@ -176,22 +176,23 @@
   color: #fff;
   border-collapse: collapse;
   border-spacing: 0;
-  background-color: rgba(20, 20, 20, .9);
+  background-color: rgba(25, 25, 25, .95);
   empty-cells: show;
-  border-radius: 2px;
+  border-radius: 3px;
+  padding-bottom: 10px !important;
 }
 
 .c3-tooltip tr {}
 
 .c3-tooltip th {
   font-size: 14px;
-  padding: 2px 5px;
+  padding: 10px;
   text-align: left;
 }
 
 .c3-tooltip td {
   font-size: 13px;
-  padding: 3px 6px;
+  padding: 0 15px 10px;
 }
 
 .c3-tooltip td>span {
