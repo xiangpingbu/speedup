@@ -106,7 +106,7 @@ public class BasicModelProcessor {
      * @throws IOException
      */
     private void loadModelConfig() throws IOException {
-        modelConfig = CommonUtils.loadModelConfig();
+        modelConfig = CommonUtils.loadModelConfig(null);
     }
 
     /**
