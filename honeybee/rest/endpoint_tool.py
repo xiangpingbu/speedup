@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
+import collections
+import json
+import sys
+from collections import OrderedDict
+from io import BytesIO
+
+import numpy as np
+import pandas as pd
+import requests
+from flask import send_file
 from werkzeug.utils import secure_filename
 
 from beans.Pmml import *
+from common.constant import const
 from rest.app_base import *
-from util import Initial_Binning as ib
-import pandas as pd
-from util import Adjust_Binning as ab
-from util import common as cmm
-import json
-from collections import OrderedDict
-import numpy as np
-import collections
-from util import A99_Functions as a99
-from io import BytesIO
-from flask import send_file
 from service import variable_service as vs
-import sys
+from util import A99_Functions as a99
+from util import Adjust_Binning as ab
+from util import Initial_Binning as ib
+from util import common as cmm
 from util import model_function
 import requests
 from common.constant import  const
@@ -35,16 +38,17 @@ def file_init():
     return [train, test]
 
 
-
 model_name = "model_train_selected"
 
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/df_train.xlsx")
+# df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/df_test.xlsx")
-df_test = None
+df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
+df_all = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train_ind.xlsx")
+
+# df_test = None
 safely_apply = False
 apply_result = None
 
@@ -58,7 +62,7 @@ def init():
         name = model_name
         branch = "master"
 
-    result = vs.load_branch(name,branch)
+    result = vs.load_branch(name, branch)
 
     # if var_service.if_branch_exist(model, branch):
     #     var_service.update_branch(model, branch, remove_list, selected_list)
@@ -67,7 +71,7 @@ def init():
 
     remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
-    for o in remove_list_json :
+    for o in remove_list_json:
         remove_list.append(o)
 
     # remove_list.append(target)
@@ -83,7 +87,7 @@ def init():
     # first_bin = val[0]
     # if first_bin["category_t"] == False:
     #     val[0]["min"] = min_val
-    out_sorted_iv= sort_iv(out)
+    out_sorted_iv = sort_iv(out)
     return responseto(data=out_sorted_iv)
 
 
@@ -177,7 +181,7 @@ def divide():
         max = data_map["selected"]["max_boundary"]
         df = df[(df[name].astype(float) >= float(min)) & (df[name].astype(float) < float(max))]
 
-        #for index, row in df.iterrows():
+        # for index, row in df.iterrows():
         #    if float(min) <= float(row[name]) < float(
         # max):
         #        pass
@@ -193,17 +197,18 @@ def divide():
 
         for v in list:
             bound_list.append(float(v["min_boundary"]))
-        #bound_list.append(np.nan)
+        # bound_list.append(np.nan)
 
         result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
                            , target=target, expected_column={name})
-        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
+                   'bad_rate', 'woe',
                    'type']
         iv = result['IV'].sum()
         df = pd.DataFrame(result,
                           columns=columns)
         data = generate_response(name, df, iv)
-        #data = get_merged(name, df, min_val)
+        # data = get_merged(name, df, min_val)
 
         return responseto(data=data)
 
@@ -231,18 +236,19 @@ def divide():
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
         result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
-                           ,target=target, expected_column={name})
+                           , target=target, expected_column={name})
         iv = result['IV'].sum()
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
         df = pd.DataFrame(result,
                           columns=columns)
 
-        data = generate_response(name, df,iv)
-        #data = get_merged(name, df, min_val)
-        return responseto(data = data)
+        data = generate_response(name, df, iv)
+        # data = get_merged(name, df, min_val)
+        return responseto(data=data)
 
-@app.route(base + "/divide_manually",methods=['POST'])
+
+@app.route(base + "/divide_manually", methods=['POST'])
 def divide_manually():
     boundary = request.form.get("boundary")
     variable_name = request.form.get("variable_name")
@@ -251,7 +257,7 @@ def divide_manually():
     type = request.form.get("type")
 
     boundary_list = []
-    if type =="true":
+    if type == "true":
         for s in boundary.split(","):
             temp = []
             temp.extend(map(cmm.transfer, s.split("|")))
@@ -259,14 +265,15 @@ def divide_manually():
         columns = ['bin_num', variable_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
 
-    else :
+    else:
         for s in boundary.split(","):
             boundary_list.append(float(s))
-        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
+                   'bad_rate', 'woe',
                    'type']
 
-    target = vs.load_branch(model_name,branch)[0]["model_target"]
-    result = ab.adjust(df_train, type =="true", variable_name, boundary_list
+    target = vs.load_branch(model_name, branch)[0]["model_target"]
+    result = ab.adjust(df_train, type == "true", variable_name, boundary_list
                        , target=target, expected_column={variable_name})
 
     iv = result['IV'].sum()
@@ -284,14 +291,27 @@ def apply():
 
     data = var_dict["data"]
 
-    # df = df_test.append(df_train)
-    df = df_train.copy()
+   # df = df_test.append(df_train)
+     df = df_all
     var_list = data.keys()
 
     for var_name in var_list:
-        df[var_name+'_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
+        df[var_name + '_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
 
-    global apply_result,safely_apply
+    global df_train_woe
+    global df_test_woe
+
+    global withIntercept
+    withIntercept = True
+
+    #if withIntercept:
+    #    df['intercept_woe'] = 1.0
+
+    df_train_woe = df[df['dev_ind'] == 1]
+    df_test_woe = df[df['dev_ind'] == 0]
+
+    global apply_result, safely_apply
+
     apply_result = df
     safely_apply = True
     output = BytesIO()
@@ -315,6 +335,7 @@ def isNum(v):
         return True
     except ValueError:
         return False
+
 
 def apply_get_woe_value(var_name, var_value, var_dict):
     var_content = var_dict[var_name]
@@ -340,7 +361,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
         return 0.0
     else:
         for row in var_content:
-            if var_value in row[var_name]:
+            if str(var_value) in row[var_name]:
                 return float(row['woe'])
         return 0.0
 
@@ -358,11 +379,11 @@ def upload():
             filename = secure_filename(file.filename)
 
             print filename
-            if filename.find("test") >0:
+            if filename.find("test") > 0:
                 df_test = pd.read_excel(file, encoding="utf-8")
             elif filename == 'df_train.xlsx':
                 df_train = pd.read_excel(file, encoding="utf-8")
-                if filename.find("_")>0:
+                if filename.find("_") > 0:
                     model_name = filename.split("_")[0]
                 else:
                     model_name = "anonymous"
@@ -377,7 +398,7 @@ def parse():
     if len(result) < 1:
         vs.create_branch(model_name, "master", None, None)
         result = []
-        result.append({"model_branch":"master"})
+        result.append({"model_branch": "master"})
 
     branches = []
 
@@ -387,7 +408,6 @@ def parse():
     if v["remove_list"] is not None:
         remove_list = v["remove_list"]
         data_map["target"] = v["model_target"]
-
 
     for n in result:
         branches.append(n["model_branch"])
@@ -496,11 +516,11 @@ def column_config():
     column_config = json.dumps(data,ensure_ascii=False)
     post_data = {"column_config":json.dumps(data,ensure_ascii=False),
                      "params":params}
-    pmml_xml =requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
+    pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
     mem_zip_file.append_content('column_config/column_config.json',column_config)
     mem_zip_file.append_content('column_config/model.pmml',pmml_xml)
-
-    # return responseFile(make_response(mem_zip_file),"config.zip")
+    mem_zip_file.append_content('column_config/lr',params)
+    #return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(),attachment_filename='config.zip',as_attachment=True)
 
 # column_config("model_train_selected","xiaozhuo","管理岗位,call_cnt")
@@ -545,6 +565,7 @@ def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
         out[var_name] = var_content
     return out
 
+
 '''
 def get_boundary(out, min_val=0):
     if isinstance(out, dict):
@@ -579,7 +600,8 @@ def get_boundary(out, min_val=0):
     return out
 '''
 
-#有时间的话， 要做优化修改
+
+# 有时间的话， 要做优化修改
 def get_boundary(out, min_val=0):
     if isinstance(out, dict):
         data = out.items()
@@ -598,11 +620,11 @@ def get_boundary(out, min_val=0):
                     if index == 1:
                         # if float(bin_row["min"]) >= min_val:
                         bin_row["min_boundary"] = min_val
-                        if i == (len(val[1]['var_table'])-1):
+                        if i == (len(val[1]['var_table']) - 1):
                             bin_row["max_boundary"] = 'inf'
                     else:
                         last_bin["max_boundary"] = bin_row["min_boundary"]
-                        if i == (len(val[1]['var_table'])-1):
+                        if i == (len(val[1]['var_table']) - 1):
                             bin_row["max_boundary"] = 'inf'
                 last_bin = bin_row
             else:
@@ -620,6 +642,7 @@ def get_divide_max_bound(out):
             bound.append(float(val["max_boundary"]))
     return bound
 
+
 def get_divide_min_bound(out):
     out = get_boundary(out)
 
@@ -630,6 +653,7 @@ def get_divide_min_bound(out):
             bound.append(float(val["min"]))
     return bound
 
+
 '''
 out格式
 {
@@ -639,6 +663,7 @@ out格式
  }
 }
 '''
+
 
 def get_divide_caterotical_bound(out, name):
     bound = []
@@ -713,11 +738,12 @@ def get_merged(var_name, df, min_val):
         data = get_boundary(data, min_val)
     return data
 
+
 s = u"nan"
 print s
 
 
-#************************
+# ************************
 @app.route(base + "/merge", methods=['POST'])
 def merge():
     """归并操作"""
@@ -733,7 +759,7 @@ def merge():
     # target = request.form.get('allBoundary').encode('utf-8');
     target = request.form.get('target')
     if target is None:
-        target ='bad_4w'
+        target = 'bad_4w'
     excepted_column = {var_name}
 
     min_val = 0
@@ -753,10 +779,11 @@ def merge():
                 a = np.nan
             all_boundary_list.append(a)
         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
-        #boundary_list.append(np.nan)
+        # boundary_list.append(np.nan)
         selected_list = boundary_list
 
-        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
+                   'bad_rate', 'woe',
                    'type']
     else:
         type_bool = True
@@ -780,41 +807,52 @@ def merge():
                       columns=columns)
 
     data = generate_response(var_name, df, iv)
-    #data = get_merged(var_name, df, min_val)
-    return responseto(data = data)
+    # data = get_merged(var_name, df, min_val)
+    return responseto(data=data)
+
 
 '''
 apply完成后,第一次进入时的变量选择
 '''
-@app.route(base+"/variable_select",methods=['POST'])
+
+
+@app.route(base + "/variable_select", methods=['POST'])
 def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
 
-    data = model_function.get_logit_backward(apply_result,target,20,var_list.split(","))
+    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, 20, var_list.split(","))
     if data is None:
         return responseto(success=False)
     return responseto(data=data)
 
+
 '''
 手动选择变量
 '''
-@app.route(base+"/variable_select_manual",methods=['POST'])
+
+
+@app.route(base + "/variable_select_manual", methods=['POST'])
 def variable_select_manual():
     all_list = request.form.get("all_list")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
-    data = model_function.get_logit_manual(apply_result,all_list.split(","),selected_list.split(","),target,20)
+    data = model_function.get_logit_backward_manually(apply_result, all_list.split(","), selected_list.split(","), target, 20)
     return responseto(data=data)
+
 
 '''
 导出变量配置
 '''
-@app.route(base+"/export",methods=['POST'])
+
+
+@app.route(base + "/export", methods=['POST'])
 def export_variables():
     data = request.form.get("data")
     response = make_response(data)
-    return responseFile(response,"variable_config.json")
+    return responseFile(response, "variable_config.json")
+
+
 '''
     adjust方法产生的数据转换成dict.
 
@@ -847,8 +885,10 @@ def export_variables():
         {..}]
 }
     '''
+
+
 def generate_response(var_name, df, iv):
-    #data = {var_name: []}
+    # data = {var_name: []}
     data = collections.OrderedDict()
     var_content = collections.OrderedDict()
     var_content['iv'] = iv
@@ -871,6 +911,7 @@ def sort_iv(out):
     out_sorted_iv = OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
     return out_sorted_iv
 
+
 def float_nan_to_str_nan(x):
     if type(x) == float:
         return str(x)
@@ -882,15 +923,17 @@ def sort_variable(variables,result):
     for index,name in enumerate(variables):
         v[name.decode('utf-8')] = index
 
-    new_result = []
+    new_result = [{}] * (len(v)-1)
     for variable in result:
         i = v[variable["variable_name"].decode('utf-8')]
-        new_result.insert(i,variable)
+        new_result[i] = variable
 
     return new_result
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
 # sort_variable(variables,result)
+
+
 
 
 
