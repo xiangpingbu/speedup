@@ -84,3 +84,11 @@ def delOne(name):
         return statusResponse(R404_NOTFOUND)
     datas.remove(result[0])
     return statusResponse(R204_NOCONTENT)
+
+
+
+
+
+
+
+
