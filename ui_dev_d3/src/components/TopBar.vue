@@ -38,7 +38,7 @@ export default {
 
 <style scoped>
 .header {
-  background: rgba(88, 88, 88, .2);
+  background: #202b31;
   padding: 1rem .75rem;
   margin-bottom: .75rem;
   /*border-bottom: 1px solid #28343a;*/

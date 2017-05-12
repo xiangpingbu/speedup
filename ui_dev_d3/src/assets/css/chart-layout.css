@@ -9,6 +9,7 @@
   border: 1px solid #28343a;
   font-size: 1.1rem;
   text-align: center;
+  cursor: pointer;
 }
 
 .chart-card::before {

@@ -35,6 +35,6 @@ export default {
     'others': '不属于以上情况'
   },
   // 色值未设定的会自动生成  TODO:多些色值，注意顺序
-  data_colors: ['#2970a1', '#84594E', '#BCDACB', '#47A0FB', '#9F347D', '#28BBCC', '#8A72BC', '#B95839', '#7eb26d', '#849396', '#EF8536']
+  data_colors: ['#2970a1', '#84594E', '#BCDACB', '#47A0FB', '#9F347D', '#28BBCC', '#8A72BC', '#B95839', '#7eb26d', '#849396', '#7EC1CF']
   // data_colors: []
 }
