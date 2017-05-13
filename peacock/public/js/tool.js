@@ -127,6 +127,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
         ol.append("li").append("span").append("a").attr("id", "selectAll").attr("value", 0).text("选取所有");
         ol.append("li").append("span").append("a").attr("id","export").text("导出");
+        ol.append("li").append("span").append("a").attr("id","variableSave").text("变量保存");
 
         $("#initBar").bind("click", function () {
             init();
@@ -181,6 +182,10 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             }
         });
 
+        $("#variableSave").bind("click",function() {
+
+        });
+
         $("#export").bind("click",function () {
           var data =  tool_button.exportData();
 
@@ -201,6 +206,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
             form.submit();//表单提交
         });
+
+
     }
 
     function initBar(result) {
@@ -225,6 +232,11 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             //绘制坐标轴内的bar和table
             renderBody(svg, varData, num, table_head);
             initList.push(num);
+
+            var isSelected = result.data[valName]["is_selected"];
+            if (isSelected != null && isSelected === true ) {
+                $("#"+valName+"_name").find(".icheckbox_square-green").iCheck('check');
+            }
             num++;
         }
         //记录行数
@@ -238,7 +250,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
     }
 
     function initPanel(rowName, iv, num, table_head) {
-        var h5 = d3.select("#analyze").append("div").style("margin", "5px 0px 5px 10px");
+        var h5 = d3.select("#analyze").append("div")
+            .attr("id",rowName+"_name")
+            .style("margin", "5px 0px 5px 10px");
 
         // var h5 = div.append("div").style("margin-left","20px");
         h5.append("input")
