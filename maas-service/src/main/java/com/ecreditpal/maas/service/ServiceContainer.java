@@ -28,9 +28,10 @@ public class ServiceContainer {
 //            Model model = clz.getAnnotation(Model.class);
 //            Model model = clz.getAnnotation(Model.class);
                 Model model = clz.getAnnotation(Model.class);
-                Object obj = clz.newInstance();
+
 
                 if (model != null) {
+                    Object obj = clz.newInstance();
                     Method m[] = clz.getDeclaredMethods();
                     for (Method method : m) {
                         ModelApi modelApi = method.getAnnotation(ModelApi.class);
