@@ -128,9 +128,8 @@ public class AKDModel extends ModelNew {
         }
 
         double prob = scores.get(0);
-        int finalScore = (int) scoreAlign(scoreToLogit(prob));
 
-        return finalScore;
+        return scoreAlign(scoreToLogit(prob));
     }
 
     public String toString() {

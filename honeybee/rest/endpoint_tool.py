@@ -12,7 +12,6 @@ from flask import send_file
 from werkzeug.utils import secure_filename
 
 from beans.Pmml import *
-from common.constant import const
 from rest.app_base import *
 from service import variable_service as vs
 from util import A99_Functions as a99
@@ -45,9 +44,10 @@ model_name = "model_train_selected"
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-df_all = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train_ind.xlsx")
-
+# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
+df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx",encoding="utf-8")
+df_train = df_all[df_all['dev_ind'] == 1]
+df_test = df_all[df_all['dev_ind'] == 0]
 # df_test = None
 safely_apply = False
 apply_result = None
@@ -292,7 +292,7 @@ def apply():
     data = var_dict["data"]
 
    # df = df_test.append(df_train)
-     df = df_all
+    df = df_all.copy()
     var_list = data.keys()
 
     for var_name in var_list:
@@ -327,6 +327,14 @@ def apply():
     output.seek(0)
     response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
     return responsePandas(response)
+
+@app.route(base + "/if_applyed", methods=['POST'])
+def if_applyed():
+    if safely_apply :
+        return  responseto(success=True)
+    else :
+        return responseto(success = False)
+
 
 
 def isNum(v):
@@ -379,14 +387,16 @@ def upload():
             filename = secure_filename(file.filename)
 
             print filename
-            if filename.find("test") > 0:
-                df_test = pd.read_excel(file, encoding="utf-8")
-            elif filename == 'df_train.xlsx':
-                df_train = pd.read_excel(file, encoding="utf-8")
-                if filename.find("_") > 0:
-                    model_name = filename.split("_")[0]
-                else:
-                    model_name = "anonymous"
+            df_all = pd.read_excel(file,encoding="utf-8")
+            df_train = df_all[df_all['dev_ind'] == 1]
+            df_test = df_all[df_all['dev_ind'] == 0]
+            #     df_test = pd.read_excel(file, encoding="utf-8")
+            # elif filename == 'df_train.xlsx':
+            #     df_train = pd.read_excel(file, encoding="utf-8")
+            #     if filename.find("_") > 0:
+            #         model_name = filename.split("_")[0]
+            #     else:
+            #         model_name = "anonymous"
     return responseto(data="success")
 
 
@@ -534,7 +544,7 @@ def column_config2():
     return send_file(mem_zip_file.read(),attachment_filename='capsule.zip',as_attachment=True)
 
 
-def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
+def get_init(df, target=None, invalid=None, fineMinLeafRate=0.05):
     data_map = ib.cal(df, target, invalid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
@@ -820,8 +830,11 @@ apply完成后,第一次进入时的变量选择
 def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
+    withIntercept = request.form.get("with_intercept") == 'true'
+    ks_group_num = request.form.get("ks_group_num")
+    ks_group_num = ks_group_num if ks_group_num !='' else 20
 
-    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, 20, var_list.split(","))
+    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),withIntercept)
     if data is None:
         return responseto(success=False)
     return responseto(data=data)
@@ -837,7 +850,12 @@ def variable_select_manual():
     all_list = request.form.get("all_list")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
-    data = model_function.get_logit_backward_manually(apply_result, all_list.split(","), selected_list.split(","), target, 20)
+    with_intercept = request.form.get("with_intercept") == 'true'
+    ks_group_num = request.form.get("ks_group_num")
+    ks_group_num = ks_group_num if ks_group_num !='' else 20
+
+
+    data = model_function.get_logit_backward_manually(df_train_woe, df_test_woe,all_list.split(","), selected_list.split(","), target, ks_group_num,with_intercept)
     return responseto(data=data)
 
 

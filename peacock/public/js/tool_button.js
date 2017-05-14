@@ -50,7 +50,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 //     }
                 // });
             }
-        )
+        );
     // }
 
     function changeTd() {
@@ -90,7 +90,6 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
      */
     function getTable() {
         $("#dataframe").html("");
-        debugger;
         $.ajax({
             url: host + "/tool/parse",
             type: 'get',
@@ -327,6 +326,11 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             data[name] = innerObj;
 
             var childTrs = $('#tbody_' + i).children("tr");
+            if ($("#"+name+"_name").find(".variable_apply.checked").length >0) {
+                innerObj.is_selected = 1
+            } else {
+                innerObj.is_selected= 0
+            }
             for (var innerRow = 0; innerRow < childTrs.length; innerRow++) {
                 var innerDate = {};
                 innerObj.var_table.push(innerDate);

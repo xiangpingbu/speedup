@@ -59,8 +59,8 @@ def if_branch_exist(name, branch):
 
 def save_binning_record(variable_list):
     sql = "insert into tool_model_content " \
-          "(model_name,model_branch,variable_name,variable_iv,binning_record,create_date,modify_date)" \
-          " VALUES (%s,%s,%s,%s,%s,now(),now())"
+          "(model_name,model_branch,variable_name,variable_iv,binning_record,is_selected,create_date,modify_date)" \
+          " VALUES (%s,%s,%s,%s,%s,%s,now(),now())"
     result = util.executmany(sql, variable_list)
     if result > 0:
         return True
@@ -79,7 +79,7 @@ def del_binnbing_record(model_name, model_branch):
 读取分bin后的数据
 '''
 def load_binning_record(model_name, model_branch,variables=None):
-    sql = "select id,model_name,model_branch,variable_name,variable_iv,binning_record " \
+    sql = "select id,model_name,model_branch,variable_name,variable_iv,binning_record,is_selected " \
           "from tool_model_content where model_name= %s and model_branch = %s and is_deleted = 0"
 
     paramList = [model_name, model_branch]

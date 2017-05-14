@@ -66,6 +66,9 @@ public class ConfigurationManager {
                 for (Object subModel : subModels) {
                     File file = new File(rootPath+"/"+subModel.toString() + "/src/main/resources");
                     listFile(file, conf);
+
+                    file = new File(rootPath+"/"+subModel.toString() + "/src/test/resources");
+                    listFile(file, conf);
                 }
             }
 

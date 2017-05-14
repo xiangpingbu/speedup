@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <PMML xmlns="http://www.dmg.org/PMML-4_2">
-    <DataDictionary numberOfFields="8"><DataField name="学历" optype="categorical" dataType="string"/><DataField name="手机入网时间" optype="categorical" dataType="string"/><DataField name="net_flow" optype="continuous" dataType="double"/><DataField name="contacts_class1_blacklist_cnt" optype="continuous" dataType="double"/><DataField name="公司性质" optype="categorical" dataType="string"/><DataField name="婚姻状况" optype="categorical" dataType="string"/><DataField name="年龄" optype="continuous" dataType="double"/><DataField name="性别" optype="categorical" dataType="string"/></DataDictionary>
+    <DataDictionary numberOfFields="8"><DataField name="学历" optype="categorical" dataType="string"/><DataField name="手机入网时间" optype="categorical" dataType="string"/><DataField name="contacts_class1_cnt" optype="continuous" dataType="double"/><DataField name="性别" optype="categorical" dataType="string"/><DataField name="公司性质" optype="categorical" dataType="string"/><DataField name="年龄" optype="continuous" dataType="double"/><DataField name="net_flow" optype="continuous" dataType="double"/><DataField name="婚姻状况" optype="categorical" dataType="string"/></DataDictionary>
     <RegressionModel functionName="regression" normalizationMethod="logit">
-        <MiningSchema><MiningField name="学历" usageType="active" optype="categorical"/><MiningField name="手机入网时间" usageType="active" optype="categorical"/><MiningField name="net_flow" usageType="active" optype="continuous"/><MiningField name="contacts_class1_blacklist_cnt" usageType="active" optype="continuous"/><MiningField name="公司性质" usageType="active" optype="categorical"/><MiningField name="婚姻状况" usageType="active" optype="categorical"/><MiningField name="年龄" usageType="active" optype="continuous"/><MiningField name="性别" usageType="active" optype="categorical"/></MiningSchema>
+        <MiningSchema><MiningField name="学历" usageType="active" optype="categorical"/><MiningField name="手机入网时间" usageType="active" optype="categorical"/><MiningField name="contacts_class1_cnt" usageType="active" optype="continuous"/><MiningField name="性别" usageType="active" optype="categorical"/><MiningField name="公司性质" usageType="active" optype="categorical"/><MiningField name="年龄" usageType="active" optype="continuous"/><MiningField name="net_flow" usageType="active" optype="continuous"/><MiningField name="婚姻状况" usageType="active" optype="categorical"/></MiningSchema>
         <Output><OutputField name="RawResult" optype="continuous" dataType="double" feature="predictedValue"/>
             <OutputField name="FinalResult" optype="continuous" dataType="double" feature="transformedValue">
                 <Apply function="round">
@@ -21,20 +21,20 @@
                     <Array n="0" type="int"></Array>
                 </DiscrStats>
             </UnivariateStats>
-            <UnivariateStats field="net_flow"><NumericInfo minimum="1.0" maximum="3.0" mean="2.1363636363636362" standardDeviation="0.7208192803782614" median="2.0"/></UnivariateStats>
-            <UnivariateStats field="contacts_class1_blacklist_cnt"><NumericInfo minimum="1.0" maximum="3.0" mean="2.1363636363636362" standardDeviation="0.7208192803782614" median="2.0"/></UnivariateStats>
+            <UnivariateStats field="contacts_class1_cnt"><NumericInfo minimum="1.0" maximum="3.0" mean="2.1363636363636362" standardDeviation="0.7208192803782614" median="2.0"/></UnivariateStats>
+            <UnivariateStats field="性别">
+                <DiscrStats>
+                    <Array n="0" type="int"></Array>
+                </DiscrStats>
+            </UnivariateStats>
             <UnivariateStats field="公司性质">
                 <DiscrStats>
                     <Array n="0" type="int"></Array>
                 </DiscrStats>
             </UnivariateStats>
-            <UnivariateStats field="婚姻状况">
-                <DiscrStats>
-                    <Array n="0" type="int"></Array>
-                </DiscrStats>
-            </UnivariateStats>
             <UnivariateStats field="年龄"><NumericInfo minimum="1.0" maximum="3.0" mean="2.1363636363636362" standardDeviation="0.7208192803782614" median="2.0"/></UnivariateStats>
-            <UnivariateStats field="性别">
+            <UnivariateStats field="net_flow"><NumericInfo minimum="1.0" maximum="3.0" mean="2.1363636363636362" standardDeviation="0.7208192803782614" median="2.0"/></UnivariateStats>
+            <UnivariateStats field="婚姻状况">
                 <DiscrStats>
                     <Array n="0" type="int"></Array>
                 </DiscrStats>
@@ -48,24 +48,24 @@
                 <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="学历" column="origin"/>
                     <InlineTable>
                         <row>
-                            <origin>其它</origin>
-                            <out>0.3089</out>
+                            <origin>本科</origin>
+                            <out>-1.0253</out>
                         </row>
                         <row>
-                            <origin>nan</origin>
-                            <out>-0.0331</out>
+                            <origin>硕士及以上</origin>
+                            <out>-1.0253</out>
                         </row>
                         <row>
                             <origin>专科</origin>
                             <out>-0.3264</out>
                         </row>
                         <row>
-                            <origin>本科|硕士及以上</origin>
-                            <out>-1.0253</out>
+                            <origin>其它</origin>
+                            <out>0.3089</out>
                         </row>
                         <row>
                             <origin>missing</origin>
-                            <out>0.0</out>
+                            <out>-0.0331</out>
                         </row>
                         <row>
                             <origin>invalid</origin>
@@ -78,20 +78,52 @@
                 <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="手机入网时间" column="origin"/>
                     <InlineTable>
                         <row>
-                            <origin>6-12个月</origin>
-                            <out>0.233</out>
-                        </row>
-                        <row>
-                            <origin>1--3年</origin>
-                            <out>0.1652</out>
+                            <origin>5年以上</origin>
+                            <out>-0.3187</out>
                         </row>
                         <row>
                             <origin>3--5年</origin>
                             <out>0.0658</out>
                         </row>
                         <row>
-                            <origin>5年以上|nan</origin>
+                            <origin>1--3年</origin>
+                            <out>0.1652</out>
+                        </row>
+                        <row>
+                            <origin>6-12个月</origin>
+                            <out>0.233</out>
+                        </row>
+                        <row>
+                            <origin>missing</origin>
                             <out>-0.3187</out>
+                        </row>
+                        <row>
+                            <origin>invalid</origin>
+                            <out>0.0</out>
+                        </row>
+                    </InlineTable>
+                </MapValues>
+            </DerivedField>
+            <DerivedField name="contacts_class1_cnt_woe" optype="continuous" dataType="double">
+                <Discretize field="contacts_class1_cnt" mapMissingTo="0.0" defaultValue="0.0" dataType="double">
+                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="1.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="0.1701"><Interval closure="closedOpen" leftMargin="1.0" rightMargin="28.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-0.2572"><Interval closure="closedOpen" leftMargin="28.0" rightMargin="74.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-0.5046"><Interval closure="closedOpen" leftMargin="74.0" rightMargin="153.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-0.8447"><Interval closure="closedOpen" leftMargin="153.0" rightMargin="218.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-1.7156"><Interval closure="closedOpen" leftMargin="218.0"/></DiscretizeBin>
+                </Discretize>
+            </DerivedField>
+            <DerivedField name="性别_woe" optype="continuous" dataType="double">
+                <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="性别" column="origin"/>
+                    <InlineTable>
+                        <row>
+                            <origin>女</origin>
+                            <out>-0.325</out>
+                        </row>
+                        <row>
+                            <origin>男</origin>
+                            <out>0.0994</out>
                         </row>
                         <row>
                             <origin>missing</origin>
@@ -104,76 +136,44 @@
                     </InlineTable>
                 </MapValues>
             </DerivedField>
-            <DerivedField name="net_flow_woe" optype="continuous" dataType="double">
-                <Discretize field="net_flow" mapMissingTo="0.2506" defaultValue="0.2506" dataType="double">
-                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="0.0"/></DiscretizeBin>
-                    <DiscretizeBin binValue="-0.1891"><Interval closure="closedOpen" leftMargin="0.0" rightMargin="695.8096"/></DiscretizeBin>
-                    <DiscretizeBin binValue="-0.5145"><Interval closure="closedOpen" leftMargin="695.8096"/></DiscretizeBin>
-                </Discretize>
-            </DerivedField>
-            <DerivedField name="contacts_class1_blacklist_cnt_woe" optype="continuous" dataType="double">
-                <Discretize field="contacts_class1_blacklist_cnt" mapMissingTo="0.2503" defaultValue="0.2503" dataType="double">
-                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="0.0"/></DiscretizeBin>
-                    <DiscretizeBin binValue="-0.1459"><Interval closure="closedOpen" leftMargin="0.0" rightMargin="1.0"/></DiscretizeBin>
-                    <DiscretizeBin binValue="-0.5653"><Interval closure="closedOpen" leftMargin="1.0"/></DiscretizeBin>
-                </Discretize>
-            </DerivedField>
             <DerivedField name="公司性质_woe" optype="continuous" dataType="double">
                 <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="公司性质" column="origin"/>
                     <InlineTable>
                         <row>
-                            <origin>私营</origin>
-                            <out>0.6078</out>
+                            <origin>机关及事业单位</origin>
+                            <out>-0.4874</out>
                         </row>
                         <row>
-                            <origin>民营|外资|合资</origin>
-                            <out>-0.0202</out>
+                            <origin>社会团体</origin>
+                            <out>-0.4874</out>
                         </row>
                         <row>
-                            <origin>nan</origin>
-                            <out>-0.0331</out>
+                            <origin>国有股份</origin>
+                            <out>-0.4874</out>
                         </row>
                         <row>
                             <origin>个体</origin>
                             <out>-0.2346</out>
                         </row>
                         <row>
-                            <origin>机关及事业单位|社会团体|国有股份</origin>
-                            <out>-0.4874</out>
+                            <origin>民营</origin>
+                            <out>-0.0202</out>
+                        </row>
+                        <row>
+                            <origin>外资</origin>
+                            <out>-0.0202</out>
+                        </row>
+                        <row>
+                            <origin>合资</origin>
+                            <out>-0.0202</out>
+                        </row>
+                        <row>
+                            <origin>私营</origin>
+                            <out>0.6078</out>
                         </row>
                         <row>
                             <origin>missing</origin>
-                            <out>0.0</out>
-                        </row>
-                        <row>
-                            <origin>invalid</origin>
-                            <out>0.0</out>
-                        </row>
-                    </InlineTable>
-                </MapValues>
-            </DerivedField>
-            <DerivedField name="婚姻状况_woe" optype="continuous" dataType="double">
-                <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="婚姻状况" column="origin"/>
-                    <InlineTable>
-                        <row>
-                            <origin>离异</origin>
-                            <out>0.2593</out>
-                        </row>
-                        <row>
-                            <origin>未婚</origin>
-                            <out>0.1293</out>
-                        </row>
-                        <row>
-                            <origin>丧偶|nan</origin>
-                            <out>-0.0358</out>
-                        </row>
-                        <row>
-                            <origin>再婚|已婚</origin>
-                            <out>-0.0576</out>
-                        </row>
-                        <row>
-                            <origin>missing</origin>
-                            <out>0.0</out>
+                            <out>-0.0331</out>
                         </row>
                         <row>
                             <origin>invalid</origin>
@@ -191,20 +191,39 @@
                     <DiscretizeBin binValue="-0.3021"><Interval closure="closedOpen" leftMargin="43.0"/></DiscretizeBin>
                 </Discretize>
             </DerivedField>
-            <DerivedField name="性别_woe" optype="continuous" dataType="double">
-                <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="性别" column="origin"/>
+            <DerivedField name="net_flow_woe" optype="continuous" dataType="double">
+                <Discretize field="net_flow" mapMissingTo="0.2506" defaultValue="0.2506" dataType="double">
+                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="0.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-0.1891"><Interval closure="closedOpen" leftMargin="0.0" rightMargin="695.8096"/></DiscretizeBin>
+                    <DiscretizeBin binValue="-0.5145"><Interval closure="closedOpen" leftMargin="695.8096"/></DiscretizeBin>
+                </Discretize>
+            </DerivedField>
+            <DerivedField name="婚姻状况_woe" optype="continuous" dataType="double">
+                <MapValues mapMissingTo="0.0" defaultValue="0.0" outputColumn="out" dataType="double"><FieldColumnPair field="婚姻状况" column="origin"/>
                     <InlineTable>
                         <row>
-                            <origin>男</origin>
-                            <out>0.0994</out>
+                            <origin>再婚</origin>
+                            <out>-0.0576</out>
                         </row>
                         <row>
-                            <origin>女</origin>
-                            <out>-0.325</out>
+                            <origin>已婚</origin>
+                            <out>-0.0576</out>
+                        </row>
+                        <row>
+                            <origin>丧偶</origin>
+                            <out>-0.0358</out>
+                        </row>
+                        <row>
+                            <origin>未婚</origin>
+                            <out>0.1293</out>
+                        </row>
+                        <row>
+                            <origin>离异</origin>
+                            <out>0.2593</out>
                         </row>
                         <row>
                             <origin>missing</origin>
-                            <out>0.0</out>
+                            <out>-0.0358</out>
                         </row>
                         <row>
                             <origin>invalid</origin>

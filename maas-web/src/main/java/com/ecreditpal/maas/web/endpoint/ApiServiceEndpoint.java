@@ -48,9 +48,9 @@ public class ApiServiceEndpoint {
 //        Map<String, String> map = FilterUtil.getRequestForm(request,providers);
         Map<String,String> map = JsonUtil.json2Map(lookupEventMessage.getRequestInfo().getFormParams().toString());
         //获得apiCode对应的模型
-         ModelService service = ServiceContainer.getModelService(apiCode);
+         Object obj = ServiceContainer.execute(apiCode,map,lookupEventMessage);
 
-        return Result.wrapSuccessfulResult(service.getResult(map,lookupEventMessage));
+        return Result.wrapSuccessfulResult(obj.toString());
     }
 
     @GET
