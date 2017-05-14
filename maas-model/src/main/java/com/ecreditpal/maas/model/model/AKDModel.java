@@ -9,6 +9,9 @@ import com.ecreditpal.maas.model.variables.VariableContentHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
+import org.dmg.pmml.PMML;
+import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.FieldValue;
 import org.jpmml.evaluator.ModelEvaluator;
 import org.jpmml.evaluator.ModelEvaluatorFactory;
@@ -30,12 +33,14 @@ import java.util.Map;
 public class AKDModel extends ModelNew {
     private final static Logger logger = LoggerFactory.getLogger(AKDModel.class);
     public static String localVariablePath = ConfigurationManager.getConfiguration().getString("akd_model_variables.xml");
-    public static String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml", "maas-model/src/main/resources/model_config/akd_model_pmml.pmml");
     public static VariableConfiguration AKDModelVariables;
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
 
+
+    public static PMML pmml;
+    public static Evaluator evaluator;
 
     /**
      * static block. load pmml file and init evaluator
@@ -82,12 +87,13 @@ public class AKDModel extends ModelNew {
     /**
      * load pmml file and generate evaluator
      */
-    public static void pmmlFileLoad() {
+    private static void pmmlFileLoad() {
         try {
-            setPmml(PMMLUtils.loadPMML(localPmmlPath));
-            org.dmg.pmml.Model m = pmml.getModels().get(0);
-            ModelEvaluator<?> evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
-            setEvaluator(evaluator);
+            String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml", "maas-model/src/main/resources/model_config/akd_model_pmml.pmml");
+
+            pmml = PMMLUtils.loadPMML(localPmmlPath);
+            Model m = pmml.getModels().get(0);
+            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
         } catch (Exception e) {
             logger.error("load pmml file error !", e);
         }

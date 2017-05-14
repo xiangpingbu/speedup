@@ -64,24 +64,6 @@ public class ModelNew implements Register{
     public static Map<String, ModelNew> modelInstances = new ConcurrentHashMap<>();
 
 
-    public static PMML pmml;
-    public static Evaluator evaluator;
-
-    public PMML getPmml() {
-        return pmml;
-    }
-
-    public static void setPmml(PMML input_pmml) {
-        pmml = input_pmml;
-    }
-
-    public static Evaluator getEvaluator() {
-        return evaluator;
-    }
-
-    public static void setEvaluator(Evaluator input_evaluator) {
-        evaluator = input_evaluator;
-    }
 
 
     public void register(ModelNew modelNew) {
