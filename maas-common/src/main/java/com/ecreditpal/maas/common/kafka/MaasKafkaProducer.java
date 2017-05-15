@@ -27,25 +27,24 @@ public class MaasKafkaProducer {
 
     private static final Object lock = new Object();
 
-    public static MaasKafkaProducer getInstance(String topic, String configName) {
-        MaasKafkaProducer maasKafkaProducer = producers.get(topic);
+    public static MaasKafkaProducer getInstance(String configName) {
+        MaasKafkaProducer maasKafkaProducer = producers.get(configName);
         if (maasKafkaProducer == null) {
             synchronized (lock) {
-                if ((maasKafkaProducer = producers.get(topic)) == null) {
+                if ((maasKafkaProducer = producers.get(configName)) == null) {
                     MaasKafkaConfig maasKafkaConfig =
                             (MaasKafkaConfig) ConfigurationManager.getConfiguration().getProperty(configName);
-                    maasKafkaConfig.setTopic(topic);
                     maasKafkaProducer = new MaasKafkaProducer(maasKafkaConfig);
-                    producers.put(topic, maasKafkaProducer);
+                    producers.put(configName, maasKafkaProducer);
                 }
             }
         }
         return maasKafkaProducer;
     }
 
-    public static MaasKafkaProducer getInstance(String topic) {
-        return getInstance(topic,MaasKafkaConfig.DEFAULT_CONFIG);
-    }
+//    public static MaasKafkaProducer getInstance(String topic) {
+//        return getInstance(topic,MaasKafkaConfig.DEFAULT_CONFIG);
+//    }
 
     public MaasKafkaProducer(MaasKafkaConfig maasKafkaConfig) {
         init(maasKafkaConfig.initParams());

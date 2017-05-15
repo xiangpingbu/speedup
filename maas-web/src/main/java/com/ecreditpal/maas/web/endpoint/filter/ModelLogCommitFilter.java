@@ -18,6 +18,8 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import java.io.IOException;
 
+import static com.ecreditpal.maas.common.kafka.MaasKafkaConfig.TRACKING_CONFIG;
+
 /**
  * @author lifeng
  * @version 2017/4/12.
@@ -60,7 +62,7 @@ public class ModelLogCommitFilter implements ContainerResponseFilter {
                         ModelLog ModelLog = lookupEvent.getModelLog();
 
                         if (ModelLog != null) {
-                            MaasKafkaProducer.getInstance(KAFKA_LOOKUP_EVENT_TOPIC).produce(KAFKA_LOOKUP_EVENT_TOPIC, key,
+                            MaasKafkaProducer.getInstance(TRACKING_CONFIG).produce(KAFKA_LOOKUP_EVENT_TOPIC, key,
                                     lookupEvent);
                         }
                     } catch (KafkaProducerException e) {

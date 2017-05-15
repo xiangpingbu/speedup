@@ -13,7 +13,6 @@ import java.util.Map;
 @Setter
 @Getter
 public class MaasKafkaConfig {
-    public final static String DEFAULT_CONFIG = "defaultKafkaConfig";
     public final static String TRACKING_CONFIG = "trackingKafkaConfig";
 
     /**
@@ -107,6 +106,9 @@ public class MaasKafkaConfig {
     private String schemaRegistryUrl = "http://localhost:8081";
     private final static String SCHEMA_REGISTRY_URL = "schema.registry.url";
 
+    private String zookeeperConnect = "localhost:2181";
+    private final static String ZOOKEEPER_CONNECT = "zookeeper.connect";
+
 
     /**
      * 被MAX_BLOCK_MS取代
@@ -139,6 +141,7 @@ public class MaasKafkaConfig {
                 valueSerializer);
         configs.put(SCHEMA_REGISTRY_URL, schemaRegistryUrl);
         configs.put(MAX_BLOCK_MS, maxBlockMs);
+        configs.put(ZOOKEEPER_CONNECT, zookeeperConnect);
 
 //        configs.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 //        configs.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
