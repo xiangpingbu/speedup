@@ -109,6 +109,7 @@ public class ConfigurationManager {
     private static PropertiesConfiguration demarcateKafkaConf(String filePath) throws IOException {
         Properties pro = new Properties();
         try(FileInputStream in = new FileInputStream(filePath)) {
+            //所有的kafka-config文件,读取所有的变量参数
             pro.load(in);
             Map<String, Properties> map = new HashMap<>();
             for (Object o : pro.keySet()) {
