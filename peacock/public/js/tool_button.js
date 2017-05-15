@@ -64,7 +64,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             }
         });
 
-        $("td[name='min_bound']").click(function () {
+        $("td[name='min_boundary']").click(function () {
             if (!$(this).is('.input')) {
                 $(this).addClass("input")
                     .html('<input type="text" style="width:80px" value="' + $(this).text() + '"/>')
@@ -74,7 +74,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             }
         });
 
-        $("td[name='max_bound']").click(function () {
+        $("td[name='max_boundary']").click(function () {
             if (!$(this).is('.input')) {
                 $(this).addClass("input")
                     .html('<input type="text" style="width:80px" value="' + $(this).text() + '"/>')

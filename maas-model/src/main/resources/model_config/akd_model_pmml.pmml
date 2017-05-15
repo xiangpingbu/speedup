@@ -106,8 +106,8 @@
             </DerivedField>
             <DerivedField name="contacts_class1_cnt_woe" optype="continuous" dataType="double">
                 <Discretize field="contacts_class1_cnt" mapMissingTo="0.0" defaultValue="0.0" dataType="double">
-                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="1.0"/></DiscretizeBin>
-                    <DiscretizeBin binValue="0.1701"><Interval closure="closedOpen" leftMargin="1.0" rightMargin="28.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="0.0"><Interval closure="openOpen" rightMargin="0.0"/></DiscretizeBin>
+                    <DiscretizeBin binValue="0.1701"><Interval closure="closedOpen" leftMargin="0.0" rightMargin="28.0"/></DiscretizeBin>
                     <DiscretizeBin binValue="-0.2572"><Interval closure="closedOpen" leftMargin="28.0" rightMargin="74.0"/></DiscretizeBin>
                     <DiscretizeBin binValue="-0.5046"><Interval closure="closedOpen" leftMargin="74.0" rightMargin="153.0"/></DiscretizeBin>
                     <DiscretizeBin binValue="-0.8447"><Interval closure="closedOpen" leftMargin="153.0" rightMargin="218.0"/></DiscretizeBin>
