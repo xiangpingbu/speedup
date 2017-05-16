@@ -14,5 +14,5 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Getter
 @XmlRootElement
 public class Data{
-    private Integer number;
+    private String number;
 }

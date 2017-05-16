@@ -12,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +27,7 @@ import java.util.List;
 public class D3TestEndpoint {
 //    Logger log = LoggerFactory.getLogger("model-monitor");
 
-    @GET
+    @POST
     @Path("/mock")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Returns user details", notes = "Return a mock data by json", response = Data.class)
@@ -40,15 +37,15 @@ public class D3TestEndpoint {
     public Result<List<Data>> getData() {
         List<Data> list = Lists.newArrayList();
         Data data = new Data();
-        data.setNumber(22);
+        data.setNumber("你好");
         list.add(data);
 
         data = new Data();
-        data.setNumber(23);
+        data.setNumber("哈哈");
         list.add(data);
 
         data = new Data();
-        data.setNumber(24);
+        data.setNumber("爱神的箭喀什鞍山奥斯卡接电话科技阿萨德卡死的");
         list.add(data);
         return Result.wrapSuccessfulResult(list);
     }

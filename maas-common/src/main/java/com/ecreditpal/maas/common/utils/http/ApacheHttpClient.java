@@ -171,7 +171,7 @@ public class ApacheHttpClient {
             logger.info("response : {} for postUrl {}", response, post.getURI());
 
             int code = response.getStatusLine().getStatusCode();
-            String responseBody = EntityUtils.toString(response.getEntity());
+            String responseBody = EntityUtils.toString(response.getEntity(),"gbk");
             logger.info(responseBody);
             HTTPUtil.consumeResponse(response);
 

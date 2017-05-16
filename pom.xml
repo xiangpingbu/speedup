@@ -27,7 +27,7 @@
         <app.home>/opt/maas</app.home>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
+        <httpcomponents.version>4.5.3</httpcomponents.version>
     </properties>
 
     <dependencies>

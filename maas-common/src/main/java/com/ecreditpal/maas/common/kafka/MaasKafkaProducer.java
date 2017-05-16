@@ -92,9 +92,9 @@ public class MaasKafkaProducer {
     // produce regular string message or JSON based message
     private void produce(String topic, String key, String message)
             throws KafkaProducerException {
-        String prefix = "";
+//        String prefix = "";
         ProducerRecord<Object, Object> record = new ProducerRecord<>(
-                prefix + topic, key, message);
+                 topic, key, message);
 
         try {
             producer.send(record);
