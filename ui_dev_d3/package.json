@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
-    "build": "node build/build.js && bash deploy_ui.sh",
+    "_build": "node build/build.js && bash deploy_ui.sh",
+    "build": "node build/build.js && rm -rf ../honeybee/dashboard && cp -rf dist ../honeybee/dashboard",
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {

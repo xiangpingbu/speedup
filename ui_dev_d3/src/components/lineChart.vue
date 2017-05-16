@@ -2,6 +2,7 @@
   <div>
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
+    <Loading v-if="!dataSet"/>
   </div>
 </template>
 
@@ -9,47 +10,57 @@
 // import '../js/test_line.js'
 import * as d3 from 'd3'
 import * as c3 from 'c3'
+import ConfigInfo from '@/config/config.js'
 
-function sortNumber (a, b) {
+function sortNumber(a, b) {
   return a - b
 }
 
-function sortDate (a, b) {
+function sortDate(a, b) {
   return a.date > b.date ? 1 : a.date < b.date ? -1 : 0
 }
 
 export default {
-  name: 'lineChart',
+  name: 'LineChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable'],
-  created () {
-    this.$nextTick(() => {
+  watch: {
+    'dataSet' (data) {
+      this.draw()
+    }
+  },
+  methods: {
+    draw() {
+      const dataSet = JSON.parse(JSON.stringify(this.dataSet))
       // create new data fields
-      var newDataFields = d3.keys(this.dataSet[0])
+      var newDataFields = d3.keys(dataSet[0])
       newDataFields.splice(newDataFields.indexOf('date'), 1)
       newDataFields.sort(sortNumber)
 
       // sort dataSet by date in acsending order
-      this.dataSet.sort(sortDate)
+      dataSet.sort(sortDate)
 
       // create new name maps
       var newDataNames = []
       var nameMap = {}
-      newDataFields.forEach(function (d, i) {
+      // TODO: use lodash
+      const colorMap = {}
+      newDataFields.forEach(function(d, i) {
         newDataNames[i] = d + '% value'
         nameMap[d] = newDataNames[i]
+        colorMap[d] = ConfigInfo.data_colors[i]
       })
 
       var chart = c3.generate({
         bindto: '#' + this.id,
-        size: {
-        },
+        size: {},
         padding: {
           left: 80,
           right: 50
         },
         data: {
+          colors: colorMap,
           type: 'spline',
-          json: this.dataSet,
+          json: dataSet,
           keys: {
             x: 'date',
             // value: ['p50', 'p80', 'p10', 'p20', 'p30', 'p40', 'p60', 'p70', 'p90', 'p95', 'p99']
@@ -72,8 +83,8 @@ export default {
         axis: {
           x: {
             type: 'timeseries',
-            extent: this.dataSet.length < 5 ? [this.dataSet[0].date, this.dataSet[this.dataSet.length - 1].date] : [this.dataSet[this.dataSet.length - 5].date, this.dataSet[this.dataSet.length - 1].date],
-            // extent: [this.dataSet[0].date, this.dataSet[this.dataSet.length - 1].date],
+            extent: dataSet.length < 5 ? [dataSet[0].date, dataSet[dataSet.length - 1].date] : [dataSet[dataSet.length - 5].date, dataSet[dataSet.length - 1].date],
+            // extent: [dataSet[0].date, dataSet[dataSet.length - 1].date],
             tick: {
               format: '%Y-%m-%d'
               // culling: {
@@ -97,10 +108,10 @@ export default {
         },
         zoom: {
           enabled: this.subChartEnabled,
-          onzoomstart: function (event) {
+          onzoomstart: function(event) {
             console.log('onzoomstart', event)
           },
-          onzoomend: function (domain) {
+          onzoomend: function(domain) {
             console.log('onzoomend', domain)
           }
         },
@@ -117,11 +128,10 @@ export default {
           height: 600
         })
       }
-    })
+    }
   }
 }
 </script>
 
 <style lang='css'>
-  @import '../css/c3.css';
 </style>
