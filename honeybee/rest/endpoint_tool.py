@@ -48,7 +48,9 @@ model_name = "model_train_selected"
 # df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx",encoding="utf-8")
 # df_train = df_all[df_all['dev_ind'] == 1]
 # df_test = df_all[df_all['dev_ind'] == 0]
-# df_test = None
+df_test = None
+df_train = None
+df_all = None
 safely_apply = False
 apply_result = None
 
