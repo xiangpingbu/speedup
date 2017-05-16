@@ -16,4 +16,4 @@ fi
     cd $HOME
     echo "current path `pwd`"
 
-    nohup gunicorn -c conf/gun.py honeybee_server:app > $LOG_FILE 2>&1 &
+    nohup gunicorn -c conf/gun.py honeybee_server:app > $LOG_FILE &
