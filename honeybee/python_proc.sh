@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-#HOME=/homes/maas/maas/honeybee
-HOME=/Users/lifeng/Work/code/maas/honeybee
+HOME=/homes/maas/maas/honeybee
+#HOME=/Users/lifeng/Work/code/maas/honeybee
 PID_FILE=$HOME/log/maas.pid
 LOG_FILE=$HOME/log/maas.log
 
