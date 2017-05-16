@@ -45,9 +45,9 @@ model_name = "model_train_selected"
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 # df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx",encoding="utf-8")
-df_train = df_all[df_all['dev_ind'] == 1]
-df_test = df_all[df_all['dev_ind'] == 0]
+# df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx",encoding="utf-8")
+# df_train = df_all[df_all['dev_ind'] == 1]
+# df_test = df_all[df_all['dev_ind'] == 0]
 # df_test = None
 safely_apply = False
 apply_result = None
@@ -382,6 +382,7 @@ def upload():
         global df_train
         global df_test
         global model_name
+        global df_all
         files = request.files.getlist("file[]")
         for file in files:
             filename = secure_filename(file.filename)
