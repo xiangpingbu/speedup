@@ -7,5 +7,5 @@ app = Flask(__name__)
 api = Api(app)
 # frontend pages
 @app.route('/dash/<path:path>')
-def send_file(path):
+def file_send(path):
     return send_from_directory('../dashboard', path)
