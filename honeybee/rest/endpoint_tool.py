@@ -40,13 +40,13 @@ def file_init():
 
 model_name = "model_train_selected"
 
-# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 # df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-df_all = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train_ind.xlsx")
+df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+#df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
+#df_all = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train_ind.xlsx")
 
 # df_test = None
 safely_apply = False
@@ -292,7 +292,7 @@ def apply():
     data = var_dict["data"]
 
    # df = df_test.append(df_train)
-     df = df_all
+    df = df_all
     var_list = data.keys()
 
     for var_name in var_list:
@@ -908,6 +908,7 @@ def sort_variable(variables,result):
         new_result[i] = variable
 
     return new_result
+
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
 # sort_variable(variables,result)
