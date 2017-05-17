@@ -2,7 +2,7 @@
   <div>
     <topbar :numIds="numIds" :countIds="countIds"></topbar>
     <div class="chart-card">
-      <LineChart v-if="type==='line'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable" />
+      <LineChart v-if="type==='line'" :id="id" :subChartEnabled="true" />
       <BarChart v-if="type==='bar'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable" :nameMap="nameMap" />
       <PsiLineChart v-if="type==='psi'" :id="id" :dataSet="dataSet" :subChartEnabled="true" />
       <StatChart v-if="type==='stat'" :id="id" :dataSet="dataSet" :subChartEnabled="true" />

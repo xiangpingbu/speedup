@@ -13,7 +13,7 @@
         <LineChart :id="id[2]" :dataSet="dataMap[id[2]]" :variable="varMap[id[2]]" />
       </div>
     </div>
-    
+
     <div class="pure-u-1-1">
       <div class="chart-card" @click="viewChart(id[0], 'line')" name='score'>
         <LineChart :id="id[0]" :dataSet="dataMap[id[0]]" :variable="varMap[id[0]]" />
@@ -46,7 +46,7 @@
       </div>
     </div>
   </div>
-  
+
     <!-- <div class="pure-u-1-2">
       <div class="chart-card" @click="viewChart(countId[1], 'bar')">
         <BarChart :id="countId[1]" :dataSet="dataMap[countId[1]]" :variable="varMap[countId[1]]" :nameMap="this.nameMap[countId[1]]" />
@@ -240,8 +240,7 @@ export default {
       dataMap: {},
       nameMap: {},
       varMap: {},
-      subChartEnabled: false,
-      loading: true
+      subChartEnabled: false
     }
   },
   methods: {
