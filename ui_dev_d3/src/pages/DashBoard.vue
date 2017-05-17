@@ -42,7 +42,7 @@
   <div class="pure-g">
     <div class="pure-u-1-2" v-for="mid in countId">
       <div class="chart-card" @click="viewChart(mid, 'bar')">
-        <BarChart :id="mid" :dataSet="dataMap[mid]" :variable="varMap[mid]" :nameMap="nameMap[mid]" />
+        <BarChart :id="mid" :nameMap="nameMap[mid]" />
       </div>
     </div>
   </div>
@@ -109,15 +109,15 @@ import {mapMutations} from 'vuex'
 export default {
   name: 'DashBoard',
   created () {
-    var NumPromiseList = []
+    // var NumPromiseList = []
     var CatePromiseList = []
     var PsiPromiseList = []
 
     // get numerical urls
-    this.id.forEach((d) => {
-      var urlStr = ConfigInfo.url_prefix + this.type[0] + '_' + d
-      NumPromiseList.push(getData.getResponse(urlStr))
-    })
+    // this.id.forEach((d) => {
+    //   var urlStr = ConfigInfo.url_prefix + this.type[0] + '_' + d
+    //   NumPromiseList.push(getData.getResponse(urlStr))
+    // })
     // get categorocal urls
     this.countId.forEach((d) => {
       var urlStr = ConfigInfo.url_prefix + this.type[1] + '_' + d
@@ -133,13 +133,13 @@ export default {
     // this.numUrls.forEach(function (d) {
     //   NumPromiseList.push(getData.getResponse(d))
     // })
-    Promise.all(NumPromiseList).then((response) => {
-      response.forEach((d, i) => {
-        var res = getData.parseNumData(d.data)
-        this.dataMap[this.id[i]] = res.newJsonData
-        this.varMap[this.id[i]] = res.variable
-      })
-    })
+    // Promise.all(NumPromiseList).then((response) => {
+    //   response.forEach((d, i) => {
+    //     var res = getData.parseNumData(d.data)
+    //     this.dataMap[this.id[i]] = res.newJsonData
+    //     this.varMap[this.id[i]] = res.variable
+    //   })
+    // })
 
     // get & parse categorocal data
     // this.CateUrls.forEach(function (d) {
@@ -256,7 +256,7 @@ export default {
       // console.log(this.$store.state.charts)
 
       sessionStorage.setItem(id, JSON.stringify(this.dataMap[id]))
-      sessionStorage.setItem(id + 'Var', this.varMap[id])
+      // sessionStorage.setItem(id + 'Var', this.varMap[id])
       sessionStorage.setItem(id + 'type', type)
       sessionStorage.setItem(id + 'nameMap', JSON.stringify(this.nameMap[id]))
 

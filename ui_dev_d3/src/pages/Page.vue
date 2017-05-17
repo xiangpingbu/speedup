@@ -35,8 +35,8 @@ export default {
     update() {
       this.type = sessionStorage.getItem(this.id + 'type')
       this.$nextTick(() => {
-        this.dataSet = JSON.parse(sessionStorage.getItem(this.id))
-        this.variable = sessionStorage.getItem(this.id + 'Var')
+        // this.dataSet = JSON.parse(sessionStorage.getItem(this.id))
+        // this.variable = sessionStorage.getItem(this.id + 'Var')
         if (this.type === 'bar') {
           this.nameMap = JSON.parse(sessionStorage.getItem(this.id + 'nameMap'))
         }
