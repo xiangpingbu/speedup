@@ -874,7 +874,11 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     return yScale(d.bin_num);//根据bin_num的值设定y轴的值
                 })
                 .attr("width", function (d) {
-                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                    var width = Math.abs(xScale(d.woe) - xScale(0));
+                    if (parseInt(width) ===0){
+                        width = 10;
+                    }
+                    return width;//根据woe设置宽度
                 })
                 .attr("height", function (d) {
                     return 230 / data.length;//设置高度
@@ -902,7 +906,11 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     return yScale(d.bin_num);//根据bin_num的值设定y轴的值
                 })
                 .attr("width", function (d) {
-                    return Math.abs(xScale(d.woe) - xScale(0));//根据woe设置宽度
+                    var width = Math.abs(xScale(d.woe) - xScale(0));
+                    if (parseInt(width) ===0){
+                        width = 10;
+                    }
+                    return width;//根据woe设置宽度
                 })
                 .attr("height", function (d) {
                     return 230 / data.length;//设置高度
