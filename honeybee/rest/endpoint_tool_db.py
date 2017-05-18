@@ -5,6 +5,8 @@ import requests
 import json
 from collections import OrderedDict
 from datetime import datetime
+from common.constant import const
+
 
 
 
@@ -78,7 +80,7 @@ def save():
     list = []
     for key, val in dict.items():
         now = datetime.now()
-        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=FD)]
+        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=False),val["is_selected"]]
         list.append(obj)
     if vs.save_binning_record(list) is not True:
         return responseto(success=False)
@@ -96,7 +98,8 @@ def load_all():
     if result is not None:
         for row in result:
             data[row["variable_name"]] = {"iv": row["variable_iv"],
-                                          "var_table": json.loads(row["binning_record"])}
+                                          "var_table": json.loads(row["binning_record"]),
+                                          "is_selected":row["is_selected"]==const.SELECTED}
     return responseto(data = data)
 
 

@@ -7,9 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author lifeng
- * @CreateTime 2017/4/13.
+ * @CreateTime 2017/5/13.
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Model {
+public @interface ModelApi {
+    String apiCode();
 }

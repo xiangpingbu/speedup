@@ -9,5 +9,5 @@ import java.util.Map;
  * @CreateTime 2017/4/13.
  */
 public interface ModelService {
-    Object getResult(Map<String,String> map, GenericRecord record);
+//    Object getResult(Map<String,String> map, GenericRecord record);
 }

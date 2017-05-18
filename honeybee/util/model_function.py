@@ -8,7 +8,7 @@ Created on Wed Mar 15 17:29:53 2017
 from Model_Selection_Macro import *
 
 
-def get_logit_backward_manually(train_woe, test_woe, all_list, selected_list, target, ks_group_num, withIntercept=True):
+def get_logit_backward_manually(train_woe, test_woe, all_list, selected_list, target, ks_group_num= 20, withIntercept=True):
     train_y = train_woe[[target]]
     woe_var_list = [x + '_woe' for x in selected_list]
     if withIntercept:
@@ -81,9 +81,9 @@ def get_logit_backward_manually(train_woe, test_woe, all_list, selected_list, ta
 
     test_woe['prob_bad'] = train_result.predict(test_woe[woe_var_list])
     ks_test = ks_group(test_woe, target, 'prob_bad', ks_group_num, True).ks.max()
-    model_ks['ks_train'] = ks_train
-    model_ks['ks_test'] = ks_test
-    data['model_ks'] = model_ks
+    model_analysis['ks_train'] = ks_train
+    model_analysis['ks_test'] = ks_test
+    # data['model_ks'] = model_ks
 
     return data
 
@@ -107,14 +107,14 @@ def get_logit_backward(train_woe, test_woe, target, ks_group_num, in_vars=[], wi
     model_analysis = {}
     model_analysis['target'] = target
     model_analysis['nobs'] = train_result.nobs
-    model_analysis['df_model'] = train_result.model.df_model
-    model_analysis['df_resid'] = train_result.model.df_resid
-    model_analysis['prsquared'] = train_result.prsquared
-    model_analysis['aic'] = train_result.aic
-    model_analysis['bic'] = train_result.bic
-    model_analysis['likelyhood'] = train_result.llf
-    model_analysis['llnull'] = train_result.llnull
-    model_analysis['llr'] = train_result.llr_pvalue
+    model_analysis['df_model'] = str(train_result.model.df_model)
+    model_analysis['df_resid'] = str(train_result.model.df_resid)
+    model_analysis['prsquared'] = str(train_result.prsquared)
+    model_analysis['aic'] = str(train_result.aic)
+    model_analysis['bic'] = str(train_result.bic)
+    model_analysis['likelyhood'] = str(train_result.llf)
+    model_analysis['llnull'] = str(train_result.llnull)
+    model_analysis['llr'] = str(train_result.llr_pvalue)
     data['model_analysis'] = model_analysis
 
     params = train_result.params
@@ -157,8 +157,8 @@ def get_logit_backward(train_woe, test_woe, target, ks_group_num, in_vars=[], wi
 
     test_woe['prob_bad'] = train_result.predict(test_woe[ks_input_list])
     ks_test = ks_group(test_woe, target, 'prob_bad', ks_group_num, True).ks.max()
-    model_ks['ks_train'] = ks_train
-    model_ks['ks_test'] = ks_test
+    model_analysis['ks_train'] = ks_train
+    model_analysis['ks_test'] = ks_test
     data['model_ks'] = model_ks
 
     return data
@@ -230,50 +230,50 @@ def get_marginal_var(train_woe_data, test_woe_data, target, model_para_list, ks_
     return marginal_var_result
 
 
-df_try = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
-df_try['intercept_woe'] = 1.0
-target = 'bad_4w'
-df_train_woe_try = df_try[df_try['dev_ind'] == 1]
-df_test_woe_try = df_try[df_try['dev_ind'] == 0]
-
-
-'''
-all_list = [u'cell_operator',
-            u'province',
-            u'cell_loc',
-            u'cell_operator_zh',
-            u'信用评分_1',
-            u'contacts_class1_cnt',
-            u'phone_gray_score',
-            u'芝麻信用',
-            u'花呗金额',
-            u'公司性质',
-            u'call_in_cnt',
-            u'居住情况',
-            u'call_cnt',
-            u'total_amount',
-            u'学历',
-            u'call_in_time',
-            u'call_out_cnt',
-            u'工作年限',
-            u'手机入网时间',
-            u'中高级职称']
-'''
-all_list = [u'cell_operator',
-            u'province',
-            u'cell_loc',
-            u'信用评分_1',
-            u'call_out_cnt',
-            u'total_amount',
-            u'学历',
-            u'call_in_time']
-
-selected_list = [u'cell_operator',
-                 u'cell_loc',
-                 u'信用评分_1',
-                 u'call_out_cnt']
-ks_group_num = 20
-
-#result = get_logit_backward_manually(df_train_woe_try, df_test_woe_try, all_list, selected_list, target, ks_group_num)
-result = get_logit_backward(df_train_woe_try, df_test_woe_try, target, ks_group_num, in_vars=all_list, withIntercept=True)
-print result
+# df_try = pd.read_excel('/Users/xpbu/Documents/Work/maasFile/df_w_woe_all.xlsx')
+# df_try['intercept_woe'] = 1.0
+# target = 'bad_4w'
+# df_train_woe_try = df_try[df_try['dev_ind'] == 1]
+# df_test_woe_try = df_try[df_try['dev_ind'] == 0]
+#
+#
+# '''
+# all_list = [u'cell_operator',
+#             u'province',
+#             u'cell_loc',
+#             u'cell_operator_zh',
+#             u'信用评分_1',
+#             u'contacts_class1_cnt',
+#             u'phone_gray_score',
+#             u'芝麻信用',
+#             u'花呗金额',
+#             u'公司性质',
+#             u'call_in_cnt',
+#             u'居住情况',
+#             u'call_cnt',
+#             u'total_amount',
+#             u'学历',
+#             u'call_in_time',
+#             u'call_out_cnt',
+#             u'工作年限',
+#             u'手机入网时间',
+#             u'中高级职称']
+# '''
+# all_list = [u'cell_operator',
+#             u'province',
+#             u'cell_loc',
+#             u'信用评分_1',
+#             u'call_out_cnt',
+#             u'total_amount',
+#             u'学历',
+#             u'call_in_time']
+#
+# selected_list = [u'cell_operator',
+#                  u'cell_loc',
+#                  u'信用评分_1',
+#                  u'call_out_cnt']
+# ks_group_num = 20
+#
+# #result = get_logit_backward_manually(df_train_woe_try, df_test_woe_try, all_list, selected_list, target, ks_group_num)
+# result = get_logit_backward(df_train_woe_try, df_test_woe_try, target, ks_group_num, in_vars=all_list, withIntercept=True)
+# print result

@@ -1,0 +1,39 @@
+body {
+  color: #f2f2f2;
+  /*background-color: #212b33;*/
+  background-color: #18252d;
+  /*background-color: #1f1d1d;*/
+  font-size: 14px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #111;
+}
+
+ul, li {
+  list-style: none;
+}
+
+a {
+  cursor: pointer;
+  color: #f2f2f2;
+  text-decoration: none;
+}
+
+.fr {
+  float: right;
+}
+
+.tc {
+  text-align: center;
+}
+
+.footer {
+  position: absolute;
+  bottom: .7rem;
+  left: 0;
+  right: 0;
+  color: #666;
+  text-align: center;
+  font-size: 80%;
+}

@@ -1,5 +1,5 @@
-<template lang='html'>
-  <div>
+<template lang="html">
+  <div >
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
     <Loading v-if="!dataSet"/>
@@ -7,21 +7,16 @@
 </template>
 
 <script>
-// import '../js/test_line.js'
 import * as d3 from 'd3'
 import * as c3 from 'c3'
 import ConfigInfo from '@/config/config.js'
-
-function sortNumber(a, b) {
-  return a - b
-}
 
 function sortDate(a, b) {
   return a.date > b.date ? 1 : a.date < b.date ? -1 : 0
 }
 
 export default {
-  name: 'LineChart',
+  name: 'PsiLineChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable'],
   watch: {
     'dataSet' (data) {
@@ -34,19 +29,15 @@ export default {
       // create new data fields
       var newDataFields = d3.keys(dataSet[0])
       newDataFields.splice(newDataFields.indexOf('date'), 1)
-      newDataFields.sort(sortNumber)
 
       // sort dataSet by date in acsending order
       dataSet.sort(sortDate)
 
       // create new name maps
-      var newDataNames = []
-      var nameMap = {}
-      // TODO: use lodash
+      // var newDataNames = []
+      // var nameMap = {}
       const colorMap = {}
       newDataFields.forEach(function(d, i) {
-        newDataNames[i] = d + '% value'
-        nameMap[d] = newDataNames[i]
         colorMap[d] = ConfigInfo.data_colors[i]
       })
 
@@ -65,8 +56,8 @@ export default {
             x: 'date',
             // value: ['p50', 'p80', 'p10', 'p20', 'p30', 'p40', 'p60', 'p70', 'p90', 'p95', 'p99']
             value: newDataFields
-          },
-          names: nameMap
+          }
+          // names: nameMap
           // xFormat: '%Y%m%d'
         },
         // tooltip: {
@@ -97,6 +88,16 @@ export default {
             }
           },
           y: {
+            tick: {
+              format: function(d) {
+                // fix the psi y-axis label to '0.01'
+                var s = d3.formatSpecifier('f')
+                s.precision = d3.precisionFixed(0.01)
+                var f = d3.format(s)
+
+                return f(d)
+              }
+            },
             label: {
               // text: this.variable,
               position: 'outer-top'
@@ -133,5 +134,5 @@ export default {
 }
 </script>
 
-<style lang='css'>
+<style lang="css">
 </style>

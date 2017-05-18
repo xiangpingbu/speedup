@@ -175,6 +175,14 @@
     /*padding-right: 20px;*/
 }
 
+.variable-label{
+    margin-left:-1px;
+}
+
+.variable-select{
+    width:150px;
+}
+
 .table-ele {
     width:150px;
 }

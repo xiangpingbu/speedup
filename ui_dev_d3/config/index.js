@@ -28,8 +28,9 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-        '/monitor': {
-       target: 'http://localhost:3000',
+        '/es': {
+    //    target: 'http://localhost:3000',
+       target: 'http://localhost:8091',
        changeOrigin: true
       //  pathRewrite: {
       //    '^/api': ''

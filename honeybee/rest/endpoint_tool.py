@@ -12,7 +12,6 @@ from flask import send_file
 from werkzeug.utils import secure_filename
 
 from beans.Pmml import *
-from common.constant import const
 from rest.app_base import *
 from service import variable_service as vs
 from util import A99_Functions as a99
@@ -21,9 +20,8 @@ from util import Initial_Binning as ib
 from util import common as cmm
 from util import model_function
 import requests
-from common.constant import  const
+from common.constant import const
 from util.ZipFile import *
-
 
 base = '/tool'
 base_path = "./util/"
@@ -40,15 +38,18 @@ def file_init():
 
 model_name = "model_train_selected"
 
-df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
+# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 # df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
 # df_train = None
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-#df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-#df_all = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train_ind.xlsx")
-
-# df_test = None
+# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
+# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
+df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
+# df_train = df_all[df_all['dev_ind'] == 1]
+# df_test = df_all[df_all['dev_ind'] == 0]
+df_test = None
+df_train = None
+# df_all = None
 safely_apply = False
 apply_result = None
 
@@ -291,8 +292,8 @@ def apply():
 
     data = var_dict["data"]
 
-   # df = df_test.append(df_train)
-    df = df_all
+    # df = df_test.append(df_train)
+    df = df_all.copy()
     var_list = data.keys()
 
     for var_name in var_list:
@@ -304,7 +305,7 @@ def apply():
     global withIntercept
     withIntercept = True
 
-    #if withIntercept:
+    # if withIntercept:
     #    df['intercept_woe'] = 1.0
 
     df_train_woe = df[df['dev_ind'] == 1]
@@ -323,10 +324,22 @@ def apply():
     format.set_bg_color('#eeeeee')
     worksheet.set_column(0, 9, 28)
     writer.close()
-
     output.seek(0)
-    response = make_response(send_file(output, attachment_filename="df_iv.xlsx", as_attachment=True))
+
+    file = send_file(output, mimetype=None, as_attachment=True,
+                     attachment_filename='df_iv.xlsx', add_etags=True,
+                     cache_timeout=None, conditional=False, last_modified=None)
+    response = make_response(file)
+
     return responsePandas(response)
+
+
+@app.route(base + "/if_applyed", methods=['POST'])
+def if_applyed():
+    if safely_apply:
+        return responseto(success=True)
+    else:
+        return responseto(success=False)
 
 
 def isNum(v):
@@ -374,19 +387,22 @@ def upload():
         global df_train
         global df_test
         global model_name
+        global df_all
         files = request.files.getlist("file[]")
         for file in files:
             filename = secure_filename(file.filename)
 
             print filename
-            if filename.find("test") > 0:
-                df_test = pd.read_excel(file, encoding="utf-8")
-            elif filename == 'df_train.xlsx':
-                df_train = pd.read_excel(file, encoding="utf-8")
-                if filename.find("_") > 0:
-                    model_name = filename.split("_")[0]
-                else:
-                    model_name = "anonymous"
+            df_all = pd.read_excel(file, encoding="utf-8")
+            df_train = df_all[df_all['dev_ind'] == 1]
+            df_test = df_all[df_all['dev_ind'] == 0]
+            #     df_test = pd.read_excel(file, encoding="utf-8")
+            # elif filename == 'df_train.xlsx':
+            #     df_train = pd.read_excel(file, encoding="utf-8")
+            #     if filename.find("_") > 0:
+            #         model_name = filename.split("_")[0]
+            #     else:
+            #         model_name = "anonymous"
     return responseto(data="success")
 
 
@@ -434,16 +450,16 @@ def column_config():
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
     params = var_dict["params"]
-    result = sort_variable(list.split(","),vs.load_binning_record(model_name,model_branch,list.split(",")))
+    result = sort_variable(list.split(","), vs.load_binning_record(model_name, model_branch, list.split(",")))
     data = []
     mem_zip_file = MemoryZipFile()
     for variable in result:
         # list = result.copy
-        records = json.loads(variable["binning_record"],encoding="utf8")
+        records = json.loads(variable["binning_record"], encoding="utf8")
         first_row = records[0]
-        #如果type为true,那么为Numrical
+        # 如果type为true,那么为Numrical
         type = first_row["type"] == 'Numerical'
-        #如果bin_num为0,那么这一行woe值为missing值
+        # 如果bin_num为0,那么这一行woe值为missing值
         if first_row["bin_num"] == '0' and type:
             missing_woe = first_row["woe"]
             del records[0]
@@ -463,19 +479,17 @@ def column_config():
         pmml.columnName = variable_name
         pmml.columnBinning = columnBinning
 
-
         if type:
             pmml.columnType = "N"
             columnBinning["binBoundary"] = ["-Infinity"]
             columnBinning["binCategory"] = None
-            #0指代invalid的值
+            # 0指代invalid的值
             columnBinning["binCountWoe"] = [0]
         else:
             pmml.columnType = "C"
             columnBinning["binCategory"] = []
             columnBinning["binBoundary"] = None
             columnBinning["binCountWoe"] = []
-
 
         index = 0
         categorical_nan_woe = 0
@@ -488,18 +502,18 @@ def column_config():
             if type:
                 columnBinning["binBoundary"].append(float(val["min_boundary"]))
                 columnBinning["binCountWoe"].append(float(val["woe"]))
-                if index == len(records)-1:
+                if index == len(records) - 1:
                     columnBinning["binCountWoe"].append(float(missing_woe))
             else:
                 # categorical的woe值
                 # for cate in records:
-                v_list= val[variable_name.decode('utf-8')].split("|")
+                v_list = val[variable_name.decode('utf-8')].split("|")
                 for v in v_list:
                     if v != 'nan':
                         columnBinning["binCategory"].append(v)
                         columnBinning["binCountWoe"].append(val["woe"])
                     else:
-                        categorical_nan_woe =val['woe']
+                        categorical_nan_woe = val['woe']
             index += 1
 
         if type:
@@ -513,28 +527,28 @@ def column_config():
 
         data.append(pmml.__dict__)
 
-    column_config = json.dumps(data,ensure_ascii=False)
-    post_data = {"column_config":json.dumps(data,ensure_ascii=False),
-                     "params":params}
+    column_config = json.dumps(data, ensure_ascii=False)
+    post_data = {"column_config": json.dumps(data, ensure_ascii=False),
+                 "params": params}
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
-    mem_zip_file.append_content('column_config/column_config.json',column_config)
-    mem_zip_file.append_content('column_config/model.pmml',pmml_xml)
-    mem_zip_file.append_content('column_config/lr',params)
-    #return responseFile(make_response(mem_zip_file),"config.zip")
-    return send_file(mem_zip_file.read(),attachment_filename='config.zip',as_attachment=True)
+    mem_zip_file.append_content('column_config/column_config.json', column_config)
+    mem_zip_file.append_content('column_config/model.pmml', pmml_xml)
+    mem_zip_file.append_content('column_config/lr', params)
+    # return responseFile(make_response(mem_zip_file),"config.zip")
+    return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)
+
 
 # column_config("model_train_selected","xiaozhuo","管理岗位,call_cnt")
 @app.route(base + "/column_config2", methods=['get'])
 def column_config2():
     mem_zip_file = MemoryZipFile()
-    mem_zip_file.append_content('column_config/column_config.json',"1")
-    mem_zip_file.append_content('column_config/model.pmml',"2")
+    mem_zip_file.append_content('column_config/column_config.json', "1")
+    mem_zip_file.append_content('column_config/model.pmml', "2")
+
+    return send_file(mem_zip_file.read(), attachment_filename='capsule.zip', as_attachment=True)
 
 
-    return send_file(mem_zip_file.read(),attachment_filename='capsule.zip',as_attachment=True)
-
-
-def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
+def get_init(df, target=None, invalid=None, fineMinLeafRate=0.05):
     data_map = ib.cal(df, target, invalid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
@@ -564,6 +578,7 @@ def get_init(df=df_train, target=None, invalid=None, fineMinLeafRate=0.05):
         var_content['var_table'] = subList
         out[var_name] = var_content
     return out
+
 
 '''
 def get_boundary(out, min_val=0):
@@ -599,7 +614,8 @@ def get_boundary(out, min_val=0):
     return out
 '''
 
-#有时间的话， 要做优化修改
+
+# 有时间的话， 要做优化修改
 def get_boundary(out, min_val=0):
     if isinstance(out, dict):
         data = out.items()
@@ -618,11 +634,11 @@ def get_boundary(out, min_val=0):
                     if index == 1:
                         # if float(bin_row["min"]) >= min_val:
                         bin_row["min_boundary"] = min_val
-                        if i == (len(val[1]['var_table'])-1):
+                        if i == (len(val[1]['var_table']) - 1):
                             bin_row["max_boundary"] = 'inf'
                     else:
                         last_bin["max_boundary"] = bin_row["min_boundary"]
-                        if i == (len(val[1]['var_table'])-1):
+                        if i == (len(val[1]['var_table']) - 1):
                             bin_row["max_boundary"] = 'inf'
                 last_bin = bin_row
             else:
@@ -640,6 +656,7 @@ def get_divide_max_bound(out):
             bound.append(float(val["max_boundary"]))
     return bound
 
+
 def get_divide_min_bound(out):
     out = get_boundary(out)
 
@@ -650,6 +667,7 @@ def get_divide_min_bound(out):
             bound.append(float(val["min"]))
     return bound
 
+
 '''
 out格式
 {
@@ -659,6 +677,7 @@ out格式
  }
 }
 '''
+
 
 def get_divide_caterotical_bound(out, name):
     bound = []
@@ -733,11 +752,11 @@ def get_merged(var_name, df, min_val):
         data = get_boundary(data, min_val)
     return data
 
+
 s = u"nan"
-print s
 
 
-#************************
+# ************************
 @app.route(base + "/merge", methods=['POST'])
 def merge():
     """归并操作"""
@@ -753,7 +772,7 @@ def merge():
     # target = request.form.get('allBoundary').encode('utf-8');
     target = request.form.get('target')
     if target is None:
-        target ='bad_4w'
+        target = 'bad_4w'
     excepted_column = {var_name}
 
     min_val = 0
@@ -773,10 +792,11 @@ def merge():
                 a = np.nan
             all_boundary_list.append(a)
         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
-        #boundary_list.append(np.nan)
+        # boundary_list.append(np.nan)
         selected_list = boundary_list
 
-        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
+        columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
+                   'bad_rate', 'woe',
                    'type']
     else:
         type_bool = True
@@ -800,41 +820,61 @@ def merge():
                       columns=columns)
 
     data = generate_response(var_name, df, iv)
-    #data = get_merged(var_name, df, min_val)
-    return responseto(data = data)
+    # data = get_merged(var_name, df, min_val)
+    return responseto(data=data)
+
 
 '''
 apply完成后,第一次进入时的变量选择
 '''
-@app.route(base+"/variable_select",methods=['POST'])
+
+
+@app.route(base + "/variable_select", methods=['POST'])
 def variable_select():
     var_list = request.form.get("var_list")
     target = request.form.get("target")
+    withIntercept = request.form.get("with_intercept") == 'true'
+    ks_group_num = request.form.get("ks_group_num")
+    ks_group_num = ks_group_num if ks_group_num != '' else 20
 
-    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, 20, var_list.split(","))
+    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
+                                             withIntercept)
     if data is None:
         return responseto(success=False)
     return responseto(data=data)
 
+
 '''
 手动选择变量
 '''
-@app.route(base+"/variable_select_manual",methods=['POST'])
+
+
+@app.route(base + "/variable_select_manual", methods=['POST'])
 def variable_select_manual():
     all_list = request.form.get("all_list")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
-    data = model_function.get_logit_backward_manually(apply_result, all_list.split(","), selected_list.split(","), target, 20)
+    with_intercept = request.form.get("with_intercept") == 'true'
+    ks_group_num = request.form.get("ks_group_num")
+    ks_group_num = ks_group_num if ks_group_num != '' else 20
+
+    data = model_function.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
+                                                      selected_list.split(","), target, ks_group_num, with_intercept)
     return responseto(data=data)
+
 
 '''
 导出变量配置
 '''
-@app.route(base+"/export",methods=['POST'])
+
+
+@app.route(base + "/export", methods=['POST'])
 def export_variables():
     data = request.form.get("data")
     response = make_response(data)
-    return responseFile(response,"variable_config.json")
+    return responseFile(response, "variable_config.json")
+
+
 '''
     adjust方法产生的数据转换成dict.
 
@@ -867,8 +907,10 @@ def export_variables():
         {..}]
 }
     '''
+
+
 def generate_response(var_name, df, iv):
-    #data = {var_name: []}
+    # data = {var_name: []}
     data = collections.OrderedDict()
     var_content = collections.OrderedDict()
     var_content['iv'] = iv
@@ -891,18 +933,20 @@ def sort_iv(out):
     out_sorted_iv = OrderedDict(sorted(out.items(), key=lambda v: v[1]['iv'], reverse=True))
     return out_sorted_iv
 
+
 def float_nan_to_str_nan(x):
     if type(x) == float:
         return str(x)
     else:
         return x
 
-def sort_variable(variables,result):
+
+def sort_variable(variables, result):
     v = {}
-    for index,name in enumerate(variables):
+    for index, name in enumerate(variables):
         v[name.decode('utf-8')] = index
 
-    new_result = [{}] * (len(v)-1)
+    new_result = [{}] * (len(v) - 1)
     for variable in result:
         i = v[variable["variable_name"].decode('utf-8')]
         new_result[i] = variable
@@ -912,8 +956,3 @@ def sort_variable(variables,result):
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
 # sort_variable(variables,result)
-
-
-
-
-

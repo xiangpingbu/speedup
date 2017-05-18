@@ -7,3 +7,4 @@ config-dir
 logback-test.xml
 */target
 *.DS_Store
+honeybee/dashboard/

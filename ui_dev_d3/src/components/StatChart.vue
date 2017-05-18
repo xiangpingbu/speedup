@@ -2,33 +2,46 @@
   <div >
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
+    <Loading v-if="!dataSet"/>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3'
 import * as c3 from 'c3'
+import ConfigInfo from '@/config/config.js'
 
 // sort data by date
-function sortDate (a, b) {
+function sortDate(a, b) {
   return a.date > b.date ? 1 : a.date < b.date ? -1 : 0
 }
 
 export default {
-  name: 'barChart',
+  name: 'StatChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable', 'nameMap'],
-  created () {
-    this.$nextTick(() => {
+  watch: {
+    'dataSet' (data) {
+      this.draw()
+    }
+  },
+  methods: {
+    draw() {
+      if (!this.dataSet) return
+      const dataSet = JSON.parse(JSON.stringify(this.dataSet))
       // newDataFields.splice(newDataFields.indexOf('date'), 1)
-      this.dataSet.sort(sortDate)
-      var newDataFields = d3.keys(this.dataSet[0])
+      dataSet.sort(sortDate)
+      var newDataFields = d3.keys(dataSet[0])
       newDataFields.splice(newDataFields.indexOf('date'), 1)
+      const colorMap = {}
+      newDataFields.forEach(function(d, i) {
+        colorMap[d] = ConfigInfo.data_colors[i]
+      })
 
       var keyField = 'date'
       // var valueField = 'hits'
       var jsonData = []
       var newMap = {}
-      this.dataSet.forEach((d) => {
+      dataSet.forEach((d) => {
         var date = d[keyField]
         var newObj = newMap[date]
         // input unique date as keys
@@ -59,6 +72,7 @@ export default {
           right: 50
         },
         data: {
+          colors: colorMap,
           type: 'spline',
           // json: this.dataSet,
           json: jsonData,
@@ -128,10 +142,10 @@ export default {
         },
         zoom: {
           enabled: this.subChartEnabled,
-          onzoomstart: function (event) {
+          onzoomstart: function(event) {
             console.log('onzoomstart', event)
           },
-          onzoomend: function (domain) {
+          onzoomend: function(domain) {
             console.log('onzoomend', domain)
           }
         },
@@ -142,7 +156,6 @@ export default {
           hide: (!this.subChartEnabled)
         }
       })
-
       if (this.subChartEnabled) {
         chart.resize({
           height: 600
@@ -155,11 +168,10 @@ export default {
       //   tg.push(newDataFields)
       //   chart.groups(tg)
       // }, 2000)
-    })
+    }
   }
 }
 </script>
 
 <style lang='css'>
-  @import '../css/c3.css';
 </style>

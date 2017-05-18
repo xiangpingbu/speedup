@@ -2,11 +2,11 @@ package com.ecreditpal.maas.common.utils.http;
 
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,8 +32,8 @@ import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -52,24 +52,24 @@ public class MyHttpClient {
     private static MyHttpClient myHttpClient = new MyHttpClient();
 
     public static MyHttpClient getInstance() {
-        return  myHttpClient;
+        return myHttpClient;
     }
 
-    public static synchronized CloseableHttpClient getHttpClient(){
+    public static synchronized CloseableHttpClient getHttpClient() {
         if (httpClient == null) {
             //注册访问协议相关的socket工厂
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
                     RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", PlainConnectionSocketFactory.INSTANCE)
-                    .register("https", SSLConnectionSocketFactory.getSystemSocketFactory()).build();
+                            .register("http", PlainConnectionSocketFactory.INSTANCE)
+                            .register("https", SSLConnectionSocketFactory.getSystemSocketFactory()).build();
             //HttpConnection工厂:配置写请求/解析相应处理器
-            HttpConnectionFactory<HttpRoute,ManagedHttpClientConnection> connectionFactory =
+            HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connectionFactory =
                     new ManagedHttpClientConnectionFactory(DefaultHttpRequestWriterFactory.INSTANCE,
                             DefaultHttpResponseParserFactory.INSTANCE);
             //DNS解析器
             DnsResolver dnsResolver = SystemDefaultDnsResolver.INSTANCE;
             //创建池化链接管理器
-            manager = new PoolingHttpClientConnectionManager(socketFactoryRegistry,connectionFactory,dnsResolver);
+            manager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, connectionFactory, dnsResolver);
             //默认为Socket配置
             SocketConfig defaultSocketConfig = SocketConfig.custom().setTcpNoDelay(true).build();
             manager.setDefaultSocketConfig(defaultSocketConfig);
@@ -81,16 +81,16 @@ public class MyHttpClient {
             //路由是对maxTotal的细分
             manager.setDefaultMaxPerRoute(32);
             //在连接池获取连接时,链接不活跃多长时间后需要进行一次验证,默认为2s
-            manager.setValidateAfterInactivity(5*1000);
+            manager.setValidateAfterInactivity(5 * 1000);
 
-            String target = ConfigurationManager.getConfiguration().getString("maas.headstream","dolphin.myecreditpal.com");
-            int port = ConfigurationManager.getConfiguration().getInt("maas.headstream.port",8888);
-            manager.setMaxPerRoute(new HttpRoute(new HttpHost(target,port)),64);
+            String target = ConfigurationManager.getConfiguration().getString("maas.headstream", "dolphin.myecreditpal.com");
+            int port = ConfigurationManager.getConfiguration().getInt("maas.headstream.port", 8888);
+            manager.setMaxPerRoute(new HttpRoute(new HttpHost(target, port)), 64);
 
             //默认请求配置
             RequestConfig defaultRequestConfig = RequestConfig.custom()
-                    .setConnectTimeout(2*1000) // 设置链接超时时间
-                    .setSocketTimeout(5*1000)//设置等待数据超时时间
+                    .setConnectTimeout(2 * 1000) // 设置链接超时时间
+                    .setSocketTimeout(5 * 1000)//设置等待数据超时时间
                     .setConnectionRequestTimeout(2000)
                     //设置从连接池获取连接的等待超时时间
                     .build();
@@ -102,7 +102,7 @@ public class MyHttpClient {
                     .evictIdleConnections(600, TimeUnit.SECONDS)//定期回收空闲链接
                     .evictExpiredConnections()//定期回收过期链接a
                     //链接存活时间,如果不设置,则根据长连接信息决定
-                    .setConnectionTimeToLive(60,TimeUnit.SECONDS)
+                    .setConnectionTimeToLive(60, TimeUnit.SECONDS)
                     //设置默认请求配置
                     .setDefaultRequestConfig(defaultRequestConfig)
                     //链接重用策略,即是否能keepAlive
@@ -110,14 +110,14 @@ public class MyHttpClient {
                     //长连接配置,即获取长连接生产多长时间
                     .setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE)
                     //设置重试次数,默认是3次:当前是禁用状态
-                    .setRetryHandler(new DefaultHttpRequestRetryHandler(0,false))
+                    .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
                     .build();
-            Runtime.getRuntime().addShutdownHook(new Thread(){
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     try {
                         httpClient.close();
-                    }catch(IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -126,42 +126,44 @@ public class MyHttpClient {
         return httpClient;
     }
 
-    public  String get(String url) {
+    public String get(String url) {
         HttpResponse response = null;
         HttpGet get = new HttpGet(url);
         try {
             response = getHttpClient().execute(get);
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 EntityUtils.consume(response.getEntity());
             } else {
-                return EntityUtils.toString(response.getEntity());
+                return EntityUtils.toString(response.getEntity(), Charset.forName("utf-8"));
             }
         } catch (Exception e) {
-            log.error("error sending get request",e);
+            log.error("error sending get request", e);
             if (response != null) {
                 try {
                     EntityUtils.consume(response.getEntity());
                 } catch (IOException e1) {
-                    log.error("error getting the entity",e);
+                    log.error("error getting the entity", e);
                 }
             }
         }
         return null;
     }
 
-    public String post(String url, Map<String,Object> params) {
+    public String post(String url, Map<String, String> params) {
         HttpResponse response = null;
         HttpPost post = new HttpPost(url);
         List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
         //lamba 表达式构造http请求所需的参数
-        params.forEach((k,v) -> nameValuePair.add(new BasicNameValuePair(k,v.toString())));
+        params.forEach((k, v) -> nameValuePair.add(new BasicNameValuePair(k, v)));
         try {
-            post.setEntity(new UrlEncodedFormEntity(nameValuePair));
+            post.setEntity(new UrlEncodedFormEntity(nameValuePair,"utf-8"));
+//            post.setHeader("Content-type","utf-8");
             response = getHttpClient().execute(post);
-            if (response.getStatusLine().getStatusCode() !=HttpStatus.SC_OK) {
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 EntityUtils.consume(response.getEntity());
             } else {
-                return EntityUtils.toString(response.getEntity());
+//                String charset = getContentCharSet(response.getEntity());
+                return EntityUtils.toString(response.getEntity(), "utf-8");
             }
         } catch (Exception e) {
             log.error("error sending post request the request", e);
@@ -169,11 +171,32 @@ public class MyHttpClient {
                 try {
                     EntityUtils.consume(response.getEntity());
                 } catch (IOException e1) {
-                    log.error("error getting the entity",e);
+                    log.error("error getting the entity", e);
                 }
             }
         }
         return null;
+    }
+
+    public static String getContentCharSet(final HttpEntity entity)
+            throws Exception {
+        if (entity == null) {
+            throw new IllegalArgumentException("HTTP entity may not be null");
+        }
+        String charset = null;
+        if (entity.getContentType() != null) {
+            HeaderElement values[] = entity.getContentType().getElements();
+            if (values.length > 0) {
+                NameValuePair param = values[0].getParameterByName("charset");
+                if (param != null) {
+                    charset = param.getValue();
+                }
+            }
+        }
+        if (StringUtils.isEmpty(charset)) {
+            charset = "UTF-8";
+        }
+        return charset;
     }
 
 }
