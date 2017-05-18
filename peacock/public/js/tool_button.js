@@ -415,6 +415,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
     function clearAndSet(removeList) {
         var remove_list = JSON.parse(removeList);
+        debugger;
         $("#dataframe").find("tbody tr").each(function (i, n) {
             $(n).children().eq(0).iCheck('uncheck');
             if (remove_list[$(n).children().eq(1).html()] != undefined) {

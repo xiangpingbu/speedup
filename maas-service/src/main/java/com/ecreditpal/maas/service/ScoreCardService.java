@@ -35,6 +35,7 @@ public class ScoreCardService  {
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
+        lookupEventMessage.getResponseInfo().setResponseBody(score);
 
         return score;
     }
@@ -47,6 +48,7 @@ public class ScoreCardService  {
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = akdModel.ParseVariables(akdModel.getVariableList(), score.toString(), AKDModel.AKDModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
+        lookupEventMessage.getResponseInfo().setResponseBody(String.valueOf(Math.round(score)));
 
         return Math.round(score);
     }

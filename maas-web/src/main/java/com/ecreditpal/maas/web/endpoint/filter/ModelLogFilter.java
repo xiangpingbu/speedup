@@ -56,19 +56,15 @@ public class ModelLogFilter implements ContainerRequestFilter {
         if (!shouldApplyLookupEventMessageFilter(requestContext)) {
             return;
         }
-
-        LookupEventMessage.Builder eventBuilder = LookupEventMessage.newBuilder();
-        MultivaluedMap<String, String> form = FilterUtil.getRequestForm(requestContext,providers);
-
-        eventBuilder.setEventId(buildEventIds(requestContext));
-        eventBuilder.setRequestInfo(buildRequestInfo(requestContext, form));
+//        LookupEventMessage.Builder eventBuilder = LookupEventMessage.newBuilder();
+//
+//        eventBuilder.setEventId(buildEventIds(requestContext));
+//        eventBuilder.setRequestInfo(buildRequestInfo(requestContext, form));
 //        eventBuilder.setUserInfo(buildUserInfo(form));
         requestContext.setProperty(
                 PROPERTY_NAME_LOOKUP_EVENT_MESSAGE,
-                eventBuilder.build());
+                buildEvent(requestContext).build());
     }
-
-
 
 
     private EventIds buildEventIds(ContainerRequestContext requestContext) {
@@ -82,26 +78,42 @@ public class ModelLogFilter implements ContainerRequestFilter {
     }
 
 
+    private LookupEventMessage.Builder buildEvent(ContainerRequestContext requestContext) {
+        MultivaluedMap<String, String> form = FilterUtil.getRequestForm(requestContext, providers);
 
+        LookupEventMessage.Builder eventBuilder = LookupEventMessage.newBuilder();
 
-    private RequestInfo buildRequestInfo(ContainerRequestContext requestContext,
-                                         MultivaluedMap<String, String> form) {
         RequestInfo.Builder requestInfoBuilder = RequestInfo
                 .newBuilder();
 
-        // TODO: we should have a style guide for all api definitions. Some
-        // information may have user credentials and we should not log these
-        // data.
+
         requestInfoBuilder.setRequestMethod(requestContext.getMethod());
         requestInfoBuilder
                 .setRequestPath(requestContext.getUriInfo().getPath());
-        requestInfoBuilder.setQueryParams(multiValMapToStr(
-                requestContext.getUriInfo().getQueryParameters()));
-        requestInfoBuilder.setPathParams(multiValMapToStr(
-                requestContext.getUriInfo().getPathParameters()));
-        requestInfoBuilder.setFormParams(multiValMapToStr(form));
+        requestInfoBuilder.setQueryParams(JsonUtil.toJson(multiValMapToMap(
+                requestContext.getUriInfo().getQueryParameters())));
+        requestInfoBuilder.setPathParams(JsonUtil.toJson(multiValMapToMap(
+                requestContext.getUriInfo().getPathParameters())));
+        Map<String, String> formMap = multiValMapToMap(form);
+        requestInfoBuilder.setFormParams(JsonUtil.toJson(formMap));
 
-        return requestInfoBuilder.build();
+
+        EventIds.Builder eventIdBuilder = EventIds
+                .newBuilder();
+
+        String eventId = formMap.get("eventId");
+        eventId = eventId == null
+                ? TaskIdHelper.generateTaskId()
+                : eventId;
+
+        eventIdBuilder.setEventId(eventId);
+        eventIdBuilder.setIpAddress(servletRequest.getRemoteAddr());
+        eventIdBuilder.setTimestampMs(System.currentTimeMillis());
+
+        eventBuilder.setEventId(eventIdBuilder.build());
+        eventBuilder.setRequestInfo(requestInfoBuilder.build());
+
+        return eventBuilder;
     }
 
     private UserInfo buildUserInfo(MultivaluedMap<String, String> form) {
@@ -129,23 +141,23 @@ public class ModelLogFilter implements ContainerRequestFilter {
      * 将map对象转换为字符串
      *
      * @param maps 一对多的map
-     * @return String`
+     * @return map
      */
-    private String multiValMapToStr(final MultivaluedMap<String, String> maps) {
+    private Map<String, String> multiValMapToMap(final MultivaluedMap<String, String> maps) {
 //        StringBuilder strBuilder = new StringBuilder(512);
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : maps.entrySet()) {
             if (CREDENTIAL_PATTERN.matcher(entry.getKey()).matches()) {
                 continue;
             }
-            map.put(entry.getKey(),entry.getValue().get(0));
+            map.put(entry.getKey(), entry.getValue().get(0));
 //            strBuilder.append(entry.getKey());
 //            strBuilder.append(":{");
 //            strBuilder.append(String.join(",", entry.getValue()));
 //            strBuilder.append("};");
         }
 
-        return JsonUtil.toJson(map);
+        return map;
     }
 
     public static boolean shouldApplyLookupEventMessageFilter(
