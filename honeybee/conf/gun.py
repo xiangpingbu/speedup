@@ -12,7 +12,8 @@ pidfile = 'log/maas.pid'
 logfile = 'log/maas.log'
 
 #启动的进程数
-workers = multiprocessing.cpu_count() * 2 + 1
+# workers = multiprocessing.cpu_count() * 2 + 1
+workers = 1
 worker_class = 'gunicorn.workers.ggevent.GeventWorker'
 
 x_forwarded_for_header = 'X-FORWARDED-FOR'
