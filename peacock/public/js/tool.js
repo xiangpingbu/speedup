@@ -428,12 +428,14 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
      * 例如 [0,1,2] ,初始化三个前三个variable的合并按钮
      */
     function buttonInit(initList) {
-        $(".var-btn").unbind("click");
+        debugger;
+        // $(".var-btn").unbind("click");
         /**
          * 前后点击两次点击bar,可以多选,第三次会重置,重新开始选择
          */
         //初始化每一个variable的点击事件,预先初始化相关变量
         for (var a of initList) {
+            $("#merge_" + a).unbind("click");
             controlMap[a] = {};
             var map = controlMap[a];
             map.start = {};
