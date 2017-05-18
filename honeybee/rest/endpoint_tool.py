@@ -49,6 +49,7 @@ model_name = "model_train_selected"
 # df_test = df_all[df_all['dev_ind'] == 0]
 df_test = None
 df_train = None
+df_all = None
 # df_all = None
 safely_apply = False
 apply_result = None
