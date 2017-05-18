@@ -44,11 +44,12 @@ model_name = "model_train_selected"
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 # df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
+# df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
 # df_train = df_all[df_all['dev_ind'] == 1]
 # df_test = df_all[df_all['dev_ind'] == 0]
 df_test = None
 df_train = None
+df_all = None
 # df_all = None
 safely_apply = False
 apply_result = None
@@ -396,13 +397,14 @@ def upload():
             df_all = pd.read_excel(file, encoding="utf-8")
             df_train = df_all[df_all['dev_ind'] == 1]
             df_test = df_all[df_all['dev_ind'] == 0]
+
             #     df_test = pd.read_excel(file, encoding="utf-8")
             # elif filename == 'df_train.xlsx':
             #     df_train = pd.read_excel(file, encoding="utf-8")
-            #     if filename.find("_") > 0:
-            #         model_name = filename.split("_")[0]
-            #     else:
-            #         model_name = "anonymous"
+            if filename.find("_") > 0:
+                model_name = filename.split("_")[0]
+            else:
+                model_name = "anonymous"
     return responseto(data="success")
 
 
