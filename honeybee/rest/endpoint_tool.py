@@ -417,7 +417,7 @@ def parse():
         vs.create_branch(model_name, "master", None, None)
         result = []
         result.append({"model_branch": "master"})
-        result["remove_list"] = None
+        result.append({"remove_list" : None})
 
     branches = []
 
