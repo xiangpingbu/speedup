@@ -416,8 +416,7 @@ def parse():
     if len(result) < 1:
         vs.create_branch(model_name, "master", None, None)
         result = []
-        result.append({"model_branch": "master"})
-        result.append({"remove_list" : None})
+        result.append({"model_branch": "master","remove_list" : None})
 
     branches = []
 
