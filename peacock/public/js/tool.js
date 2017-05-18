@@ -825,7 +825,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     key = getVarName(obj, headMap)
                 }
 
-                if (index == 1 || index == obj.length - 2) {
+                if (index == 0 || index == 1 || index == obj.length - 2) {
                     if (key == 'min_boundary') {
                         td = td.attr("name", key);
                     }
