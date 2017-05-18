@@ -837,7 +837,16 @@ apply完成后,第一次进入时的变量选择
 
 @app.route(base + "/variable_select", methods=['POST'])
 def variable_select():
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
     var_list = request.form.get("var_list")
+
+    if var_list is None or var_list == '':
+        vs.save_selected_variable(model_name,branch,var_list)
+    else:
+        print "hehe"
+        # if(vs.delete_selected_variable())
+
     target = request.form.get("target")
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")

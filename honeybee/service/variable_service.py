@@ -94,4 +94,37 @@ def load_binning_record(model_name, model_branch,variables=None):
     result = util.query(sql, paramList)
     return result
 
+def save_selected_variable(model_name,model_branch,var_list):
+    sql = "insert into tool_model_selected_variable(model_name,model_branch,selected_variable,modify_date,create_date) values(%s,%s,%s,now(),now())"
+    result = util.execute(sql, (model_name, model_branch, var_list))
+    if result >0:
+        return True
+    else:
+        return False
+
+def update_selected_variable(model_name,model_branch,var_list,modify_date,is_deleted=0):
+    sql = "update tool_model_selected_variable " \
+          "set var_list = %s,modify_date=now(),is_deleted=%s " \
+          "where model_name = %s and model_branch=%s"
+    result = util.execute(sql,{var_list,is_deleted,model_name,model_branch})
+    if result >0 :
+        return True
+    else:
+        return False
+
+def del_selected_variable(model_name,model_branch):
+    sql = "update tool_model_selected_variable " \
+          "set is_deleted=1 ,modify_date=now()" \
+          "where model_name = %s and model_branch=%s"
+    result = util.execute(sql,(model_name,model_branch))
+    if result > 0:
+        return True
+    else:
+        return False
+
+def get_selected_variable(model_name,model_branch):
+    sql = "select id,model_name,model_branch,selected_variable,modify_date,create_date from tool_model_selected_variable " \
+          "where model_name=%s and model_branch=%s"
+
+    return util.query(sql,(model_name,model_branch))
 
