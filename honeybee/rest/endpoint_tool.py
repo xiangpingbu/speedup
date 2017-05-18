@@ -44,7 +44,8 @@ model_name = "model_train_selected"
 # df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
 # df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
 # df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
+#df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
+#df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/model_data.xlsx", encoding="utf-8")
 # df_train = df_all[df_all['dev_ind'] == 1]
 # df_test = df_all[df_all['dev_ind'] == 0]
 df_test = None
@@ -759,6 +760,7 @@ s = u"nan"
 # ************************
 @app.route(base + "/merge", methods=['POST'])
 def merge():
+    print "merge strat..."
     """归并操作"""
     # 要执行合并的variable
     var_name = request.form.get('varName')
@@ -821,6 +823,7 @@ def merge():
 
     data = generate_response(var_name, df, iv)
     # data = get_merged(var_name, df, min_val)
+    print "merge strat..."
     return responseto(data=data)
 
 
