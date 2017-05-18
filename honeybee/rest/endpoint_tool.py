@@ -22,6 +22,8 @@ from util import model_function
 import requests
 from common.constant import const
 from util.ZipFile import *
+from xml.dom import minidom
+
 
 base = '/tool'
 base_path = "./util/"
@@ -531,9 +533,11 @@ def column_config():
     post_data = {"column_config": json.dumps(data, ensure_ascii=False),
                  "params": params}
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
+    doc = minidom.parseString(pmml_xml)
+    xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
-    mem_zip_file.append_content('column_config/model.pmml', pmml_xml)
+    mem_zip_file.append_content('column_config/model.pmml', xml_str)
     mem_zip_file.append_content('column_config/lr', params)
     # return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)

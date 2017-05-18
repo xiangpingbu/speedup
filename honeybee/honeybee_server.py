@@ -2,7 +2,7 @@
 import copy
 
 from flask import request
-from rest import test
+from rest import py_test
 
 import rest.endpoint_tool
 import rest.endpoint_es
