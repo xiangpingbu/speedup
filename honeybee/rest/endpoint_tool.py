@@ -327,9 +327,7 @@ def apply():
     writer.close()
     output.seek(0)
 
-    file = send_file(output, mimetype=None, as_attachment=True,
-                     attachment_filename='df_iv.xlsx', add_etags=True,
-                     cache_timeout=None, conditional=False, last_modified=None)
+    file = send_file(output,as_attachment=True,attachment_filename='df_iv.xlsx')
     response = make_response(file)
 
     return responsePandas(response)
@@ -533,6 +531,7 @@ def column_config():
     post_data = {"column_config": json.dumps(data, ensure_ascii=False),
                  "params": params}
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
+
     mem_zip_file.append_content('column_config/column_config.json', column_config)
     mem_zip_file.append_content('column_config/model.pmml', pmml_xml)
     mem_zip_file.append_content('column_config/lr', params)
