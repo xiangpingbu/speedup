@@ -635,7 +635,7 @@ def get_boundary(out, min_val=0):
                 else:
                     if index == 1:
                         # if float(bin_row["min"]) >= min_val:
-                        bin_row["min_boundary"] = min_val
+                        bin_row["min_boundary"] = min(min_val, float(bin_row["min"]))
                         if i == (len(val[1]['var_table']) - 1):
                             bin_row["max_boundary"] = 'inf'
                     else:

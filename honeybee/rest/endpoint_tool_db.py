@@ -29,7 +29,7 @@ def new_branch():
     branch = request.form.get("branch")
     original_branch = request.form.get("original_branch")
 
-    result = vs.load_binning_record(model_name,original_branch)
+    result = vs.load_binning_record(model_name, original_branch)
 
     list = []
 
