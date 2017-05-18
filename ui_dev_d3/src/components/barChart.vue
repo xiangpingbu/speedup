@@ -22,8 +22,7 @@ export default {
   props: ['id', 'subChartEnabled', 'nameMap'],
   data () {
     return {
-      loading: true,
-      dataMap: {}
+      loading: true
     }
   },
   created () {
