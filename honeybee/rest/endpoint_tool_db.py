@@ -34,7 +34,7 @@ def new_branch():
     list = []
 
     for record in result:
-        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"].replace("\\","")]
+        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"],record["is_selected"]]
         list.append(obj)
 
     if vs.copy_branch(model_name, branch,original_branch):

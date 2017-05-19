@@ -127,7 +127,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
         ol.append("li").append("span").append("a").attr("id", "selectAll").attr("value", 0).text("选取所有");
         ol.append("li").append("span").append("a").attr("id","export").text("导出");
-        ol.append("li").append("span").append("a").attr("id","variableSave").text("变量保存");
+        ol.append("li").append("span").append("a").attr("id","variableExport").text("导出已选变量");
 
         $("#initBar").bind("click", function () {
             init();
@@ -182,8 +182,27 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             }
         });
 
-        $("#variableSave").bind("click",function() {
+        $("#variableExport").bind("click",function() {
+            $("#downVariable").remove();
+            var data = {};
+            data.model_name =localStorage.getItem("model_name");
+            data.branch = localStorage.getItem("branch");
+            data.type="xlsx";
+            var form = $("<form>");//定义一个form表单
+            form.attr("id", "downVariable");
+            form.attr("style", "display:none");
+            form.attr("target", "");
+            form.attr("method", "post");
+            form.attr("action", host + "/tool/export_selected_variable");
+            var input1 = $("<input>");
+            input1.attr("type", "hidden");
+            input1.attr("name", "data");
 
+            input1.attr("value", JSON.stringify(data));
+            form.append(input1);
+            $("body").append(form);//将表单放置在web中
+
+            form.submit();//表单提交
         });
 
         $("#export").bind("click",function () {
