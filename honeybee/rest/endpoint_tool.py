@@ -69,21 +69,10 @@ def init():
         branch = "master"
 
     result = vs.load_branch(name, branch)
-
-    # if var_service.if_branch_exist(model, branch):
-    #     var_service.update_branch(model, branch, remove_list, selected_list)
-    # else:
-    #     var_service.create_branch(model, branch, target, remove_list, selected_list)
-
     remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
     for o in remove_list_json:
         remove_list.append(o)
-
-    # remove_list.append(target)
-
-    # invalid = invalid.split(",")
-    # min = request.form.get("min")
     min_val = 0
     df = df_train
     init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
@@ -95,6 +84,15 @@ def init():
     #     val[0]["min"] = min_val
     out_sorted_iv = sort_iv(out)
     return responseto(data=out_sorted_iv)
+
+
+@app.route(base+"/rank",methods=['POST'])
+def rank():
+    data = request.form.get("data")
+    json_obj = json.loads(data)
+    out_sorted_iv = sort_iv(json_obj)
+    return responseto(data = out_sorted_iv)
+
 
 
 # @app.route(base + "/merge", methods=['POST'])
@@ -930,7 +928,9 @@ def export_variables():
 }
     '''
 
-
+'''
+导出变量到excel
+'''
 @app.route(base + "/export_selected_variable", methods=['POST'])
 def export_selected_variable():
     data = request.form.get("data")
@@ -938,17 +938,18 @@ def export_selected_variable():
     branch = dataDict["branch"]
     type = dataDict["type"]
     model_name = dataDict["model_name"]
-    if type == None: type = "xlsx"
+    if type == None:
+        type = "xlsx"
     result = vs.load_binning_record(model_name, branch)
     # result = filter(lambda x: x["is_selected"] >0,result)
     new_result = []
     for record in result:
-        if record["is_selected"] > 0:
-            new_record = []
-            new_record.append(record["variable_name"])
-            new_record.append(record["variable_iv"])
-            new_result.append(new_record)
-    headers = ('variable_name', 'variable_iv')
+        new_record = []
+        new_record.append(record["variable_name"])
+        new_record.append(record["variable_iv"])
+        new_record.append(record["is_selected"])
+        new_result.append(new_record)
+    headers = ('variable_name', 'variable_iv','is_selected')
     data = tablib.Dataset(*new_result, headers=headers)
 
     # 实例化一个Workbook()对象(即excel文件)
