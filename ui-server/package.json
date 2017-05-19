@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "./node_modules/.bin/nodemon",
     "start": "node ./server.js",
-    "build-dashboard": "cd ../ui_dev_d3 && npm run build && rm -rf ../ui-server/dashboard && mv dist ../ui-server/dashboard",
-    "build-tool": "cd ../peacock && npm run build",
-    "build": "npm run build-dashboard && npm run build-tool",
+    "build-dash": "cd ../ui_dev_d3 && npm run build && rm -rf ../ui-server/dash && mv dist ../ui-server/dash",
+    "build-tool": "cd ../peacock/tool-vue && npm run build && rm -rf ../../ui-server/tool && mv dist ../../ui-server/tool",
+    "build": "npm run build-dash && npm run build-tool",
     "upload": "rsync -avz ./dist/* xx@xx:/home/",
     "deploy": "npm run build && npm run upload"
   },

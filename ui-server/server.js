@@ -9,16 +9,16 @@ router
     .get('/', async(ctx, next) => {
         await send(ctx, './index.html')
     })
-    .get('/dash', async(ctx, next) => {
-        await send(ctx, './dashboard/index.html')
+    .get('/dash/', async(ctx, next) => {
+        await send(ctx, './dash/index.html')
     })
-    .get('/tool', async(ctx, next) => {
+    .get('/tool/', async(ctx, next) => {
         await send(ctx, './tool/index.html')
     })
 
 app
     .use(router.routes())
-    .use(serve({rootDir: 'dashboard', rootPath: '/dash'}))
+    .use(serve({rootDir: 'dash', rootPath: '/dash'}))
     .use(serve({rootDir: 'tool', rootPath: '/tool'}))
     .use(router.allowedMethods())
 // response
