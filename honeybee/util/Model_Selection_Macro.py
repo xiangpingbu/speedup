@@ -148,7 +148,7 @@ def variable_order_shuffle(df):
 
 def equal_size_bin(df_score, group_num, reverse=False):
     l = len(df_score)
-    step = l/group_num
+    step = l/int(group_num)
     df_sort = df_score.sort_values(['score'], ascending=[~reverse])
     df_sort['row_count'] = range(0, l)
     df_sort['bucket'] = df_sort['row_count'].apply(lambda r: r/step)
