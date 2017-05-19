@@ -45,6 +45,12 @@ public class ConfigurationManager {
             if (productConfigDir == null) {
                 //从本地获取配置文件
                  rootPath = FileUtil.getRootPath();
+                System.out.println(rootPath);
+                System.out.println(rootPath);
+                System.out.println(rootPath);
+                System.out.println(rootPath);
+                System.out.println(rootPath);
+                System.out.println(rootPath);
                 propertiesPath = rootPath + "/maas-web/target/classes";
             } else {
                 //从服务器的目录获取配置文件
