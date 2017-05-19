@@ -57,6 +57,7 @@ def get_logit_backward_manually(train_woe, test_woe, all_list, selected_list, ta
 
     all_var_list_with_target = [x + '_woe' for x in all_list]
     all_var_list_with_target.append(target)
+
     if withIntercept:
         all_var_list_with_target.append('intercept')
 
