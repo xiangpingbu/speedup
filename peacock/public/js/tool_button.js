@@ -30,7 +30,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 //     "data": JSON.stringify(exportData())
                 // };
                 o = {};
-                o.data = exportData();
+                o.data = exportData(true);
                 o.target = localStorage.getItem("target");
                 input1.attr("value", JSON.stringify(o));
                 form.append(input1);
@@ -265,20 +265,6 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     });
 
 
-    $("#columnConfig").click(function () {
-        $.ajax({
-            url: host + "/tool/column-config",
-            type: 'post',
-            data: {
-                "data": JSON.stringify(exportData())
-            },
-            async: true,
-            success: function (result) {
-
-            }
-        });
-    });
-
     $("#getBar").click(function () {
         window.location.href = window.location.href.substr(0, window.location.href.indexOf("#")) + "#bar";
     });
@@ -364,11 +350,16 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
 
-    function exportData() {
+    function exportData(exportSelected) {
         var row = $("#rowNum").val();
         var data = {};
         for (var i = 0; i < row; i++) {
             var name = $('#merge_' + i).attr("name");
+            if (exportSelected) {
+                if ($("#" + name+"_name").find(".checked").length <= 0) {
+                    continue;
+                }
+            }
             var innerList = [];
             data[name] = innerList;
 

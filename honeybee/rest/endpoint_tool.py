@@ -22,6 +22,8 @@ from util import model_function
 import requests
 from common.constant import const
 from util.ZipFile import *
+from xml.dom import minidom
+
 
 base = '/tool'
 base_path = "./util/"
@@ -531,9 +533,11 @@ def column_config():
     post_data = {"column_config": json.dumps(data, ensure_ascii=False),
                  "params": params}
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
+    doc = minidom.parseString(pmml_xml)
+    xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
-    mem_zip_file.append_content('column_config/model.pmml', pmml_xml)
+    mem_zip_file.append_content('column_config/model.pmml', xml_str)
     mem_zip_file.append_content('column_config/lr', params)
     # return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)
@@ -833,7 +837,20 @@ apply完成后,第一次进入时的变量选择
 
 @app.route(base + "/variable_select", methods=['POST'])
 def variable_select():
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
     var_list = request.form.get("var_list")
+
+    #调用接口时发现var_list为空,那么主动从数据库中读取
+    if var_list is None or var_list == '':
+        result = vs.get_selected_variable(model_name,branch)[0]
+        var_list = result["selected_variable"].decode('utf-8')
+    else:
+    #清除旧数据,插入新的数据
+        if(vs.del_selected_variable(model_name,branch)):
+            vs.save_selected_variable(model_name,branch,var_list)
+        else:
+            return responseto(messege="fail to save selected variable",success=False)
     target = request.form.get("target")
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")

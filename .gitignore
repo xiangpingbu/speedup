@@ -6,5 +6,5 @@ node_modules
 config-dir
 logback-test.xml
 */target
-*.DS_Store
+.DS_Store
 honeybee/dashboard/

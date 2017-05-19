@@ -1,6 +1,9 @@
 # coding=utf-8
 from rest.app_base import *
 import copy
+import xml.dom.minidom
+from io import BytesIO
+import re
 
 
 datas = [{'name': 'javascript', 'useto': 'web development'},
@@ -86,6 +89,42 @@ def delOne(name):
     return statusResponse(R204_NOCONTENT)
 
 
+def GenerateXml():
+
+    impl = xml.dom.minidom.getDOMImplementation()
+    dom = impl.createDocument(None, 'employees', None)
+    root = dom.documentElement
+    employee = dom.createElement('employee')
+    root.appendChild(employee)
+
+    nameE=dom.createElement('name')
+    nameT=dom.createTextNode('linux')
+    nameE.appendChild(nameT)
+    employee.appendChild(nameE)
+
+    ageE=dom.createElement('age')
+    ageT=dom.createTextNode('30')
+    ageE.appendChild(ageT)
+    employee.appendChild(ageE)
+
+    # s = " " % ()
+    # f= open('/Users/lifeng/Desktop/employees2.xml', 'w')
+    output = BytesIO()
+    dom.writexml(output, addindent='  ', newl='\n',encoding='utf-8')
+    s = output.getvalue()
+    print s
+    # f.close()
+    # print s
+
+def parseXml():
+    s = '<?xml version="1.0" encoding="utf-8"?><employees><employee><name>linux</name><age>30</age></employee></employees>'
+    doc = xml.dom.minidom.parseString(s)
+    # root = dom.documentElement
+    output = BytesIO()
+    xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
+    # repl = lambda x: ">%s</" % x.group(1).strip() if len(x.group(1).strip()) != 0 else x.group(0)
+    # pretty_str = re.sub(r'>\n\s*([^<]+)</', repl, xml_str)
+    print xml_str
 
 
 
