@@ -9,6 +9,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         var url;
         var data = {};
         data.target = localStorage.getItem("target");
+        data.modelName = localStorage.getItem("model_name");
+        data.branch = localStorage.getItem("branch");
         var selected_variable = [];
         //如果进入isVariableSelect环节,将从该环节的页面获取数据
         //否则将从getBar环节获取数据
@@ -38,11 +40,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
 
                 selected_variable.push($(this).find(".apply-checks").attr("name"));
                 data.var_list = selected_variable.join(",");
-                data.with_intercept =  $("#withIntercept").val();
-                data.ks_group_num = $("#ksGroupNum").val();
-                url = host + "/tool/variable_select";
             });
-
+            url = host + "/tool/variable_select";
+            data.ks_group_num = $("#ksGroupNum").val();
+            data.with_intercept =  $("#withIntercept").val();
         }
 
 
@@ -57,9 +58,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     alert("invalid variable select,please change the variable");
                 }
 
-                $("#variable_select_content").html("");
+                $("#variable_select_content").remove();
 
                 var div =  d3.select("#variableSelect").append("div").attr("class", "ibox-content").attr("id","variable_select_content");
+                // var div =  d3.select("#variable_select_content");
                 div.append("div").text("模型信息");
                 var table = div.append("table").attr("class", "table table-striped");
                 var tbody = table.append("tbody");

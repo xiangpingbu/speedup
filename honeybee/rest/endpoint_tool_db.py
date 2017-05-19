@@ -29,12 +29,12 @@ def new_branch():
     branch = request.form.get("branch")
     original_branch = request.form.get("original_branch")
 
-    result = vs.load_binning_record(model_name,original_branch)
+    result = vs.load_binning_record(model_name, original_branch)
 
     list = []
 
     for record in result:
-        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"].replace("\\","")]
+        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"],record["is_selected"]]
         list.append(obj)
 
     if vs.copy_branch(model_name, branch,original_branch):

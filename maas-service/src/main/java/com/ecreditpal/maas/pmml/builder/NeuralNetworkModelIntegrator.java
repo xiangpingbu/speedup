@@ -20,6 +20,7 @@ import org.dmg.pmml.*;
 import java.util.HashMap;
 import java.util.List;
 
+
 /**
  * This class glues the partial PMML neural network model with the neural layers
  * part, by adding bias field and neural input layer.

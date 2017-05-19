@@ -12,7 +12,6 @@ def logisticReg_KS(df_train, df_test, target, para_list, ks_group_num):
         return [None, None]
     p = result_temp.summary2()
     p_value = p.tables[1][u'P>|z|'][-1]
-
     #get score for training set
     df_train['prob_bad'] = result_temp.predict(df_train[para_list])
     df_test['prob_bad'] = result_temp.predict(df_test[para_list])
@@ -149,7 +148,7 @@ def variable_order_shuffle(df):
 
 def equal_size_bin(df_score, group_num, reverse=False):
     l = len(df_score)
-    step = l/group_num
+    step = l/int(group_num)
     df_sort = df_score.sort_values(['score'], ascending=[~reverse])
     df_sort['row_count'] = range(0, l)
     df_sort['bucket'] = df_sort['row_count'].apply(lambda r: r/step)

@@ -12,10 +12,14 @@ router
     .get('/dash', async(ctx, next) => {
         await send(ctx, './dashboard/index.html')
     })
+    .get('/tool', async(ctx, next) => {
+        await send(ctx, './tool/index.html')
+    })
 
 app
     .use(router.routes())
     .use(serve({rootDir: 'dashboard', rootPath: '/dash'}))
+    .use(serve({rootDir: 'tool', rootPath: '/tool'}))
     .use(router.allowedMethods())
 // response
 // app.use(async(ctx) => {
