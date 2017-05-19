@@ -23,9 +23,8 @@ import requests
 from common.constant import const
 from util.ZipFile import *
 from xml.dom import minidom
-import xlwt
-from datetime import datetime
 import tablib
+from common import global_value
 
 base = '/tool'
 base_path = "./util/"

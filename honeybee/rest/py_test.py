@@ -3,7 +3,7 @@ from rest.app_base import *
 import copy
 import xml.dom.minidom
 from io import BytesIO
-import re
+from common import global_value
 
 
 datas = [{'name': 'javascript', 'useto': 'web development'},
@@ -107,8 +107,6 @@ def GenerateXml():
     ageE.appendChild(ageT)
     employee.appendChild(ageE)
 
-    # s = " " % ()
-    # f= open('/Users/lifeng/Desktop/employees2.xml', 'w')
     output = BytesIO()
     dom.writexml(output, addindent='  ', newl='\n',encoding='utf-8')
     s = output.getvalue()
@@ -119,16 +117,16 @@ def GenerateXml():
 def parseXml():
     s = '<?xml version="1.0" encoding="utf-8"?><employees><employee><name>linux</name><age>30</age></employee></employees>'
     doc = xml.dom.minidom.parseString(s)
-    # root = dom.documentElement
     output = BytesIO()
     xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
     # repl = lambda x: ">%s</" % x.group(1).strip() if len(x.group(1).strip()) != 0 else x.group(0)
     # pretty_str = re.sub(r'>\n\s*([^<]+)</', repl, xml_str)
     print xml_str
 
-# from service import variable_service as vs
-# result = vs.load_binning_record("model","master")
-# result = filter(lambda x: x["is_selected"] >0,result)
-# print result
 
+def ppp():
+    return global_value.get_value()
 
+a = {"aa"}
+a.add("aa")
+print a
