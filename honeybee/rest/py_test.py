@@ -126,8 +126,9 @@ def parseXml():
     # pretty_str = re.sub(r'>\n\s*([^<]+)</', repl, xml_str)
     print xml_str
 
-
-
-
+# from service import variable_service as vs
+# result = vs.load_binning_record("model","master")
+# result = filter(lambda x: x["is_selected"] >0,result)
+# print result
 
 

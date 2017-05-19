@@ -23,7 +23,9 @@ import requests
 from common.constant import const
 from util.ZipFile import *
 from xml.dom import minidom
-
+import xlwt
+from datetime import datetime
+import tablib
 
 base = '/tool'
 base_path = "./util/"
@@ -67,21 +69,10 @@ def init():
         branch = "master"
 
     result = vs.load_branch(name, branch)
-
-    # if var_service.if_branch_exist(model, branch):
-    #     var_service.update_branch(model, branch, remove_list, selected_list)
-    # else:
-    #     var_service.create_branch(model, branch, target, remove_list, selected_list)
-
     remove_list_json = json.loads(result[0]["remove_list"])
     remove_list = []
     for o in remove_list_json:
         remove_list.append(o)
-
-    # remove_list.append(target)
-
-    # invalid = invalid.split(",")
-    # min = request.form.get("min")
     min_val = 0
     df = df_train
     init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
@@ -93,6 +84,15 @@ def init():
     #     val[0]["min"] = min_val
     out_sorted_iv = sort_iv(out)
     return responseto(data=out_sorted_iv)
+
+
+@app.route(base+"/rank",methods=['POST'])
+def rank():
+    data = request.form.get("data")
+    json_obj = json.loads(data)
+    out_sorted_iv = sort_iv(json_obj)
+    return responseto(data = out_sorted_iv)
+
 
 
 # @app.route(base + "/merge", methods=['POST'])
@@ -329,7 +329,7 @@ def apply():
     writer.close()
     output.seek(0)
 
-    file = send_file(output,as_attachment=True,attachment_filename='df_iv.xlsx')
+    file = send_file(output, as_attachment=True, attachment_filename='df_iv.xlsx')
     response = make_response(file)
 
     return responsePandas(response)
@@ -416,7 +416,7 @@ def parse():
     if len(result) < 1:
         vs.create_branch(model_name, "master", None, None)
         result = []
-        result.append({"model_branch": "master","remove_list" : None})
+        result.append({"model_branch": "master", "remove_list": None})
 
     branches = []
 
@@ -534,7 +534,7 @@ def column_config():
                  "params": params}
     pmml_xml = requests.post(const.MAAS_HOST + "/rest/pmml/generate", data=post_data).text
     doc = minidom.parseString(pmml_xml)
-    xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
+    xml_str = doc.toprettyxml(indent="  ", newl="\n", encoding='utf-8')
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
     mem_zip_file.append_content('column_config/model.pmml', xml_str)
@@ -841,16 +841,16 @@ def variable_select():
     branch = request.form.get("branch")
     var_list = request.form.get("var_list")
 
-    #调用接口时发现var_list为空,那么主动从数据库中读取
+    # 调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
-        result = vs.get_selected_variable(model_name,branch)[0]
+        result = vs.get_selected_variable(model_name, branch)[0]
         var_list = result["selected_variable"].decode('utf-8')
     else:
-    #清除旧数据,插入新的数据
-        if(vs.del_selected_variable(model_name,branch)):
-            vs.save_selected_variable(model_name,branch,var_list)
+        # 清除旧数据,插入新的数据
+        if (vs.del_selected_variable(model_name, branch)):
+            vs.save_selected_variable(model_name, branch, var_list)
         else:
-            return responseto(messege="fail to save selected variable",success=False)
+            return responseto(messege="fail to save selected variable", success=False)
     target = request.form.get("target")
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")
@@ -879,6 +879,7 @@ def variable_select_manual():
 
     data = model_function.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
                                                       selected_list.split(","), target, ks_group_num, with_intercept)
+
     return responseto(data=data)
 
 
@@ -927,6 +928,34 @@ def export_variables():
 }
     '''
 
+'''
+导出变量到excel
+'''
+@app.route(base + "/export_selected_variable", methods=['POST'])
+def export_selected_variable():
+    data = request.form.get("data")
+    dataDict = json.loads(data)
+    branch = dataDict["branch"]
+    type = dataDict["type"]
+    model_name = dataDict["model_name"]
+    if type == None:
+        type = "xlsx"
+    result = vs.load_binning_record(model_name, branch)
+    # result = filter(lambda x: x["is_selected"] >0,result)
+    new_result = []
+    for record in result:
+        new_record = []
+        new_record.append(record["variable_name"])
+        new_record.append(record["variable_iv"])
+        new_record.append(record["is_selected"])
+        new_result.append(new_record)
+    headers = ('variable_name', 'variable_iv','is_selected')
+    data = tablib.Dataset(*new_result, headers=headers)
+
+    # 实例化一个Workbook()对象(即excel文件)
+    resp = make_response(data.xlsx)
+    return responseFile(resp, "selected_variable." + type)
+
 
 def generate_response(var_name, df, iv):
     # data = {var_name: []}
@@ -958,19 +987,6 @@ def float_nan_to_str_nan(x):
         return str(x)
     else:
         return x
-
-
-def sort_variable(variables, result):
-    v = {}
-    for index, name in enumerate(variables):
-        v[name.decode('utf-8')] = index
-
-    new_result = [{}] * (len(v) - 1)
-    for variable in result:
-        i = v[variable["variable_name"].decode('utf-8')]
-        new_result[i] = variable
-
-    return new_result
 
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
