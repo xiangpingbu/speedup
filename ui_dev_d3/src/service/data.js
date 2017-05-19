@@ -1,11 +1,9 @@
 import axios from 'axios'
 import * as d3 from 'd3'
 
-// axios.defaults.baseURL = 'http://localhost:3000/'
+axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? process.env.AXIOS_BASE_URL : ''
 // axios.defaults.baseURL = '/api/'
 axios.interceptors.request.use(function (config) {
-  // 将请求直接发送到python，跳过node
-  config.url = `/es/resource/${config.url.split('/monitor/')[1]}`
   return config
 }, function (error) {
   return Promise.reject(error)
