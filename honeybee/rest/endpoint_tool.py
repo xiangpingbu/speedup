@@ -841,12 +841,16 @@ def variable_select():
     branch = request.form.get("branch")
     var_list = request.form.get("var_list")
 
+    #调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
-        vs.save_selected_variable(model_name,branch,var_list)
+        result = vs.get_selected_variable(model_name,branch)[0]
+        var_list = result["selected_variable"]
     else:
-        print "hehe"
-        # if(vs.delete_selected_variable())
-
+    #清除旧数据,插入新的数据
+        if(vs.del_selected_variable(model_name,branch)):
+            vs.save_selected_variable(model_name,branch,var_list)
+        else:
+            return responseto(messege="fail to save selected variable",success=False)
     target = request.form.get("target")
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")

@@ -113,14 +113,17 @@ def update_selected_variable(model_name,model_branch,var_list,modify_date,is_del
         return False
 
 def del_selected_variable(model_name,model_branch):
-    sql = "update tool_model_selected_variable " \
+    if(len(get_selected_variable(model_name,model_branch)) >0):
+        sql = "update tool_model_selected_variable " \
           "set is_deleted=1 ,modify_date=now()" \
           "where model_name = %s and model_branch=%s"
-    result = util.execute(sql,(model_name,model_branch))
-    if result > 0:
-        return True
+        result = util.execute(sql,(model_name,model_branch))
+        if result > 0:
+            return True
+        else:
+            return False
     else:
-        return False
+        return True
 
 def get_selected_variable(model_name,model_branch):
     sql = "select id,model_name,model_branch,selected_variable,modify_date,create_date from tool_model_selected_variable " \
