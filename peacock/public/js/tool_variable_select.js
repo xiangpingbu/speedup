@@ -58,9 +58,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     alert("invalid variable select,please change the variable");
                 }
 
-                $("#variable_select_content").html("");
+                $("#variable_select_content").remove();
 
                 var div =  d3.select("#variableSelect").append("div").attr("class", "ibox-content").attr("id","variable_select_content");
+                // var div =  d3.select("#variable_select_content");
                 div.append("div").text("模型信息");
                 var table = div.append("table").attr("class", "table table-striped");
                 var tbody = table.append("tbody");

@@ -844,7 +844,7 @@ def variable_select():
     #调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
         result = vs.get_selected_variable(model_name,branch)[0]
-        var_list = result["selected_variable"]
+        var_list = result["selected_variable"].decode('utf-8')
     else:
     #清除旧数据,插入新的数据
         if(vs.del_selected_variable(model_name,branch)):
