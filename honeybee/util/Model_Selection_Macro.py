@@ -12,7 +12,6 @@ def logisticReg_KS(df_train, df_test, target, para_list, ks_group_num):
         return [None, None]
     p = result_temp.summary2()
     p_value = p.tables[1][u'P>|z|'][-1]
-
     #get score for training set
     df_train['prob_bad'] = result_temp.predict(df_train[para_list])
     df_test['prob_bad'] = result_temp.predict(df_test[para_list])
