@@ -11,7 +11,10 @@ from Model_Selection_Macro import *
 def get_logit_backward_manually(train_woe, test_woe, all_list, selected_list, target, ks_group_num=20,
                                 withIntercept=True):
     train_y = train_woe[[target]]
+    if 'intercept' in selected_list: selected_list.remove('intercept')
+    if 'intercept' in all_list: all_list.remove('intercept')
     woe_var_list = [x + '_woe' for x in selected_list]
+
     if withIntercept:
         woe_var_list.append('intercept')
         train_woe['intercept'] = 1.0
@@ -92,11 +95,7 @@ def get_logit_backward(train_woe, test_woe, target, ks_group_num, in_vars=[], wi
                        in_max_loop=100):
     train_y = train_woe[[target]]
     woe_var_list = [x + '_woe' for x in in_vars]
-    woe_var_list_with_target = [x for x in woe_var_list]
-    woe_var_list_with_target.append(target)
     train_x = train_woe[woe_var_list]
-    train_x_with_target = train_woe[woe_var_list_with_target]
-    test_x_with_target = test_woe[woe_var_list_with_target]
 
     train_result = logit_backward(train_x, train_y, vars=woe_var_list, with_intercept=withIntercept, p_value=in_p_value,
                                   max_loop=in_max_loop)
@@ -134,6 +133,17 @@ def get_logit_backward(train_woe, test_woe, target, ks_group_num, in_vars=[], wi
 
     data['selected_var'] = var_train_result
 
+    if withIntercept:
+        woe_var_list.append('intercept')
+        train_woe['intercept'] = 1.0
+        test_woe['intercept'] = 1.0
+
+    woe_var_list_with_target = [x for x in woe_var_list]
+    woe_var_list_with_target.append(target)
+    train_x_with_target = train_woe[woe_var_list_with_target]
+    test_x_with_target = test_woe[woe_var_list_with_target]
+
+
     woe_var_list.append(target)
     model_para_list = train_result.params.index.tolist()
     marginal_var_train_result = get_marginal_var(train_x_with_target, test_x_with_target, target, model_para_list,
@@ -150,9 +160,7 @@ def get_logit_backward(train_woe, test_woe, target, ks_group_num, in_vars=[], wi
 
     model_ks = {}
     ks_input_list = model_para_list
-    if withIntercept:
-        train_woe['intercept'] = 1.0
-        test_woe['intercept'] = 1.0
+
 
     train_woe['prob_bad'] = train_result.predict(train_woe[ks_input_list])
     ks_train = ks_group(train_woe, target, 'prob_bad', ks_group_num, True).ks.max()
@@ -218,9 +226,10 @@ def logit_backward(x, y, vars=[], with_intercept=True, p_value=0.05, max_loop=10
 def negative_coef_to_drop(mdlresult):
     #
     aa = mdlresult.params.copy()
+    if 'intercept' in aa.index: aa = aa.drop('intercept')
     aa.sort_values(inplace=True, ascending=True)
     aa = aa[aa < 0]
-
+    print aa
     if len(aa) > 0:
         return aa.index[0]
     else:
