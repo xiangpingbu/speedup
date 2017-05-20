@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+"""
+@author: xiangping
+"""
+
 import random
 
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 
-import ks_function as kf
+from service import ks_calculation_service as kf
 
 
 def logisticReg_KS(df_train, df_test, target, para_list, ks_group_num):

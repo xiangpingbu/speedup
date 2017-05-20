@@ -14,11 +14,11 @@ from werkzeug.utils import secure_filename
 from beans.Pmml import *
 from common.constant import const
 from rest.app_base import *
+from service import binning_service as bf
 from service import db_service as vs
-from util import basic_analysis as ba
+from service import basic_analysis_service as ba
+from service import logit_model_service as lmf
 from util import common as cmm
-from util import logit_model_function as lmf
-from util import binning_function as bf
 from util.ZipFile import *
 
 base = '/tool'
