@@ -1,12 +1,17 @@
 # coding=utf-8
+"""
+@author: lifeng
+"""
+
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+
 def transfer(str):
     """将字符串转化为utf8"""
     return str.encode('utf-8')
 
-# def transferNan(str):
 
 def replace(str):
     """将字符串中的|替换为,"""
@@ -14,21 +19,19 @@ def replace(str):
 
 
 def df_for_html(df):
-    dataMap = {}
+    data_map = {}
     head = []
     for column in df.columns:
         head.append(str(column))
 
-    dataMap["body"] = []
+    data_map["body"] = []
     for index,row in df.iterrows():
         body = []
-        dataMap["body"].append(body)
+        data_map["body"].append(body)
         for key in head:
             body.append(str(row[key]))
 
-    dataMap["head"] = head
+    data_map["head"] = head
 
-    return dataMap
-
-
+    return data_map
 
