@@ -428,7 +428,7 @@ def parse():
             global_value.set_value(**df_map)
         else:
             df_train = df_map[key]['df_train']
-        df = a99.GetDFSummary(df_train)
+        df = ba.GetDFSummary(df_train)
         # 得到df_train,将dataframe转换为用于展示前端展示的数据
         data_map = cmm.df_for_html(df)
         result = vs.load_model(model_name)
@@ -803,7 +803,7 @@ def merge():
         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
 
-    result = ab.adjust(df_map["df_train"], type_bool, var_name, selected_list, target=target,
+    result = bf.adjust_bin(df_map["df_train"], type_bool, var_name, selected_list, target=target,
                        expected_column=excepted_column)  # 获得合并的结果
     iv = result['IV'].sum()
 
