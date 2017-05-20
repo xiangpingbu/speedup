@@ -9,7 +9,7 @@ import os
 class Config(object):
     DEBUG = False
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
-    TRAININF_FILE_STORAGE="/Users/lifeng/Desktop/"
+    ROOT_PATH="/Users/lifeng/Desktop"
 
 
 class Development(Config):  # inherit from Config

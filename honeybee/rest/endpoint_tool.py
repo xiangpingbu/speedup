@@ -40,7 +40,7 @@ def file_init():
     return [train, test]
 
 
-model_name = "model_train_selected"
+# model_name = "model_train_selected"
 
 # df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
 # df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
@@ -51,9 +51,9 @@ model_name = "model_train_selected"
 # df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
 # df_train = df_all[df_all['dev_ind'] == 1]
 # df_test = df_all[df_all['dev_ind'] == 0]
-df_test = None
-df_train = None
-df_all = None
+# df_test = None
+# df_train = None
+# df_all = None
 # df_all = None
 safely_apply = False
 apply_result = None
@@ -61,12 +61,13 @@ apply_result = None
 
 @app.route(base + "/init", methods=['POST'])
 def init():
-    name = request.form.get("model_name")
+    name = request.form.get("modelName")
     branch = request.form.get("branch")
 
-    if name is None or name == '':
-        name = model_name
-        branch = "master"
+    # if name is None or name == '':
+    #     name = model_name
+    #     branch = "master"
+    df_map = global_value.get_value(name+"_"+branch)
 
     result = vs.load_branch(name, branch)
     remove_list_json = json.loads(result[0]["remove_list"])
@@ -74,7 +75,7 @@ def init():
     for o in remove_list_json:
         remove_list.append(o)
     min_val = 0
-    df = df_train
+    df = df_map['df_train']
     init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
 
     out = get_boundary(init_result, min_val)
@@ -168,6 +169,10 @@ def divide():
     :return:
     """
 
+    model_name  = request.form.get("modelName")
+    branch = request.form.get('branch')
+    df_map = global_value.get_value(model_name+"_"+branch)
+    df_train = df_map['df_train']
     min_val = 0
     data = request.form.get('data')
     # 解析json
@@ -259,6 +264,9 @@ def divide_manually():
     model_name = request.form.get("model_name")
     type = request.form.get("type")
 
+    df_map = global_value.get_value(model_name+"_"+branch)
+    df_train  = df_map['df_train']
+
     boundary_list = []
     if type == "true":
         for s in boundary.split(","):
@@ -289,13 +297,16 @@ def divide_manually():
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
+    df_map = global_value.get_value(model_name+"_"+branch)
     req = request.form.get('data')
     var_dict = json.loads(req)
 
     data = var_dict["data"]
 
     # df = df_test.append(df_train)
-    df = df_all.copy()
+    df = df_map['df_all'].copy()
     var_list = data.keys()
 
     for var_name in var_list:
@@ -391,10 +402,7 @@ def upload():
     if request.method == 'POST':
         # 获取training文件上传的路径
         storage = app.config['TRAININF_FILE_STORAGE']
-        global df_train
-        global df_test
-        global model_name
-        global df_all
+
         files = request.files.getlist("file[]")
         for file in files:
             from unicodedata import normalize
@@ -421,31 +429,60 @@ def upload():
 @app.route(base + "/parse", methods=['GET'])
 def parse():
     # 对train文件进行转换,分析
-    df = a99.GetDFSummary(df_train)
-    # dataframe转换为用于展示
-    data_map = cmm.df_for_html(df)
-    result = vs.load_model(model_name)
-    if len(result) < 1:
-        vs.create_branch(model_name, "master", None, None)
-        result = []
-        result.append({"model_branch": "master", "remove_list": None})
 
-    branches = []
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
+    # 用户指定的文件相对路径
+    file_path = request.form.get("filePath")
+    root_path = app.config["ROOT_PATH"]
 
-    # 只取master
-    v = result[0]
-    remove_list = ""
-    if v["remove_list"] is not None:
-        remove_list = v["remove_list"]
-        data_map["target"] = v["model_target"]
+    path = root_path + file_path
+    # 以模型名称和分支名作为唯一的key
+    key = model_name + "_" + branch
+    # df_train = None
+    # 流程继续下去的前提就是路径是真实存在的
+    if os.path.exists(path):
+        # 检查是否已经加载过了
+        df_map = global_value.get_value(key)
+        if df_map is None:
+            # 重新加载资源
+            df_all = pd.read_excel(path)
+            df_train = df_all[df_all['dev_ind'] == 1]
+            df_test = df_all[df_all['dev_ind'] == 0]
+            df_map = {model_name + "_" + branch:
+                          {"df_all": df_all,
+                           "df_train": df_train,
+                           "df_test": df_test}}
+            global_value.set_value(**df_map)
+        else:
+            df_train = df_map[key]['df_train']
+        df = a99.GetDFSummary(df_train)
+        # 得到df_train,将dataframe转换为用于展示前端展示的数据
+        data_map = cmm.df_for_html(df)
+        result = vs.load_model(model_name)
+        # if len(result) < 1:
+        #     vs.create_branch(model_name, "master", None, None)
+        #     result = []
+        #     result.append({"model_branch": "master", "remove_list": None})
 
-    for n in result:
-        branches.append(n["model_branch"])
+        branches = []
 
-    data_map["current_model"] = model_name
-    data_map["branches"] = branches
-    data_map["remove_list"] = remove_list
-    return responseto(data=data_map)
+        # 只取master
+        v = result[0]
+        remove_list = ""
+        if v["remove_list"] is not None:
+            remove_list = v["remove_list"]
+            data_map["target"] = v["model_target"]
+
+        for n in result:
+            branches.append(n["model_branch"])
+
+        data_map["current_model"] = model_name
+        data_map["branches"] = branches
+        data_map["remove_list"] = remove_list
+        return responseto(data=data_map)
+    else:
+        return responseto(message="file not exist",success=False)
 
 
 @app.route(base + "/column_config", methods=['POST'])
@@ -778,6 +815,8 @@ print s
 @app.route(base + "/merge", methods=['POST'])
 def merge():
     """归并操作"""
+    model_name  =request.form.get("modelName")
+    branch =  request.form.get("branch")
     # 要执行合并的variable
     var_name = request.form.get('varName')
     # 变量的类型
@@ -794,6 +833,8 @@ def merge():
     excepted_column = {var_name}
 
     min_val = 0
+
+    df_map = global_value.get_value(model_name+"_"+branch)
 
     result = None
     type_bool = False
@@ -830,7 +871,7 @@ def merge():
         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
 
-    result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
+    result = ab.adjust(df_map["df_train"], type_bool, var_name, selected_list, target=target,
                        expected_column=excepted_column)  # 获得合并的结果
     iv = result['IV'].sum()
 
