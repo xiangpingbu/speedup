@@ -1,6 +1,6 @@
 # coding=utf-8
 from rest.app_base import *
-from service import variable_service as vs
+from service import db_service as vs
 import requests
 import json
 from collections import OrderedDict

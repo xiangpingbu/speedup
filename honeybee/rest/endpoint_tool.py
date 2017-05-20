@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import collections
-import json
 import sys
 from collections import OrderedDict
 from io import BytesIO
+from xml.dom import minidom
 
 import numpy as np
 import pandas as pd
@@ -12,15 +12,13 @@ from flask import send_file
 from werkzeug.utils import secure_filename
 
 from beans.Pmml import *
-from rest.app_base import *
-from service import variable_service as vs
-from util import A99_Functions as a99
-from util import Adjust_Binning as ab
-from util import Initial_Binning as ib
-from util import common as cmm
-from util import model_function
-import requests
 from common.constant import const
+from rest.app_base import *
+from service import binning_service as bf
+from service import db_service as vs
+from service import basic_analysis_service as ba
+from service import logit_model_service as lmf
+from util import common as cmm
 from util.ZipFile import *
 from xml.dom import minidom
 import tablib
@@ -42,19 +40,10 @@ def file_init():
 
 # model_name = "model_train_selected"
 
-# df_train = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_train.xlsx")
-# df_train = pd.read_excel("/Users/lifeng/Desktop/pailie/model_train_selected2.xlsx")
-# df_train = None
-# df_test = pd.read_excel("/Users/lifeng/Desktop/df_test.xlsx")
-# df_test = pd.read_excel("/Users/xpbu/Documents/Work/maasFile/df_test.xlsx")
-# df_test = pd.read_excel("/Users/lifeng/Desktop/pailie/model_test_selected2.xlsx")
-# df_all = pd.read_excel("/Users/lifeng/Desktop/pailie/model_selected2.xlsx", encoding="utf-8")
-# df_train = df_all[df_all['dev_ind'] == 1]
-# df_test = df_all[df_all['dev_ind'] == 0]
-# df_test = None
-# df_train = None
-# df_all = None
-# df_all = None
+df_test = None
+df_train = None
+df_all = None
+
 safely_apply = False
 apply_result = None
 
@@ -74,15 +63,12 @@ def init():
     remove_list = []
     for o in remove_list_json:
         remove_list.append(o)
+
     min_val = 0
     df = df_map['df_train']
     init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
 
     out = get_boundary(init_result, min_val)
-    # for
-    # first_bin = val[0]
-    # if first_bin["category_t"] == False:
-    #     val[0]["min"] = min_val
     out_sorted_iv = sort_iv(out)
     return responseto(data=out_sorted_iv)
 
@@ -188,14 +174,6 @@ def divide():
         min = data_map["selected"]["min_boundary"]
         max = data_map["selected"]["max_boundary"]
         df = df[(df[name].astype(float) >= float(min)) & (df[name].astype(float) < float(max))]
-
-        # for index, row in df.iterrows():
-        #    if float(min) <= float(row[name]) < float(
-        # max):
-        #        pass
-        #    else:
-        #        df.drop(index, inplace=True)
-
         out = get_init(df, target=target, invalid=[], fineMinLeafRate=0)
         bound_list = get_divide_min_bound(out)
 
@@ -207,7 +185,7 @@ def divide():
             bound_list.append(float(v["min_boundary"]))
         # bound_list.append(np.nan)
 
-        result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
+        result = bf.adjust_bin(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
                            , target=target, expected_column={name})
         columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
                    'bad_rate', 'woe',
@@ -222,12 +200,6 @@ def divide():
 
     else:
         val = data_map["selected"][name].split("|")
-        # for index, row in df.iterrows():
-        #     if row[name] in val:
-        #         pass
-        #     else:
-        #         df.drop(index, inplace=True)
-
         df[name] = df[name].apply(lambda x: float_nan_to_str_nan(x))
 
         df = df[df[name].isin(val)]
@@ -243,7 +215,7 @@ def divide():
         # 将分裂的结果加入原有的列表中
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
-        result = ab.adjust(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
+        result = bf.adjust_bin(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
                            , target=target, expected_column={name})
         iv = result['IV'].sum()
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
@@ -284,7 +256,7 @@ def divide_manually():
                    'type']
 
     target = vs.load_branch(model_name, branch)[0]["model_target"]
-    result = ab.adjust(df_train, type == "true", variable_name, boundary_list
+    result = bf.adjust_bin(df_train, type == "true", variable_name, boundary_list
                        , target=target, expected_column={variable_name})
 
     iv = result['IV'].sum()
@@ -603,7 +575,7 @@ def column_config2():
 
 
 def get_init(df, target=None, invalid=None, fineMinLeafRate=0.05):
-    data_map = ib.cal(df, target, invalid, fineMinLeafRate)
+    data_map = bf.get_init_bin(df, target, invalid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
@@ -632,41 +604,6 @@ def get_init(df, target=None, invalid=None, fineMinLeafRate=0.05):
         var_content['var_table'] = subList
         out[var_name] = var_content
     return out
-
-
-'''
-def get_boundary(out, min_val=0):
-    if isinstance(out, dict):
-        data = out.items()
-    else:
-        data = [out]
-
-    for val in data:
-        index = 0
-        last_bin = None
-        for bin_row in val[1]['var_table']:
-            if bin_row["type"] == "Numerical":
-                index += 1
-                if index == 1:
-                    # if float(bin_row["min"]) >= min_val:
-                    last_bin = bin_row
-                    if float(bin_row["min"]) > min_val:
-                        bin_row["min_boundary"] = min_val
-                else:
-                    if bin_row["min"] != 'nan':
-                        last_bin["max_boundary"] = bin_row["min_boundary"]
-
-                        if  len(val[1]) ==index :
-                            bin_row["max_boundary"] = 'inf'
-                        last_bin = bin_row
-
-                    else:
-                        last_bin["max_boundary"] = 'inf'
-            else:
-                break
-
-    return out
-'''
 
 
 # 有时间的话， 要做优化修改
@@ -807,11 +744,6 @@ def get_merged(var_name, df, min_val):
     return data
 
 
-s = u"nan"
-print s
-
-
-# ************************
 @app.route(base + "/merge", methods=['POST'])
 def merge():
     """归并操作"""
@@ -909,7 +841,7 @@ def variable_select():
     ks_group_num = request.form.get("ks_group_num")
     ks_group_num = ks_group_num if ks_group_num != '' else 20
 
-    data = model_function.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
+    data = lmf.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
                                              withIntercept)
     if data is None:
         return responseto(success=False)
@@ -930,7 +862,7 @@ def variable_select_manual():
     ks_group_num = request.form.get("ks_group_num")
     ks_group_num = ks_group_num if ks_group_num != '' else 20
 
-    data = model_function.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
+    data = lmf.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
                                                       selected_list.split(","), target, ks_group_num, with_intercept)
 
     return responseto(data=data)
@@ -1055,7 +987,3 @@ def sort_variable(variables, result):
         new_result[i] = variable
 
     return new_result
-
-# variables = ["性别","年龄"]
-# result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
-# sort_variable(variables,result)
