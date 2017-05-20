@@ -428,7 +428,7 @@ def parse():
             global_value.set_value(**df_map)
         else:
             df_train = df_map[key]['df_train']
-        df = ba.GetDFSummary(df_train)
+        df = ba.get_df_summary(df_train)
         # 得到df_train,将dataframe转换为用于展示前端展示的数据
         data_map = cmm.df_for_html(df)
         result = vs.load_model(model_name)
