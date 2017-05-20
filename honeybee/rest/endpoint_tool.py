@@ -24,6 +24,7 @@ from common.constant import const
 from util.ZipFile import *
 from xml.dom import minidom
 import tablib
+import os
 from common import global_value
 
 base = '/tool'
@@ -85,13 +86,12 @@ def init():
     return responseto(data=out_sorted_iv)
 
 
-@app.route(base+"/rank",methods=['POST'])
+@app.route(base + "/rank", methods=['POST'])
 def rank():
     data = request.form.get("data")
     json_obj = json.loads(data)
     out_sorted_iv = sort_iv(json_obj)
-    return responseto(data = out_sorted_iv)
-
+    return responseto(data=out_sorted_iv)
 
 
 # @app.route(base + "/merge", methods=['POST'])
@@ -379,23 +379,34 @@ def apply_get_woe_value(var_name, var_value, var_dict):
         return 0.0
 
 
+'''
+上传training文件,如果是跨域上传会先用OPTIONS请求试探,然后使用post调用
+'''
+
+
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
 def upload():
     """工具依赖的源文件修改"""
     # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
     if request.method == 'POST':
+        # 获取training文件上传的路径
+        storage = app.config['TRAININF_FILE_STORAGE']
         global df_train
         global df_test
         global model_name
         global df_all
         files = request.files.getlist("file[]")
         for file in files:
-            filename = secure_filename(file.filename)
-
-            print filename
-            df_all = pd.read_excel(file, encoding="utf-8")
-            df_train = df_all[df_all['dev_ind'] == 1]
-            df_test = df_all[df_all['dev_ind'] == 0]
+            from unicodedata import normalize
+            filename = normalize('NFKD', file.filename).encode('utf-8', 'ignore')
+            # filename = secure_filename(file.filename.decode('utf-8'))
+            if (os.path.exists(storage + filename)):
+                pass
+            else:
+                file.save(storage + filename)
+            # df_all = pd.read_excel(file, encoding="utf-8")
+            # df_train = df_all[df_all['dev_ind'] == 1]
+            # df_test = df_all[df_all['dev_ind'] == 0]
 
             #     df_test = pd.read_excel(file, encoding="utf-8")
             # elif filename == 'df_train.xlsx':
@@ -409,7 +420,9 @@ def upload():
 
 @app.route(base + "/parse", methods=['GET'])
 def parse():
+    # 对train文件进行转换,分析
     df = a99.GetDFSummary(df_train)
+    # dataframe转换为用于展示
     data_map = cmm.df_for_html(df)
     result = vs.load_model(model_name)
     if len(result) < 1:
@@ -930,6 +943,8 @@ def export_variables():
 '''
 导出变量到excel
 '''
+
+
 @app.route(base + "/export_selected_variable", methods=['POST'])
 def export_selected_variable():
     data = request.form.get("data")
@@ -948,7 +963,7 @@ def export_selected_variable():
         new_record.append(record["variable_iv"])
         new_record.append(record["is_selected"])
         new_result.append(new_record)
-    headers = ('variable_name', 'variable_iv','is_selected')
+    headers = ('variable_name', 'variable_iv', 'is_selected')
     data = tablib.Dataset(*new_result, headers=headers)
 
     # 实例化一个Workbook()对象(即excel文件)
@@ -986,6 +1001,19 @@ def float_nan_to_str_nan(x):
         return str(x)
     else:
         return x
+
+
+def sort_variable(variables, result):
+    v = {}
+    for index, name in enumerate(variables):
+        v[name.decode('utf-8')] = index
+
+    new_result = [{}] * (len(v) - 1)
+    for variable in result:
+        i = v[variable["variable_name"].decode('utf-8')]
+        new_result[i] = variable
+
+    return new_result
 
 # variables = ["性别","年龄"]
 # result = vs.load_binning_record("model_train_selected","xiaozhuo",variables)
