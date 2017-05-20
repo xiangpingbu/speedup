@@ -19,8 +19,8 @@ require.config({
     }
 });
 
-//var host = "http://localhost:8091";
-var host = "http://101.71.245.166:8091";
+var host = "http://localhost:8091";
+//var host = "http://101.71.245.166:8091";
 var originUt;
 
 
