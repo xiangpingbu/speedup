@@ -373,7 +373,7 @@ def upload():
     # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
     if request.method == 'POST':
         # 获取training文件上传的路径
-        storage = app.config['TRAININF_FILE_STORAGE']
+        storage = app.config['ROOT_PATH']
 
         files = request.files.getlist("file[]")
         for file in files:
@@ -391,10 +391,10 @@ def upload():
             #     df_test = pd.read_excel(file, encoding="utf-8")
             # elif filename == 'df_train.xlsx':
             #     df_train = pd.read_excel(file, encoding="utf-8")
-            if filename.find("_") > 0:
-                model_name = filename.split("_")[0]
-            else:
-                model_name = "anonymous"
+            # if filename.find("_") > 0:
+            #     model_name = filename.split("_")[0]
+            # else:
+            #     model_name = "anonymous"
     return responseto(data="success")
 
 

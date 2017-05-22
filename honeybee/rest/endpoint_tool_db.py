@@ -21,29 +21,6 @@ def es_req(key):
     return responseto(data=json.loads(response.text))
 
 '''
-创建新的分支,将会复制原有的分支的内容
-'''
-@app.route(base + "/branch", methods=['POST'])
-def new_branch():
-    model_name = request.form.get("model_name")
-    branch = request.form.get("branch")
-    original_branch = request.form.get("original_branch")
-
-    result = vs.load_binning_record(model_name, original_branch)
-
-    list = []
-
-    for record in result:
-        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"],record["is_selected"]]
-        list.append(obj)
-
-    if vs.copy_branch(model_name, branch,original_branch):
-        vs.save_binning_record(list)
-        return responseto(data=True)
-    return responseto(data=False)
-
-
-'''
 @pre-init步骤提交该分支的信息
 '''
 @app.route(base + "/branch/commit-branch", methods=['POST'])

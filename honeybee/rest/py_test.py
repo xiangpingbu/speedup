@@ -126,6 +126,3 @@ def parseXml():
 
 def ppp():
     return global_value.get_value("")
-
-
-
