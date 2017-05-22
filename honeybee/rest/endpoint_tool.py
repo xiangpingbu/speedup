@@ -827,3 +827,4 @@ def sort_variable(variables, result):
         new_result[i] = variable
 
     return new_result
+
