@@ -5,17 +5,26 @@ from datetime import datetime
 
 
 
+
 def load_model(**params):
     """获得对应模型的信息:分支,模型名称,资源文件位置等"""
     # sql = "select model_branch,remove_list,model_target from tool_model where model_name = %s and is_deleted = 0"
 
-    sql = "select model_name,model_branch,model_target,remove_list,selected_list,file_path " \
+    sql = "select model_name,model_branch,model_target,remove_list,selected_list,file_path, " \
           "create_date,modify_date,is_deleted from tool_model"
 
     process_result = db_util.process_query(sql, params)
 
     result = util.query(process_result[0], process_result[1])
     return result
+
+def update_branch(name, branch, target, remove_list=None, selected_list=None):
+    '''更新对应分支的配置'''
+    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s , modify_date= %s where model_name=%s and model_branch= %s"
+    result = util.execute(sql, (target, remove_list, selected_list, datetime.now(), name, branch))
+    if result > 0:
+        return True
+    return False
 
 
 
@@ -36,6 +45,8 @@ def create_branch(**params):
 
     #process_insert会根据参数拼接sql
     sql = "insert into tool_model"
+    params["create_date"] = datetime.now()
+    params["modify_date"] = datetime.now()
 
     process_result = db_util.process_insert(sql,params)
 

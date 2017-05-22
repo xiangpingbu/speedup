@@ -27,10 +27,10 @@ def es_req(key):
 def commit_branch():
     model_name = request.form.get("model_name")
     branch = request.form.get("branch")
-    remove_list = request.form.get("remove_list")
+    selected_list = request.form.get("selected_list")
     target = request.form.get("target")
 
-    return responseto(data=vs.update_branch(model_name, branch, target, remove_list))
+    return responseto(data=vs.update_branch(model_name, branch, target, selected_list=selected_list))
 
 
 '''

@@ -10,3 +10,6 @@ def set_value(**input_value):
 
 def get_value(modelname_branch):
     return value[modelname_branch]
+
+def has_key(key):
+    return value.has_key(key)

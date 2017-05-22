@@ -5,7 +5,6 @@ import xml.dom.minidom
 from io import BytesIO
 from common import global_value
 
-
 datas = [{'name': 'javascript', 'useto': 'web development'},
          {'name': 'python', 'useto': 'do anything'},
          {'name': 'php', 'useto': 'web development'},
@@ -15,24 +14,26 @@ datas = [{'name': 'javascript', 'useto': 'web development'},
 @app.route('/languages')
 def getAll():
     return fullResponse(R200_OK, datas)
-@app.route('/tool',methods=['GET','POST'])
+
+
+@app.route('/tool', methods=['GET', 'POST'])
 def resp():
     if request.method == "POST":
         binNums = request.form.get('binNums')
     else:
         binNums = None
     data = [[{"bin_num": 0, "woe": 0.1564},
-            {"bin_num": 1, "woe": 0.0726},
-            {"bin_num": 2, "woe": 0.0236},
-            {"bin_num": 3, "woe": -0.1455},
-            {"bin_num": 4, "woe": -0.1472},
-            {"bin_num": 5, "woe": -0.4853},
-            {"bin_num": 6, "woe": -0.1629}]]
+             {"bin_num": 1, "woe": 0.0726},
+             {"bin_num": 2, "woe": 0.0236},
+             {"bin_num": 3, "woe": -0.1455},
+             {"bin_num": 4, "woe": -0.1472},
+             {"bin_num": 5, "woe": -0.4853},
+             {"bin_num": 6, "woe": -0.1629}]]
     data2 = copy.copy(data)
     print data
     if binNums is not None:
-        index=binNums.encode('utf8').split(',')
-        for i in range(int(index[0]),int(index[1])):
+        index = binNums.encode('utf8').split(',')
+        for i in range(int(index[0]), int(index[1])):
             for d in data:
                 if d["bin_num"] == i:
                     data.remove(d)
@@ -90,35 +91,35 @@ def delOne(name):
 
 
 def GenerateXml():
-
     impl = xml.dom.minidom.getDOMImplementation()
     dom = impl.createDocument(None, 'employees', None)
     root = dom.documentElement
     employee = dom.createElement('employee')
     root.appendChild(employee)
 
-    nameE=dom.createElement('name')
-    nameT=dom.createTextNode('linux')
+    nameE = dom.createElement('name')
+    nameT = dom.createTextNode('linux')
     nameE.appendChild(nameT)
     employee.appendChild(nameE)
 
-    ageE=dom.createElement('age')
-    ageT=dom.createTextNode('30')
+    ageE = dom.createElement('age')
+    ageT = dom.createTextNode('30')
     ageE.appendChild(ageT)
     employee.appendChild(ageE)
 
     output = BytesIO()
-    dom.writexml(output, addindent='  ', newl='\n',encoding='utf-8')
+    dom.writexml(output, addindent='  ', newl='\n', encoding='utf-8')
     s = output.getvalue()
     print s
     # f.close()
     # print s
 
+
 def parseXml():
     s = '<?xml version="1.0" encoding="utf-8"?><employees><employee><name>linux</name><age>30</age></employee></employees>'
     doc = xml.dom.minidom.parseString(s)
     output = BytesIO()
-    xml_str  = doc.toprettyxml(indent="  ", newl="\n",encoding='utf-8')
+    xml_str = doc.toprettyxml(indent="  ", newl="\n", encoding='utf-8')
     # repl = lambda x: ">%s</" % x.group(1).strip() if len(x.group(1).strip()) != 0 else x.group(0)
     # pretty_str = re.sub(r'>\n\s*([^<]+)</', repl, xml_str)
     print xml_str
@@ -126,3 +127,11 @@ def parseXml():
 
 def ppp():
     return global_value.get_value("")
+
+
+import os
+import os.path
+
+list = ["bad_4w","province","cell_loc"]
+import json
+print json.dumps(list)

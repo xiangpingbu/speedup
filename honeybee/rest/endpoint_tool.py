@@ -24,6 +24,9 @@ from xml.dom import minidom
 import tablib
 import os
 from common import global_value
+from service.db import tool_model_service
+from datetime import datetime
+
 
 base = '/tool'
 base_path = "./util/"
@@ -379,11 +382,16 @@ def upload():
         for file in files:
             from unicodedata import normalize
             filename = normalize('NFKD', file.filename).encode('utf-8', 'ignore')
+            file_path = storage + "/"+filename
             # filename = secure_filename(file.filename.decode('utf-8'))
-            if (os.path.exists(storage + "/"+filename)):
+            if (os.path.exists(file_path)):
                 return responseto(data="file exist",success=False)
             else:
-                file.save(storage + "/"+ filename)
+                file.save(file_path)
+                model_name = filename.split(".")
+                tool_model_service.create_branch(model_name=model_name[0],model_branch="master",
+                                                 create_date=datetime.now(),modify_date=datetime.now(),
+                                                 file_path=file_path,model_target="")
             # df_all = pd.read_excel(file, encoding="utf-8")
             # df_train = df_all[df_all['dev_ind'] == 1]
             # df_test = df_all[df_all['dev_ind'] == 0]
@@ -396,66 +404,6 @@ def upload():
             # else:
             #     model_name = "anonymous"
     return responseto(data="success")
-
-
-@app.route(base + "/parse", methods=['GET'])
-def parse():
-    # 对train文件进行转换,分析
-
-    model_name = request.form.get("modelName")
-    branch = request.form.get("branch")
-    # 用户指定的文件相对路径
-    file_path = request.form.get("filePath")
-    root_path = app.config["ROOT_PATH"]
-
-    path = root_path + file_path
-    # 以模型名称和分支名作为唯一的key
-    key = model_name + "_" + branch
-    # df_train = None
-    # 流程继续下去的前提就是路径是真实存在的
-    if os.path.exists(path):
-        # 检查是否已经加载过了
-        df_map = global_value.get_value(key)
-        if df_map is None:
-            # 重新加载资源
-            df_all = pd.read_excel(path)
-            df_train = df_all[df_all['dev_ind'] == 1]
-            df_test = df_all[df_all['dev_ind'] == 0]
-            df_map = {model_name + "_" + branch:
-                          {"df_all": df_all,
-                           "df_train": df_train,
-                           "df_test": df_test}}
-            global_value.set_value(**df_map)
-        else:
-            df_train = df_map[key]['df_train']
-        df = ba.get_df_summary(df_train)
-        # 得到df_train,将dataframe转换为用于展示前端展示的数据
-        data_map = cmm.df_for_html(df)
-        result = vs.load_model(model_name)
-        # if len(result) < 1:
-        #     vs.create_branch(model_name, "master", None, None)
-        #     result = []
-        #     result.append({"model_branch": "master", "remove_list": None})
-
-        branches = []
-
-        # 只取master
-        v = result[0]
-        remove_list = ""
-        if v["remove_list"] is not None:
-            remove_list = v["remove_list"]
-            data_map["target"] = v["model_target"]
-
-        for n in result:
-            branches.append(n["model_branch"])
-
-        data_map["current_model"] = model_name
-        data_map["branches"] = branches
-        data_map["remove_list"] = remove_list
-        return responseto(data=data_map)
-    else:
-        return responseto(message="file not exist",success=False)
-
 
 @app.route(base + "/column_config", methods=['POST'])
 def column_config():
