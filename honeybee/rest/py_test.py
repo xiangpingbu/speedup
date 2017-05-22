@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from rest.app_base import *
 import copy
 import xml.dom.minidom
@@ -125,9 +126,6 @@ def parseXml():
     # repl = lambda x: ">%s</" % x.group(1).strip() if len(x.group(1).strip()) != 0 else x.group(0)
     # pretty_str = re.sub(r'>\n\s*([^<]+)</', repl, xml_str)
     print xml_str
-
-
-
 
 
 
