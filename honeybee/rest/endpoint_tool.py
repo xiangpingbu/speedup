@@ -380,10 +380,10 @@ def upload():
             from unicodedata import normalize
             filename = normalize('NFKD', file.filename).encode('utf-8', 'ignore')
             # filename = secure_filename(file.filename.decode('utf-8'))
-            if (os.path.exists(storage + filename)):
-                pass
+            if (os.path.exists(storage + "/"+filename)):
+                return responseto(data="file exist",success=False)
             else:
-                file.save(storage + filename)
+                file.save(storage + "/"+ filename)
             # df_all = pd.read_excel(file, encoding="utf-8")
             # df_train = df_all[df_all['dev_ind'] == 1]
             # df_test = df_all[df_all['dev_ind'] == 0]

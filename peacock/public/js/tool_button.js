@@ -95,6 +95,18 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         addLabel("#dataframe", "branch", false);
         addLabel("#dataframe", "target", true);
 
+        $.ajax({
+                url: host + "/tool/init_model_name",
+                type: 'get',
+                async: true,
+                success:function (result) {
+                    if (result.success()){
+                        // d3.select("#model").append("option").text(data["current_model"]);
+                        $("#model").append(new Option("Jquery", 10001, false, true))
+                    }
+                }
+        });
+
         $("#branch").on("select2:open", function (e) {
             originalBranch = $(this).val();
             console.log(originalBranch);
