@@ -6,6 +6,7 @@ import json
 from collections import OrderedDict
 from datetime import datetime
 from common.constant import const
+from service.db import tool_model_service
 
 
 
@@ -69,7 +70,7 @@ def load_all():
     model_name = request.values.get("model_name")
     branch = request.values.get("branch")
 
-    result = vs.load_binning_record(model_name, branch)
+    result = tool_model_service.load_binning_record(model_name, branch)
 
     data = {}
     if result is not None:

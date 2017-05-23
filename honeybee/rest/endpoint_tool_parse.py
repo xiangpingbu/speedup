@@ -61,6 +61,7 @@ def parse():
         # data_map["current_model"] = model_name
         data_map["branches"] = branches
         data_map["selected_list"] = v["selected_list"]
+        data_map["target"] = v["model_target"]
 
         return responseto(data=data_map)
     else:

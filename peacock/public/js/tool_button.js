@@ -8,6 +8,7 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 originalBranch = null;
+finishInit= false;
 
 // var host = "http://192.168.31.68:8091";
 // var host = "http://localhost:8091";
@@ -143,14 +144,19 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                 success: function (result) {
                     var files = result.data["files"];
                     var selectedFile = result.data["selected_file"];
+                    var target = result.data["target"];
                     // var target = result.data["target"];
                     // $("#model").append(new Option("选择模型", "选择模型", false,false));
                     for (let i in files) {
                         $("#filePath").append(new Option(files[i], files[i]));
                         // $("#target").append(new Option(data[i]["target"], data[i][["target"]]));
                     }
+
                     $("#filePath").val(selectedFile).trigger("change");
-                    $("#target").append(new Option(result.data["target"], result.data["target"]))
+                    $("#target").append(new Option(target, target,true,true));
+                    currentTarget = target;
+                    // $("#target").val(result.data["target"]).trigger("change")
+
                 }
             });
         })
@@ -263,7 +269,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     }
 
 
-                    // $('#target').val(data["target"]).trigger("change");
+                    $('#target').val(data["target"]).trigger("change");
 
 
                     $('.i-checks').iCheck({
@@ -288,6 +294,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                         .on('ifUnchecked', function (event) {
                             $(".icheckbox_square-green").iCheck('uncheck');
                         });
+                    finishInit = true;
                 },
                 error: function () {
                     $(this).removeClass("btn-primary");
@@ -590,33 +597,35 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
      * 提交分支
      */
     function commitBranch() {
-        var selected_list = {};
-        var target = $('#target').val();
-        var branch = $('#branch').val();
-        var model_name = $("#model").val();
-        var file_path = $("#filePath").val();
-        /**
-         * 将被选中的variable添加到removeList中
-         */
-        $("#dataframe").find("tbody .checked").each(function (i, n) {
-            selected_list[$(n).parents("tr").children().eq(1).html()] = i;
-        });
-        $.ajax({
-            url: host + "/tool/db/branch/commit-branch",
-            type: 'post',
-            data: {
-                selected_list: JSON.stringify(selected_list),
-                target: target,
-                branch: branch,
-                model_name: model_name,
-            },
-            async: true,
-            success: function (result) {
-            },
-            error: function () {
+        if (finishInit) {
+            var selected_list = {};
+            var target = $('#target').val();
+            var branch = $('#branch').val();
+            var model_name = $("#model").val();
+            var file_path = $("#filePath").val();
+            /**
+             * 将被选中的variable添加到removeList中
+             */
+            $("#dataframe").find("tbody .checked").each(function (i, n) {
+                selected_list[$(n).parents("tr").children().eq(1).html()] = i;
+            });
+            $.ajax({
+                url: host + "/tool/db/branch/commit-branch",
+                type: 'post',
+                data: {
+                    selected_list: JSON.stringify(selected_list),
+                    target: target,
+                    branch: branch,
+                    model_name: model_name,
+                },
+                async: true,
+                success: function (result) {
+                },
+                error: function () {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     return {

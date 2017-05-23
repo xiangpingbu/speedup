@@ -61,15 +61,13 @@ def init():
     #     branch = "master"
     df_map = global_value.get_value(name+"_"+branch)
 
-    result = vs.load_branch(name, branch)
-    remove_list_json = json.loads(result[0]["remove_list"])
-    remove_list = []
-    for o in remove_list_json:
-        remove_list.append(o)
+    result = tool_model_service.load_model(model_name=name, model_branch=branch)
+    selected_list_json = json.loads(result[0]["selected_list"])
+    selected_list = selected_list_json.keys()
 
     min_val = 0
     df = df_map['df_train']
-    init_result = get_init(df, target=result[0]["model_target"], invalid=remove_list)
+    init_result = get_init(df, target=result[0]["model_target"], valid=selected_list)
 
     out = get_boundary(init_result, min_val)
     out_sorted_iv = sort_iv(out)
@@ -522,8 +520,8 @@ def column_config2():
     return send_file(mem_zip_file.read(), attachment_filename='capsule.zip', as_attachment=True)
 
 
-def get_init(df, target=None, invalid=None, fineMinLeafRate=0.05):
-    data_map = bf.get_init_bin(df, target, invalid, fineMinLeafRate)
+def get_init(df, target=None, invalid=None, valid= None, fineMinLeafRate=0.05):
+    data_map = bf.get_init_bin(df, target, invalid,valid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
