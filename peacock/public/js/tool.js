@@ -85,7 +85,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             type: 'post',
             data: {
                 branch: localStorage.getItem("branch"),
-                model_name: localStorage.getItem("model_name")
+                modelName: localStorage.getItem("model_name")
             },
             async: true,
             success: function (result) {
@@ -126,8 +126,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         ol.append("li").append("span").append("a").attr("id", "saveAll").text("保存所有");
         ol.append("li").append("span").append("a").attr("id", "loadAll").text("读取所有");
         ol.append("li").append("span").append("a").attr("id", "selectAll").attr("value", 0).text("选取所有");
-        ol.append("li").append("span").append("a").attr("id","export").text("导出");
-        ol.append("li").append("span").append("a").attr("id","variableSave").text("变量保存");
+        ol.append("li").append("span").append("a").attr("id", "rank").text("排序");
+        ol.append("li").append("span").append("a").attr("id", "export").text("导出");
+        ol.append("li").append("span").append("a").attr("id", "variableExport").text("导出已选变量");
 
         $("#initBar").bind("click", function () {
             init();
@@ -182,12 +183,31 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             }
         });
 
-        $("#variableSave").bind("click",function() {
+        $("#variableExport").bind("click", function () {
+            $("#downVariable").remove();
+            var data = {};
+            data.model_name = localStorage.getItem("model_name");
+            data.branch = localStorage.getItem("branch");
+            data.type = "xlsx";
+            var form = $("<form>");//定义一个form表单
+            form.attr("id", "downVariable");
+            form.attr("style", "display:none");
+            form.attr("target", "");
+            form.attr("method", "post");
+            form.attr("action", host + "/tool/export_selected_variable");
+            var input1 = $("<input>");
+            input1.attr("type", "hidden");
+            input1.attr("name", "data");
 
+            input1.attr("value", JSON.stringify(data));
+            form.append(input1);
+            $("body").append(form);//将表单放置在web中
+
+            form.submit();//表单提交
         });
 
-        $("#export").bind("click",function () {
-          var data =  tool_button.exportData();
+        $("#export").bind("click", function () {
+            var data = tool_button.exportData();
 
             $("#downConfig").remove();
             var form = $("<form>");//定义一个form表单
@@ -205,6 +225,23 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             $("body").append(form);//将表单放置在web中
 
             form.submit();//表单提交
+        });
+
+        $("#rank").bind("click", function () {
+            var data = tool_button.saveAll();
+            $.ajax({
+                url: host + "/tool/rank",
+                data: {"data":JSON.stringify(data)},
+                type: 'post',
+                async: true,
+                success: function (result) {
+                    $("#analyze").html("");
+                    initHead();
+                    initBar(result)
+                }, error: function () {
+                    alert("读取出错");
+                }
+            });
         });
 
 
@@ -234,8 +271,8 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             initList.push(num);
 
             var isSelected = result.data[valName]["is_selected"];
-            if (isSelected != null && isSelected === true ) {
-                $("#"+valName+"_name").find(".icheckbox_square-green").iCheck('check');
+            if (isSelected != null && (isSelected === true || isSelected ===1)) {
+                $("#" + valName + "_name").find(".icheckbox_square-green").iCheck('check');
             }
             num++;
         }
@@ -251,7 +288,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
 
     function initPanel(rowName, iv, num, table_head) {
         var h5 = d3.select("#analyze").append("div")
-            .attr("id",rowName+"_name")
+            .attr("id", rowName + "_name")
             .style("margin", "5px 0px 5px 10px");
 
         // var h5 = div.append("div").style("margin-left","20px");
@@ -436,6 +473,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //初始化每一个variable的点击事件,预先初始化相关变量
         for (var a of initList) {
             $("#merge_" + a).unbind("click");
+            $("#divide_" + a).unbind("click");
             controlMap[a] = {};
             var map = controlMap[a];
             map.start = {};
@@ -553,7 +591,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     type: 'post',
                     data: {
                         "data": JSON.stringify(data),
-                        "target": localStorage.getItem("target")
+                        "target": localStorage.getItem("target"),
+                        "modelName":localStorage.getItem("model_name"),
+                        "branch":localStorage.getItem("branch")
                     },
                     async: true,
                     success: function (result) {
@@ -696,7 +736,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         "boundary": list,
                         "allBoundary": wholeList,
                         "type": type,
-                        "target": localStorage.getItem("target")
+                        "target": localStorage.getItem("target"),
+                        "modelName":localStorage.getItem("model_name"),
+                        "branch":localStorage.getItem("branch")
                     },
                     async: true,
                     success: function (result) {
@@ -758,7 +800,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                             "variable_name": name,
                             "boundary": boundary,
                             "branch": branch,
-                            "model_name": model_name,
+                            "modelName": model_name,
                             "type": isCate
                         },
                         async: true,
@@ -875,7 +917,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 })
                 .attr("width", function (d) {
                     var width = Math.abs(xScale(d.woe) - xScale(0));
-                    if (parseInt(width) ===0){
+                    if (parseInt(width) === 0) {
                         width = 10;
                     }
                     return width;//根据woe设置宽度
@@ -907,7 +949,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                 })
                 .attr("width", function (d) {
                     var width = Math.abs(xScale(d.woe) - xScale(0));
-                    if (parseInt(width) ===0){
+                    if (parseInt(width) === 0) {
                         width = 10;
                     }
                     return width;//根据woe设置宽度

@@ -18,23 +18,8 @@ def load_branch(name, branch):
     return result
 
 
-def create_branch(name, branch, target=None, remove_list=None, selected_list=None):
-    '''获得对应模型的所有分支'''
-    # json_remove_list = None if remove_list is None else json.dumps(remove_list, ensure_ascii=False)
-    # selected_list = None if selected_list is None else json.dumps(selected_list, ensure_ascii=False)
-    now = datetime.now()
-
-    sql = "insert into tool_model(model_name,model_branch,model_target,remove_list," \
-          "selected_list,create_date,modify_date) VALUES(%s,%s,%s,%s,%s,%s,%s)"
-    result = util.execute(sql, (name, branch, target, remove_list, selected_list, now, now))
-    if result > 0:
-        return True
-    return False
 
 
-def copy_branch(name, branch, original_branch):
-    record = load_branch(name, original_branch)[0]
-    return create_branch(name, branch, record["model_target"], record["remove_list"], record["selected_list"])
 
 
 def update_branch(name, branch, target, remove_list=None, selected_list=None):
@@ -73,28 +58,6 @@ def del_binnbing_record(model_name, model_branch):
     if result > 0:
         return True
     return False
-
-
-'''
-读取分bin后的数据
-'''
-
-
-def load_binning_record(model_name, model_branch, variables=None):
-    sql = "select id,model_name,model_branch,variable_name,variable_iv,binning_record,is_selected " \
-          "from tool_model_content where model_name= %s and model_branch = %s and is_deleted = 0"
-
-    paramList = [model_name, model_branch]
-
-    if variables is not None:
-        s = " and variable_name IN (%s)"
-        in_p = ', '.join((map(lambda x: '%s', variables)))
-        s = s % in_p
-        sql += s
-        paramList.extend(variables)
-
-    result = util.query(sql, paramList)
-    return result
 
 
 def save_selected_variable(model_name, model_branch, var_list):

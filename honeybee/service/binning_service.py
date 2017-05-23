@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 @author: xiangping
 """
@@ -8,7 +9,7 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 
 
-def get_init_bin(df_train, target, invalid=None, min_leaf_rate=0.05):
+def get_init_bin(df_train, target, invalid=None,valid= None, min_leaf_rate=0.05):
     """
     :param df_train:
     :param target:
@@ -17,20 +18,27 @@ def get_init_bin(df_train, target, invalid=None, min_leaf_rate=0.05):
     :return: map <var, binning result>
             binning result: variable, variable type, tree_bin result, boundary list, IV
     """
-
-    invalid_vars_list = invalid
-    if invalid_vars_list is None:
-        invalid_vars_list = []
-    invalid_vars_list.append(target)
-
     # get initial binning
     df = df_train
     vars = df.columns
     df_iv = pd.DataFrame()
     iv_rank_map = {}
+    if_valid = False
 
+    if valid is not None:
+        vars_list = valid
+        if_valid = True
+    else :
+        vars_list = invalid
+        if vars_list is None:
+            vars_list = []
+        vars_list.append(target)
+
+    #if_valid为True,那么v是被选中的变量
+    #if_valid为False,那么v是未被选中的变量
     for v in vars:
-        if v not in invalid_vars_list:
+        a = v  in vars_list
+        if a == if_valid:
             t = str(df[v].dtype)
             tree_bin = get_tree_bin(df, v, target, t, null_value_list=[], tree_deep=3, min_leaf_rate=min_leaf_rate)
             # IV

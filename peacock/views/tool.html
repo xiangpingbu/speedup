@@ -87,11 +87,12 @@
             this.on("sendingmultiple", function () {
             });
             this.on("successmultiple", function (files, response) {
-                console.log(response.success);
-                if (response.data) {
+                if (response.success) {
                     $("#modelName").val(response.data);
                     window.location.href = window.location.href + "#uploaded";
-
+                }
+                else{
+                    alert(response.data)
                 }
             });
             this.on("errormultiple", function (files, response) {

@@ -8,49 +8,52 @@ cateIndex = 11;
 categoricalIndex = 1;
 branches = null;
 originalBranch = null;
+finishInit= false;
 
 // var host = "http://192.168.31.68:8091";
 // var host = "http://localhost:8091";
 
 define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     // function outputDateMap() {
-        $("#output").click(function () {
-                $("#downloadform").remove();
-                var form = $("<form>");//定义一个form表单
-                form.attr("id", "downloadform");
-                form.attr("style", "display:none");
-                form.attr("target", "");
-                form.attr("method", "post");
-                form.attr("action", host + "/tool/apply");
-                var input1 = $("<input>");
-                input1.attr("type", "hidden");
-                input1.attr("name", "data");
+    $("#output").click(function () {
+            $("#downloadform").remove();
+            var form = $("<form>");//定义一个form表单
+            form.attr("id", "downloadform");
+            form.attr("style", "display:none");
+            form.attr("target", "");
+            form.attr("method", "post");
+            form.attr("action", host + "/tool/apply");
+            var input1 = $("<input>");
+            input1.attr("type", "hidden");
+            input1.attr("name", "data");
 
-                // var data ={
-                //     "data": JSON.stringify(exportData())
-                // };
-                o = {};
-                o.data = exportData(true);
-                o.target = localStorage.getItem("target");
-                input1.attr("value", JSON.stringify(o));
-                form.append(input1);
-                $("body").append(form);//将表单放置在web中
+            // var data ={
+            //     "data": JSON.stringify(exportData())
+            // };
+            o = {};
+            o.data = exportData(true);
+            o.target = localStorage.getItem("target");
+            o.modelName = localStorage.getItem("model_name");
+            o.branch = localStorage.getItem("branch");
+            input1.attr("value", JSON.stringify(o));
+            form.append(input1);
+            $("body").append(form);//将表单放置在web中
 
-                form.submit();//表单提交
+            form.submit();//表单提交
 
-                // $.ajax({
-                //     url: host+"/tool/apply",
-                //     type: 'post',
-                //     data: {
-                //         "data": JSON.stringify(exportData())
-                //     },
-                //     async: true,
-                //     success: function (result) {
-                //
-                //     }
-                // });
-            }
-        );
+            // $.ajax({
+            //     url: host+"/tool/apply",
+            //     type: 'post',
+            //     data: {
+            //         "data": JSON.stringify(exportData())
+            //     },
+            //     async: true,
+            //     success: function (result) {
+            //
+            //     }
+            // });
+        }
+    );
     // }
 
     function changeTd() {
@@ -89,171 +92,347 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
      * 预处理数据并获取表格
      */
     function getTable() {
-        $("#dataframe").html("");
+        // $("#dataframe").html("");
+
+        addLabel("#dataframe", "model", false);
+        addLabel("#dataframe", "branch", false);
+        addLabel("#dataframe", "target", false);
+        addLabel("#dataframe", "filePath", true);
+
         $.ajax({
-            url: host + "/tool/parse",
+            url: host + "/tool/init_model_name",
             type: 'get',
             async: true,
             success: function (result) {
-                addLabel("#dataframe", "model", false);
-                addLabel("#dataframe", "branch", false);
-                addLabel("#dataframe", "target", true);
-
-                $("#branch-commit").click(function () {
-                    var remove_list = {};
-                    var target = $('#target').val();
-                    var branch = $('#branch').val();
-                    var model_name = $("#model").val();
-                    /**
-                     * 将被选中的variable添加到removeList中
-                     */
-                    $("#dataframe").find("tbody .checked").each(function (i, n) {
-                        remove_list[$(n).parents("tr").children().eq(1).html()] = i;
-                    });
-                    $(this).attr("disabled", "disabled");
-                    $.ajax({
-                        url: host + "/tool/db/branch/commit-branch",
-                        type: 'post',
-                        data: {
-                            remove_list: JSON.stringify(remove_list),
-                            target: target,
-                            branch: branch,
-                            model_name: model_name
-                        },
-                        async: true,
-                        success: function (result) {
-                            $("#branch-commit").removeAttr("disabled");
-                        },
-                        error: function () {
-                            $(this).removeClass("btn-primary");
-                            $(this).addClass("btn-warning")
-                        }
-                    });
-                });
-
-
-                var table = d3.select("#dataframe").append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
-
-                var data = result.data;
-                var thead = table.append("thead");
-                var tbody = table.append("tbody");
-                var tr = thead.append("tr");
-
-                /**
-                 * 添加头部的select标签栏
-                 */
-                branches = data["branches"];
-                for (let obj of branches) {
-                    d3.select("#branch").append("option").text(obj)
-                }
-                d3.select("#model").append("option").text(data["current_model"]);
-
-
-                $("#branch").on("select2:open", function (e) {
-                    originalBranch = $(this).val();
-                    console.log(originalBranch);
-                })
-                    .on("select2:closing", function (e) {
-                        var current = $(this).val();
-                        for (let obj of branches) {
-                            //当该分支已经存在时
-                            if (current == obj) {
-                                $.ajax({
-                                    url: host + "/tool/db/branch/checkout",
-                                    data: {"branch": current, "model_name": $("#model").val()},
-                                    type: 'get',
-                                    async: false,
-                                    success: function (result) {
-                                        clearAndSet(result.data.remove_list);
-                                        $('#target').val(result.data.model_target).trigger("change")
-                                    }
-                                });
-                                return;
-                            }
-                        }
-                        // branches.push(current);
-                        // d3.select("#branch").append("option").text(current);
+                if (result.success) {
+                    // d3.select("#model").append("option").text(data["current_model"]);
+                    var data = result.data;
+                    // $("#model").append(new Option("选择模型", "选择模型", false,false));
+                    for (let i in data) {
+                        $("#model").append(new Option(data[i], data[i], false, false));
+                    }
+                    // 选择模型名后的联动效果
+                    $("#model").on("select2:select", function (e) {
                         $.ajax({
-                            url: host + "/tool/db/branch",
-                            data: {"branch": current, "model_name": $("#model").val(),"original_branch":originalBranch},
-                            type: 'post',
+                            url: host + "/tool/get_branch_name",
+                            type: 'get',
+                            data: {"modelName": $("#model").val()},
                             async: true,
                             success: function (result) {
-                                branches.push(current);
-                                d3.select("#branch").append("option").text(current);
+                                var data = result.data;
+                                // $("#model").append(new Option("选择模型", "选择模型", false,false));
+                                for (let i in data) {
+                                    $("#branch").append(new Option(data[i], data[i], false, false));
+                                }
                             }
                         });
-                    });
-
-
-                //head处加入一列,用于控制标签的全选
-                var headTd = tr.append("td").append("div");
-                headTd.append("input")
-                    .attr("type", "checkbox")
-                    .attr("id", "head-checks")
-                    .attr("name", "input[]");
-
-                for (var a of data.head) {
-                    tr.append("td").text(a);
-                }
-
-                //绘制table
-                for (var b of data.body) {
-                    tr = tbody.append("tr");
-                    var select = tr.append("td");
-                    var div = select.append("div");
-                    div.append("input")
-                        .attr("type", "checkbox")
-                        .attr("class", "i-checks")
-                        .attr("name", "input[]");
-
-                    for (var item of b) {
-                        tr.append("td").text(item)
-                    }
-                    d3.select("#target").append("option").text(b[0]);
-                }
-
-                $('#target').val(data["target"]).trigger("change");
-
-
-                $('.i-checks').iCheck({
-                    checkboxClass: 'icheckbox_square-green',
-                    radioClass: 'iradio_square-green',
-                });
-
-
-                setSelected(data.remove_list, b[0]);
-
-                /**
-                 * 点击头部按钮可以全选或者反选.
-                 */
-                $('#head-checks')
-                    .iCheck({
-                        checkboxClass: 'icheckbox_square-green hhhh',
-                        radioClass: 'iradio_square-green',
                     })
-                    .on('ifChecked', function (event) {
-                        $(".icheckbox_square-green").iCheck('check');
-                    })
-                    .on('ifUnchecked', function (event) {
-                        $(".icheckbox_square-green").iCheck('uncheck');
-                    });
-
-                /**
-                 * dataframe行点击事件
-                 * 点击一行可以触发radio的勾选和反选
-                 */
-                // $("#dataframe").find("tbody tr").find("td:eq(1)").click(function () {
-                //     //.icheckbox_square-green负责按钮的渲染
-                //     var radio = $($(this).parent().find(".icheckbox_square-green"));
-                //     if (radio.hasClass('checked')) {
-                //         radio.iCheck('uncheck');
-                //     } else {
-                //         radio.iCheck('check');
-                //     }
-                // });
+                }
             }
         });
+
+        $("#branch").on("select2:open", function (e) {
+            originalBranch = $(this).val();
+        }).on("select2:select", function (e) {
+            $.ajax({
+                url: host + "/tool/get_branch_info",
+                type: 'get',
+                data: {
+                    "modelName": $("#model").val()
+                    , "branch": $("#branch").val()
+                    ,"originalBranch":originalBranch
+                },
+                async: true,
+                success: function (result) {
+                    var files = result.data["files"];
+                    var selectedFile = result.data["selected_file"];
+                    var target = result.data["target"];
+                    // var target = result.data["target"];
+                    // $("#model").append(new Option("选择模型", "选择模型", false,false));
+                    for (let i in files) {
+                        $("#filePath").append(new Option(files[i], files[i]));
+                        // $("#target").append(new Option(data[i]["target"], data[i][["target"]]));
+                    }
+
+                    $("#filePath").val(selectedFile).trigger("change");
+                    if (target != '') {
+                        $("#target").append(new Option(target, target, true, true));
+                        currentTarget = target;
+                    }
+                    // $("#target").val(result.data["target"]).trigger("change")
+
+                }
+            });
+        })
+            .on("select2:closing", function (e) {
+                var current = $(this).val();
+                if (branches != null) {
+                    for (let obj of branches) {
+                        //当该分支已经存在时
+                        if (current == obj) {
+                            originalBranch = null;
+                            $.ajax({
+                                url: host + "/tool/db/branch/checkout",
+                                data: {"branch": current, "model_name": $("#model").val()},
+                                type: 'get',
+                                async: false,
+                                success: function (result) {
+                                    clearAndSet(result.data.remove_list);
+                                    // $('#target').val(result.data.model_target).trigger("change")
+                                }
+                            });
+                            return;
+                        }
+                    }
+                }
+                // branches.push(current);
+                // d3.select("#branch").append("option").text(current);
+                // $.ajax({
+                //     url: host + "/tool/db/branch",
+                //     data: {"branch": current, "model_name": $("#model").val(), "original_branch": originalBranch},
+                //     type: 'post',
+                //     async: true,
+                //     success: function (result) {
+                //         branches.push(current);
+                //         d3.select("#branch").append("option").text(current);
+                //     }
+                // });
+            });
+
+
+        $("#branch-commit").click(function () {
+            // var remove_list = {};
+            var target = $('#target').val();
+            var branch = $('#branch').val();
+            var model_name = $("#model").val();
+            var file_path = $("#filePath").val();
+            /**
+             * 将被选中的variable添加到removeList中
+             */
+            // $("#dataframe").find("tbody .checked").each(function (i, n) {
+            //     remove_list[$(n).parents("tr").children().eq(1).html()] = i;
+            // });
+            // $(this).attr("disabled", "disabled");
+            $.ajax({
+                url: host + "/tool/parse",
+                type: 'post',
+                data: {
+                    // remove_list: JSON.stringify(remove_list),
+                    target: target,
+                    branch: branch,
+                    modelName: model_name,
+                    filePath: file_path
+                },
+                async: true,
+                success: function (result) {
+                    // $("#branch-commit").removeAttr("disabled");
+                    $("#table-content").remove();
+                    var tableContent = d3.select("#dataframe").append("div").attr("id","table-content");
+                    var table = tableContent.append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
+
+                    var data = result.data;
+                    var thead = table.append("thead");
+                    var tbody = table.append("tbody");
+                    var tr = thead.append("tr");
+
+                    /**
+                     * 添加头部的select标签栏
+                     */
+                    branches = data["branches"];
+                    // for (let obj of branches) {
+                    //     d3.select("#branch").append("option").text(obj)
+                    // }
+                    d3.select("#model").append("option").text(data["current_model"]);
+
+                    //head处加入一列,用于控制标签的全选
+                    var headTd = tr.append("td").append("div");
+                    headTd.append("input")
+                        .attr("type", "checkbox")
+                        .attr("id", "head-checks")
+                        .attr("name", "input[]");
+
+                    for (var a of data.head) {
+                        tr.append("td").text(a);
+                    }
+
+                    //绘制table
+                    $("#target").html("");
+                    for (var b of data.body) {
+                        tr = tbody.append("tr");
+                        var select = tr.append("td");
+                        var div = select.append("div");
+                        div.append("input")
+                            .attr("type", "checkbox")
+                            .attr("class", "i-checks")
+                            .attr("name", "input[]");
+
+                        for (var item of b) {
+                            tr.append("td").text(item)
+                        }
+                        d3.select("#target").append("option").text(b[0]);
+                    }
+
+
+                    $('#target').val(data["target"]).trigger("change");
+
+
+                    $('.i-checks').iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        radioClass: 'iradio_square-green',
+                    });
+
+
+                    setSelected(data.selected_list);
+
+                    /**
+                     * 点击头部按钮可以全选或者反选.
+                     */
+                    $('#head-checks')
+                        .iCheck({
+                            checkboxClass: 'icheckbox_square-green hhhh',
+                            radioClass: 'iradio_square-green',
+                        })
+                        .on('ifChecked', function (event) {
+                            $(".icheckbox_square-green").iCheck('check');
+                        })
+                        .on('ifUnchecked', function (event) {
+                            $(".icheckbox_square-green").iCheck('uncheck');
+                        });
+                    finishInit = true;
+                },
+                error: function () {
+                    $(this).removeClass("btn-primary");
+                    $(this).addClass("btn-warning")
+                }
+            });
+        });
+
+        // $.ajax({
+        //     url: host + "/tool/parse",
+        //     type: 'get',
+        //     async: true,
+        //     success: function (result) {
+        //         // addLabel("#dataframe", "model", false);
+        //         // addLabel("#dataframe", "branch", false);
+        //         // addLabel("#dataframe", "target", true);
+        //
+        //         $("#branch-commit").click(function () {
+        //             var remove_list = {};
+        //             var target = $('#target').val();
+        //             var branch = $('#branch').val();
+        //             var model_name = $("#model").val();
+        //             /**
+        //              * 将被选中的variable添加到removeList中
+        //              */
+        //             $("#dataframe").find("tbody .checked").each(function (i, n) {
+        //                 remove_list[$(n).parents("tr").children().eq(1).html()] = i;
+        //             });
+        //             $(this).attr("disabled", "disabled");
+        //             $.ajax({
+        //                 url: host + "/tool/db/branch/commit-branch",
+        //                 type: 'post',
+        //                 data: {
+        //                     remove_list: JSON.stringify(remove_list),
+        //                     target: target,
+        //                     branch: branch,
+        //                     model_name: model_name
+        //                 },
+        //                 async: true,
+        //                 success: function (result) {
+        //                     $("#branch-commit").removeAttr("disabled");
+        //                 },
+        //                 error: function () {
+        //                     $(this).removeClass("btn-primary");
+        //                     $(this).addClass("btn-warning")
+        //                 }
+        //             });
+        //         });
+        //
+        //
+        //         var table = d3.select("#dataframe").append("table").attr("class", "table table-striped table-bordered table-hover dataTables-example dataTable");
+        //
+        //         var data = result.data;
+        //         var thead = table.append("thead");
+        //         var tbody = table.append("tbody");
+        //         var tr = thead.append("tr");
+        //
+        //         /**
+        //          * 添加头部的select标签栏
+        //          */
+        //         branches = data["branches"];
+        //         for (let obj of branches) {
+        //             d3.select("#branch").append("option").text(obj)
+        //         }
+        //         d3.select("#model").append("option").text(data["current_model"]);
+        //
+        //         //head处加入一列,用于控制标签的全选
+        //         var headTd = tr.append("td").append("div");
+        //         headTd.append("input")
+        //             .attr("type", "checkbox")
+        //             .attr("id", "head-checks")
+        //             .attr("name", "input[]");
+        //
+        //         for (var a of data.head) {
+        //             tr.append("td").text(a);
+        //         }
+        //
+        //         //绘制table
+        //         for (var b of data.body) {
+        //             tr = tbody.append("tr");
+        //             var select = tr.append("td");
+        //             var div = select.append("div");
+        //             div.append("input")
+        //                 .attr("type", "checkbox")
+        //                 .attr("class", "i-checks")
+        //                 .attr("name", "input[]");
+        //
+        //             for (var item of b) {
+        //                 tr.append("td").text(item)
+        //             }
+        //             d3.select("#target").append("option").text(b[0]);
+        //         }
+        //
+        //         $('#target').val(data["target"]).trigger("change");
+        //
+        //
+        //         $('.i-checks').iCheck({
+        //             checkboxClass: 'icheckbox_square-green',
+        //             radioClass: 'iradio_square-green',
+        //         });
+        //
+        //
+        //         setSelected(data.remove_list, b[0]);
+        //
+        //         /**
+        //          * 点击头部按钮可以全选或者反选.
+        //          */
+        //         $('#head-checks')
+        //             .iCheck({
+        //                 checkboxClass: 'icheckbox_square-green hhhh',
+        //                 radioClass: 'iradio_square-green',
+        //             })
+        //             .on('ifChecked', function (event) {
+        //                 $(".icheckbox_square-green").iCheck('check');
+        //             })
+        //             .on('ifUnchecked', function (event) {
+        //                 $(".icheckbox_square-green").iCheck('uncheck');
+        //             });
+        //
+        //         /**
+        //          * dataframe行点击事件
+        //          * 点击一行可以触发radio的勾选和反选
+        //          */
+        //         // $("#dataframe").find("tbody tr").find("td:eq(1)").click(function () {
+        //         //     //.icheckbox_square-green负责按钮的渲染
+        //         //     var radio = $($(this).parent().find(".icheckbox_square-green"));
+        //         //     if (radio.hasClass('checked')) {
+        //         //         radio.iCheck('uncheck');
+        //         //     } else {
+        //         //         radio.iCheck('check');
+        //         //     }
+        //         // });
+        //     }
+        // });
     }
 
     /**
@@ -298,6 +477,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         }
 
         $("#" + labelName).select2({tags: true});
+        $("#" + labelName).append(new Option("请选择"))
     }
 
 
@@ -312,10 +492,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             data[name] = innerObj;
 
             var childTrs = $('#tbody_' + i).children("tr");
-            if ($("#"+name+"_name").find(".variable_apply.checked").length >0) {
+            if ($("#" + name + "_name").find(".variable_apply.checked").length > 0) {
                 innerObj.is_selected = 1
             } else {
-                innerObj.is_selected= 0
+                innerObj.is_selected = 0
             }
             for (var innerRow = 0; innerRow < childTrs.length; innerRow++) {
                 var innerDate = {};
@@ -356,7 +536,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         for (var i = 0; i < row; i++) {
             var name = $('#merge_' + i).attr("name");
             if (exportSelected) {
-                if ($("#" + name+"_name").find(".checked").length <= 0) {
+                if ($("#" + name + "_name").find(".checked").length <= 0) {
                     continue;
                 }
             }
@@ -393,11 +573,11 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         return data
     }
 
-    function setSelected(removeList) {
-        if (removeList != "") {
-            var remove_list = JSON.parse(removeList);
+    function setSelected(selected) {
+        if (selected != null) {
+            var list = JSON.parse(selected);
             $("#dataframe").find("tbody tr").each(function (i, n) {
-                if (remove_list[$(n).children().eq(1).html()] != undefined) {
+                if (list[$(n).children().eq(1).html()] != undefined) {
                     $(n).children().eq(0).iCheck('check');
                 }
             });
@@ -405,46 +585,51 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
     }
 
     function clearAndSet(removeList) {
-        var remove_list = JSON.parse(removeList);
-        debugger;
-        $("#dataframe").find("tbody tr").each(function (i, n) {
-            $(n).children().eq(0).iCheck('uncheck');
-            if (remove_list[$(n).children().eq(1).html()] != undefined) {
-                $(n).children().eq(0).iCheck('check');
-            }
-        });
+        if (removeList != null) {
+            var remove_list = JSON.parse(removeList);
+
+            $("#dataframe").find("tbody tr").each(function (i, n) {
+                $(n).children().eq(0).iCheck('uncheck');
+                if (remove_list[$(n).children().eq(1).html()] != undefined) {
+                    $(n).children().eq(0).iCheck('check');
+                }
+            });
+        }
     }
 
     /**
      * 提交分支
      */
     function commitBranch() {
-        var remove_list = {};
-        var target = $('#target').val();
-        var branch = $('#branch').val();
-        var model_name = $("#model").val();
-        /**
-         * 将被选中的variable添加到removeList中
-         */
-        $("#dataframe").find("tbody .checked").each(function (i, n) {
-            remove_list[$(n).parents("tr").children().eq(1).html()] = i;
-        });
-        $.ajax({
-            url: host + "/tool/db/branch/commit-branch",
-            type: 'post',
-            data: {
-                remove_list: JSON.stringify(remove_list),
-                target: target,
-                branch: branch,
-                model_name: model_name
-            },
-            async: true,
-            success: function (result) {
-            },
-            error: function () {
+        if (finishInit) {
+            var selected_list = {};
+            var target = $('#target').val();
+            var branch = $('#branch').val();
+            var model_name = $("#model").val();
+            var file_path = $("#filePath").val();
+            /**
+             * 将被选中的variable添加到removeList中
+             */
+            $("#dataframe").find("tbody .checked").each(function (i, n) {
+                selected_list[$(n).parents("tr").children().eq(1).html()] = i;
+            });
+            $.ajax({
+                url: host + "/tool/db/branch/commit-branch",
+                type: 'post',
+                data: {
+                    selected_list: JSON.stringify(selected_list),
+                    target: target,
+                    branch: branch,
+                    model_name: model_name,
+                },
+                async: true,
+                success: function (result) {
+                },
+                error: function () {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     return {
@@ -452,8 +637,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         changeTd: changeTd,
         getTable: getTable,
         saveAll: exportDataWithIV,
-        exportData:exportData,
-        commitBranch:commitBranch
+        exportData: exportData,
+        commitBranch: commitBranch
     }
 });
 
