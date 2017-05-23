@@ -246,6 +246,9 @@ def decision_tree_bin(df, var, target, var_type, tree_deep=3, min_leaf=200):
     df_non_null_predict = pd.DataFrame(df_non_null_tree.predict_proba(df_non_null[[var]]))
     df_non_null_predict.rename(columns={0: 'good_hood', 1: 'bad_hood'}, inplace=True)
 
+    if 'bad_hood' not in df_non_null_predict.columns:
+        df_non_null_predict['bad_hood'] = 0
+
     if var_type in ['object', 'str', 'Categorical']:
         # categorical variable should not use _woe in the name
         org_var = var.replace('_woe', '')
@@ -275,6 +278,7 @@ def decision_tree_bin(df, var, target, var_type, tree_deep=3, min_leaf=200):
     df_result = transform_categorical_to_woe(df_predict, 'bad_hood', target)
 
     return {'df_woe': df_woe, 'df_bin': df_result}
+
 
 def bin_assign_categorical(bin_list, v):
     for index, bin in enumerate(bin_list):
