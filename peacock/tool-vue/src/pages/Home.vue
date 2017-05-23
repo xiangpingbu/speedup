@@ -1,15 +1,11 @@
 <template>
 <div class="home ibox-content">
-    <!-- <div id="dataframe"></div> -->
     <div id="upload">
         <form id="myAwesomeDropzone" class="dropzone" method="POST" enctype="multipart/form-data">
             <div class="dropzone-previews"></div>
             <input type="hidden" id="111" value="333" />
             <button type="submit" class="btn btn-primary pull-right">Submit</button>
         </form>
-    </div>
-    <div id="variableSelect">
-
     </div>
 </div>
 </template>
@@ -48,10 +44,6 @@ export default {
                     this.on('successmultiple', function(files, response) {
                         console.log(response.success)
                         if (response.data) {
-                            // TODO
-                            // setTimeout(() => {
-                            //     $('#modelName').val(response.data)
-                            // })
                             self.$router.push('/uploaded')
                         }
                     })

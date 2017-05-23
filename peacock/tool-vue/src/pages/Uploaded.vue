@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="dataframe">
+  <div class="upload" id="dataframe">
   </div>
 </template>
 
@@ -51,7 +51,6 @@ function setSelected(removeList) {
 
 export default {
     mounted() {
-        console.warn(47);
         $.ajax({
             url: host + "/tool/parse",
             type: 'get',
@@ -228,4 +227,7 @@ export default {
 </script>
 
 <style lang="css">
+.upload {
+    padding-top: 20px;
+}
 </style>

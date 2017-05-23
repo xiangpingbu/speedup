@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/pages/Home'
 import Uploaded from '@/pages/Uploaded'
 import Bar from '@/pages/Bar'
+import Select from '@/pages/Select'
 
 Vue.use(Router)
 
@@ -19,6 +20,10 @@ export default new Router({
     path: '/bar',
     name: 'Bar',
     component: Bar
+  }, {
+    path: '/select',
+    name: 'Select',
+    component: Select
   }],
   // mode: 'history',
   scrollBehavior(to, from, savedPosition) {

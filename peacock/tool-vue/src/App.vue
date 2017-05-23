@@ -27,7 +27,7 @@ export default {
 @import './assets/style/tool.css';
 /*@import '../static/css/font-awesome.css';*/
 @import '../static/css/animate.css';
-@import '../static/css/style.css';
+/*@import '../static/css/style.css';*/
 @import '../static/css/dropzone/basic.css';
 @import '../static/css/dropzone/dropzone.css';
 @import '../static/css/iCheck/custom.css';
