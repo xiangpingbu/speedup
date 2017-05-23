@@ -276,6 +276,7 @@ def decision_tree_bin(df, var, target, var_type, tree_deep=3, min_leaf=200):
 
     return {'df_woe': df_woe, 'df_bin': df_result}
 
+
 def bin_assign_categorical(bin_list, v):
     for index, bin in enumerate(bin_list):
         # null value assign -1 bin number
