@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from rest.app_base import *
 import copy
 import xml.dom.minidom
@@ -128,10 +129,3 @@ def parseXml():
 def ppp():
     return global_value.get_value("")
 
-
-import os
-import os.path
-
-list = ["bad_4w","province","cell_loc"]
-import json
-print json.dumps(list)

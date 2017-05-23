@@ -373,7 +373,6 @@ def negative_coef_to_drop(mdlresult):
 
 def get_marginal_var(train_woe_data, test_woe_data, target, model_para_list, ks_group_num):
     """
-
     :param train_woe_data:
     :param test_woe_data:
     :param target:
@@ -384,3 +383,4 @@ def get_marginal_var(train_woe_data, test_woe_data, target, model_para_list, ks_
 
     marginal_var_result = marginal_selection(train_woe_data, test_woe_data, target, model_para_list, ks_group_num)
     return marginal_var_result
+
