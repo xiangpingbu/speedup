@@ -1,5 +1,7 @@
 import axios from 'axios'
 import * as d3 from 'd3'
+import store from '@/store'
+import { mutations } from '@/store/mutations'
 
 axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? process.env.AXIOS_BASE_URL : ''
 // axios.defaults.baseURL = '/api/'
@@ -10,7 +12,20 @@ axios.interceptors.request.use(function (config) {
 })
 
 export function getResponse (url) {
-  return axios.get(url)
+  // 控制缓存
+  if (store.state.urlCacheData[url]) {
+    return new Promise(resolve => {
+      resolve(store.state.urlCacheData[url])
+    })
+  }
+  return axios.get(url).then(data => {
+    const req = {
+      url,
+      data
+    }
+    mutations.saveUrlCache(store.state, req)
+    return data
+  })
 }
 
 // export function getNumData (url) {
