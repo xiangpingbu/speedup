@@ -271,7 +271,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             initList.push(num);
 
             var isSelected = result.data[valName]["is_selected"];
-            if (isSelected != null && isSelected === true) {
+            if (isSelected != null && (isSelected === true || isSelected ===1)) {
                 $("#" + valName + "_name").find(".icheckbox_square-green").iCheck('check');
             }
             num++;

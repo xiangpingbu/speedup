@@ -270,11 +270,12 @@ def divide_manually():
 @app.route(base + "/apply", methods=['POST'])
 def apply():
     """将train数据得到的woe与test数据进行匹配"""
-    model_name = request.form.get("modelName")
-    branch = request.form.get("branch")
-    df_map = global_value.get_value(model_name+"_"+branch)
     req = request.form.get('data')
     var_dict = json.loads(req)
+    model_name = var_dict["modelName"]
+    branch = var_dict["branch"]
+    df_map = global_value.get_value(model_name+"_"+branch)
+
 
     data = var_dict["data"]
 
@@ -285,17 +286,13 @@ def apply():
     for var_name in var_list:
         df[var_name + '_woe'] = df[var_name].apply(lambda var_value: apply_get_woe_value(var_name, var_value, data))
 
-    global df_train_woe
-    global df_test_woe
-
     global withIntercept
     withIntercept = True
 
     # if withIntercept:
     #    df['intercept_woe'] = 1.0
-
-    df_train_woe = df[df['dev_ind'] == 1]
-    df_test_woe = df[df['dev_ind'] == 0]
+    df_map["df_train_woe"] = df[df['dev_ind'] == 1]
+    df_map["df_test_woe"] = df[df['dev_ind'] == 0]
 
     global apply_result, safely_apply
 
@@ -419,7 +416,7 @@ def column_config():
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
     params = var_dict["params"]
-    result = sort_variable(list.split(","), vs.load_binning_record(model_name, model_branch, list.split(",")))
+    result = sort_variable(list.split(","), tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
     data = []
     mem_zip_file = MemoryZipFile()
     for variable in result:
@@ -772,6 +769,8 @@ def variable_select():
     branch = request.form.get("branch")
     var_list = request.form.get("var_list")
 
+    df_map = global_value.get_value(model_name+"_"+branch)
+
     # 调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
         result = vs.get_selected_variable(model_name, branch)[0]
@@ -786,6 +785,10 @@ def variable_select():
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")
     ks_group_num = ks_group_num if ks_group_num != '' else 20
+
+
+    df_train_woe = df_map["df_train_woe"]
+    df_test_woe = df_map["df_test_woe"]
 
     data = lmf.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
                                              withIntercept)
@@ -805,7 +808,14 @@ def variable_select_manual():
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
     with_intercept = request.form.get("with_intercept") == 'true'
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
     ks_group_num = request.form.get("ks_group_num")
+
+    df_map = global_value.get_value(model_name+"_"+branch)
+    df_train_woe = df_map["df_train_woe"]
+    df_test_woe = df_map["df_test_woe"]
+
     ks_group_num = ks_group_num if ks_group_num != '' else 20
 
     data = lmf.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),

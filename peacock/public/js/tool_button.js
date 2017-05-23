@@ -33,6 +33,8 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
             o = {};
             o.data = exportData(true);
             o.target = localStorage.getItem("target");
+            o.modelName = localStorage.getItem("model_name");
+            o.branch = localStorage.getItem("branch");
             input1.attr("value", JSON.stringify(o));
             form.append(input1);
             $("body").append(form);//将表单放置在web中
@@ -153,8 +155,10 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     }
 
                     $("#filePath").val(selectedFile).trigger("change");
-                    $("#target").append(new Option(target, target,true,true));
-                    currentTarget = target;
+                    if (target != '') {
+                        $("#target").append(new Option(target, target, true, true));
+                        currentTarget = target;
+                    }
                     // $("#target").val(result.data["target"]).trigger("change")
 
                 }
