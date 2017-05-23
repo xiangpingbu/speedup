@@ -85,7 +85,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             type: 'post',
             data: {
                 branch: localStorage.getItem("branch"),
-                model_name: localStorage.getItem("model_name")
+                modelName: localStorage.getItem("model_name")
             },
             async: true,
             success: function (result) {
@@ -271,7 +271,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
             initList.push(num);
 
             var isSelected = result.data[valName]["is_selected"];
-            if (isSelected != null && isSelected === true) {
+            if (isSelected != null && (isSelected === true || isSelected ===1)) {
                 $("#" + valName + "_name").find(".icheckbox_square-green").iCheck('check');
             }
             num++;
@@ -473,6 +473,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
         //初始化每一个variable的点击事件,预先初始化相关变量
         for (var a of initList) {
             $("#merge_" + a).unbind("click");
+            $("#divide_" + a).unbind("click");
             controlMap[a] = {};
             var map = controlMap[a];
             map.start = {};
@@ -590,7 +591,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                     type: 'post',
                     data: {
                         "data": JSON.stringify(data),
-                        "target": localStorage.getItem("target")
+                        "target": localStorage.getItem("target"),
+                        "modelName":localStorage.getItem("model_name"),
+                        "branch":localStorage.getItem("branch")
                     },
                     async: true,
                     success: function (result) {
@@ -733,7 +736,9 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                         "boundary": list,
                         "allBoundary": wholeList,
                         "type": type,
-                        "target": localStorage.getItem("target")
+                        "target": localStorage.getItem("target"),
+                        "modelName":localStorage.getItem("model_name"),
+                        "branch":localStorage.getItem("branch")
                     },
                     async: true,
                     success: function (result) {
@@ -795,7 +800,7 @@ define(['jquery', 'd3', 'tool_button'], function ($, d3, tool_button) {
                             "variable_name": name,
                             "boundary": boundary,
                             "branch": branch,
-                            "model_name": model_name,
+                            "modelName": model_name,
                             "type": isCate
                         },
                         async: true,
