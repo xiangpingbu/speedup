@@ -10,6 +10,8 @@ class Config(object):
     DEBUG = False
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     ROOT_PATH="/Users/lifeng/Desktop/111"
+    ES_HOST = "http://10.10.10.107:9200/"
+
 
 
 class Development(Config):  # inherit from Config
@@ -19,4 +21,5 @@ class Development(Config):  # inherit from Config
 class Production(Config):
     DEBUG = False
     HOST = '127.0.0.1'
-    PORT = 14000
+    ROOT_PATH = ""
+    ES_HOST = "http://10.10.10.107:9200/"

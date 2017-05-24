@@ -17,7 +17,7 @@ es_host = "http://10.10.10.107:9200/"
 
 @app.route(base + "/<string:name>")
 def es_req(key):
-    url = es_host + key + "/_search?pretty"
+    url = app.config["es_host"] + key + "/_search?pretty"
     response = requests.get(url)
     return responseto(data=json.loads(response.text))
 
@@ -30,6 +30,7 @@ def commit_branch():
     branch = request.form.get("branch")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
+
 
     return responseto(data=vs.update_branch(model_name, branch, target, selected_list=selected_list))
 

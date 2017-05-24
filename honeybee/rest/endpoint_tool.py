@@ -3,14 +3,10 @@ import collections
 import sys
 from collections import OrderedDict
 from io import BytesIO
-from xml.dom import minidom
-
 import numpy as np
 import pandas as pd
 import requests
 from flask import send_file
-from werkzeug.utils import secure_filename
-
 from beans.Pmml import *
 from common.constant import const
 from rest.app_base import *
@@ -21,12 +17,11 @@ from service import logit_model_service as lmf
 from util import common as cmm
 from util.ZipFile import *
 from xml.dom import minidom
-import tablib
 import os
 from common import global_value
 from service.db import tool_model_service
 from datetime import datetime
-
+from common.util import common_util
 
 base = '/tool'
 base_path = "./util/"
@@ -53,15 +48,25 @@ apply_result = None
 
 @app.route(base + "/init", methods=['POST'])
 def init():
+    """
+    初始化binning record
+    :return: dict
+    格式:
+        {variable_name1
+                -var_table
+                    -var_params(province,goods,bads...)
+                -is_selected
+                -iv
+         variable_name2...}
+    """
     name = request.form.get("modelName")
     branch = request.form.get("branch")
 
-    # if name is None or name == '':
-    #     name = model_name
-    #     branch = "master"
-    df_map = global_value.get_value(name+"_"+branch)
+    # 根据key从内存中获取已上传文件的相关参数
+    df_map = global_value.get_value(name + "_" + branch)
 
     result = tool_model_service.load_model(model_name=name, model_branch=branch)
+    # selected_list在数据库中是json格式,在python中是一个dict,格式为:select_variable:index(变量的位置)
     selected_list_json = json.loads(result[0]["selected_list"])
     selected_list = selected_list_json.keys()
 
@@ -69,80 +74,23 @@ def init():
     df = df_map['df_train']
     init_result = get_init(df, target=result[0]["model_target"], valid=selected_list)
 
+    # 根据init_result获得变量的区间
     out = get_boundary(init_result, min_val)
+    # 根据iv排序
     out_sorted_iv = sort_iv(out)
     return responseto(data=out_sorted_iv)
 
 
 @app.route(base + "/rank", methods=['POST'])
 def rank():
+    """
+    外部按钮点击触发排序
+    :return: 返回的结果与init一致
+    """
     data = request.form.get("data")
     json_obj = json.loads(data)
     out_sorted_iv = sort_iv(json_obj)
     return responseto(data=out_sorted_iv)
-
-
-# @app.route(base + "/merge", methods=['POST'])
-# def merge():
-#     """归并操作"""
-#     # 要执行合并的variable
-#     var_name = request.form.get('varName')
-#     # 变量的类型
-#     type = request.form.get('type').encode('utf-8')
-#     # 选定的范围
-#     boundary = request.form.get('boundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
-#     # 总的范围
-#     all_boundary = request.form.get('allBoundary').encode('utf-8')  # 每个bin_num的max的大小,都以逗号隔开
-#     # 获得target
-#     # target = request.form.get('allBoundary').encode('utf-8');
-#     target = request.form.get('target')
-#     if target is None:
-#         target = 'bad_4w'
-#     excepted_column = {var_name}
-#
-#     min_val = 0
-#
-#     result = None
-#     type_bool = False
-#     df = None
-#     if type == 'False':
-#         # 将字符转换为list
-#         boundary_list = map(eval, boundary.split("&"))
-#         all_boundary_list = []
-#         # 将字符转换为list,nan替换为np.nan
-#         for a in all_boundary.split("&"):
-#             if a != 'nan':
-#                 a = float(a)
-#             else:
-#                 a = np.nan
-#             all_boundary_list.append(a)
-#         boundary_list = list(set(all_boundary_list).difference(set(boundary_list)))
-#         boundary_list.append(np.nan)
-#         selected_list = boundary_list
-#
-#         columns = ['bin_num', 'min', 'max', 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-#                    'category_t']
-#     else:
-#         type_bool = True
-#         temp = []
-#         for s in boundary.split("&"):
-#             temp.extend(map(cmm.transfer, s.split("|")))
-#
-#         selected_list = [temp]
-#         for s in all_boundary.split("&"):
-#             selected_list.append(map(cmm.transfer, s.split("|")))
-#
-#         columns = ['bin_num', var_name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
-#                    'category_t']
-#
-#     result = ab.adjust(df_train, type_bool, var_name, selected_list, target=target,
-#                        expected_column=excepted_column)  # 获得合并的结果
-#     df = pd.DataFrame(result[0],
-#                       columns=columns)
-#
-#     data = get_merged(var_name, df, min_val)
-#     return responseto(data=data)
-
 
 @app.route(base + "/divide", methods=['POST'])
 def divide():
@@ -152,13 +100,16 @@ def divide():
     筛选完成后,调用init方法对数据进行初始化,得到一定数据的范围区间
     将该范围区间与原来的区间合并.
     调用adjust方法获得的结果即为分裂后的结果
-
     :return:
+        {variable_name1
+                -var_table
+                    -var_params{province,goods,bads...}
+                -iv
+        }
     """
-
-    model_name  = request.form.get("modelName")
+    model_name = request.form.get("modelName")
     branch = request.form.get('branch')
-    df_map = global_value.get_value(model_name+"_"+branch)
+    df_map = global_value.get_value(model_name + "_" + branch)
     df_train = df_map['df_train']
     min_val = 0
     data = request.form.get('data')
@@ -187,7 +138,7 @@ def divide():
         # bound_list.append(np.nan)
 
         result = bf.adjust_bin(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
-                           , target=target, expected_column={name})
+                               , target=target, expected_column={name})
         columns = ['bin_num', 'min', 'max', 'min_boundary', 'max_boundary', 'bads', 'goods', 'total', 'total_perc',
                    'bad_rate', 'woe',
                    'type']
@@ -198,10 +149,9 @@ def divide():
         # data = get_merged(name, df, min_val)
 
         return responseto(data=data)
-
     else:
         val = data_map["selected"][name].split("|")
-        df[name] = df[name].apply(lambda x: float_nan_to_str_nan(x))
+        df[name] = df[name].apply(lambda x: common_util.float_nan_to_str_nan(x))
 
         df = df[df[name].isin(val)]
 
@@ -217,7 +167,7 @@ def divide():
         for v in list:
             bound_list.append(map(cmm.transfer, v[name].split("|")))
         result = bf.adjust_bin(df_train, data_map["selected"]["type"] == 'Categorical', name, bound_list
-                           , target=target, expected_column={name})
+                               , target=target, expected_column={name})
         iv = result['IV'].sum()
         columns = ['bin_num', name, 'bads', 'goods', 'total', 'total_perc', 'bad_rate', 'woe',
                    'type']
@@ -237,8 +187,8 @@ def divide_manually():
     model_name = request.form.get("model_name")
     type = request.form.get("type")
 
-    df_map = global_value.get_value(model_name+"_"+branch)
-    df_train  = df_map['df_train']
+    df_map = global_value.get_value(model_name + "_" + branch)
+    df_train = df_map['df_train']
 
     boundary_list = []
     if type == "true":
@@ -258,7 +208,7 @@ def divide_manually():
 
     target = vs.load_branch(model_name, branch)[0]["model_target"]
     result = bf.adjust_bin(df_train, type == "true", variable_name, boundary_list
-                       , target=target, expected_column={variable_name})
+                           , target=target, expected_column={variable_name})
 
     iv = result['IV'].sum()
     df = pd.DataFrame(result,
@@ -274,8 +224,7 @@ def apply():
     var_dict = json.loads(req)
     model_name = var_dict["modelName"]
     branch = var_dict["branch"]
-    df_map = global_value.get_value(model_name+"_"+branch)
-
+    df_map = global_value.get_value(model_name + "_" + branch)
 
     data = var_dict["data"]
 
@@ -323,19 +272,14 @@ def if_applyed():
         return responseto(success=False)
 
 
-def isNum(v):
-    try:
-        val = float(v)
-        return True
-    except ValueError:
-        return False
+
 
 
 def apply_get_woe_value(var_name, var_value, var_dict):
     var_content = var_dict[var_name]
     var_type = var_content[0]['type']
     if var_type == 'Numerical':
-        if not isNum(var_value):
+        if not common_util.is_num(var_value):
             return 0.0
         for row in var_content:
             if row['min_boundary'] == '-inf':
@@ -359,12 +303,6 @@ def apply_get_woe_value(var_name, var_value, var_dict):
                 return float(row['woe'])
         return 0.0
 
-
-'''
-上传training文件,如果是跨域上传会先用OPTIONS请求试探,然后使用post调用
-'''
-
-
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
 def upload():
     """工具依赖的源文件修改"""
@@ -377,27 +315,32 @@ def upload():
         for file in files:
             from unicodedata import normalize
             filename = normalize('NFKD', file.filename).encode('utf-8', 'ignore')
-            file_path = storage + "/"+filename
+            file_path = storage + "/" + filename
             # filename = secure_filename(file.filename.decode('utf-8'))
             if (os.path.exists(file_path)):
-                return responseto(data="file exist",success=False)
+                return responseto(data="file exist", success=False)
             else:
                 file.save(file_path)
                 model_name = filename.split(".")
-                tool_model_service.create_branch(model_name=model_name[0],model_branch="master",
-                                                 create_date=datetime.now(),modify_date=datetime.now(),
-                                                 file_path=file_path,model_target="")
-            # df_all = pd.read_excel(file, encoding="utf-8")
-            # df_train = df_all[df_all['dev_ind'] == 1]
-            # df_test = df_all[df_all['dev_ind'] == 0]
+                tool_model_service.create_branch(model_name=model_name[0], model_branch="master",
+                                                 create_date=datetime.now(), modify_date=datetime.now(),
+                                                 file_path=file_path, model_target="")
+    return responseto(data="success")
 
-            #     df_test = pd.read_excel(file, encoding="utf-8")
-            # elif filename == 'df_train.xlsx':
-            #     df_train = pd.read_excel(file, encoding="utf-8")
-            # if filename.find("_") > 0:
-            #     model_name = filename.split("_")[0]
-            # else:
-            #     model_name = "anonymous"
+@app.route(base + "/load_applyed", methods=['OPTIONS', 'POST'])
+def load_applyed():
+    """读取apply后的文件"""
+    # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
+    if request.method == 'POST':
+        # 获取training文件上传的路径
+        model_name =  request.form.get("model_name")
+        branch =  request.form.get("branch")
+        files = request.files.getlist("file[]")
+        for file in files:
+            df_map = global_value.get_value(model_name+"_"+branch)
+            df = pd.read_excel(file, encoding="utf-8")
+            df_map["df_train_woe"] = df[df['dev_ind'] == 1]
+            df_map["df_test_woe"] = df[df['dev_ind'] == 0]
     return responseto(data="success")
 
 @app.route(base + "/column_config", methods=['POST'])
@@ -416,7 +359,8 @@ def column_config():
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
     params = var_dict["params"]
-    result = sort_variable(list.split(","), tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
+    result = sort_variable(list.split(","),
+                           tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
     data = []
     mem_zip_file = MemoryZipFile()
     for variable in result:
@@ -517,8 +461,8 @@ def column_config2():
     return send_file(mem_zip_file.read(), attachment_filename='capsule.zip', as_attachment=True)
 
 
-def get_init(df, target=None, invalid=None, valid= None, fineMinLeafRate=0.05):
-    data_map = bf.get_init_bin(df, target, invalid,valid, fineMinLeafRate)
+def get_init(df, target=None, invalid=None, valid=None, fineMinLeafRate=0.05):
+    data_map = bf.get_init_bin(df, target, invalid, valid, fineMinLeafRate)
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
@@ -690,8 +634,8 @@ def get_merged(var_name, df, min_val):
 @app.route(base + "/merge", methods=['POST'])
 def merge():
     """归并操作"""
-    model_name  =request.form.get("modelName")
-    branch =  request.form.get("branch")
+    model_name = request.form.get("modelName")
+    branch = request.form.get("branch")
     # 要执行合并的variable
     var_name = request.form.get('varName')
     # 变量的类型
@@ -709,7 +653,7 @@ def merge():
 
     min_val = 0
 
-    df_map = global_value.get_value(model_name+"_"+branch)
+    df_map = global_value.get_value(model_name + "_" + branch)
 
     result = None
     type_bool = False
@@ -747,7 +691,7 @@ def merge():
                    'type']
 
     result = bf.adjust_bin(df_map["df_train"], type_bool, var_name, selected_list, target=target,
-                       expected_column=excepted_column)  # 获得合并的结果
+                           expected_column=excepted_column)  # 获得合并的结果
     iv = result['IV'].sum()
 
     df = pd.DataFrame(result,
@@ -769,7 +713,7 @@ def variable_select():
     branch = request.form.get("branch")
     var_list = request.form.get("var_list")
 
-    df_map = global_value.get_value(model_name+"_"+branch)
+    df_map = global_value.get_value(model_name + "_" + branch)
 
     # 调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
@@ -786,12 +730,11 @@ def variable_select():
     ks_group_num = request.form.get("ks_group_num")
     ks_group_num = ks_group_num if ks_group_num != '' else 20
 
-
     df_train_woe = df_map["df_train_woe"]
     df_test_woe = df_map["df_test_woe"]
 
     data = lmf.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
-                                             withIntercept)
+                                  withIntercept)
     if data is None:
         return responseto(success=False)
     return responseto(data=data)
@@ -812,14 +755,14 @@ def variable_select_manual():
     branch = request.form.get("branch")
     ks_group_num = request.form.get("ks_group_num")
 
-    df_map = global_value.get_value(model_name+"_"+branch)
+    df_map = global_value.get_value(model_name + "_" + branch)
     df_train_woe = df_map["df_train_woe"]
     df_test_woe = df_map["df_test_woe"]
 
     ks_group_num = ks_group_num if ks_group_num != '' else 20
 
     data = lmf.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
-                                                      selected_list.split(","), target, ks_group_num, with_intercept)
+                                           selected_list.split(","), target, ks_group_num, with_intercept)
 
     return responseto(data=data)
 
@@ -873,33 +816,6 @@ def export_variables():
 导出变量到excel
 '''
 
-
-@app.route(base + "/export_selected_variable", methods=['POST'])
-def export_selected_variable():
-    data = request.form.get("data")
-    dataDict = json.loads(data)
-    branch = dataDict["branch"]
-    type = dataDict["type"]
-    model_name = dataDict["model_name"]
-    if type == None:
-        type = "xlsx"
-    result = vs.load_binning_record(model_name, branch)
-    # result = filter(lambda x: x["is_selected"] >0,result)
-    new_result = []
-    for record in result:
-        new_record = []
-        new_record.append(record["variable_name"])
-        new_record.append(record["variable_iv"])
-        new_record.append(record["is_selected"])
-        new_result.append(new_record)
-    headers = ('variable_name', 'variable_iv', 'is_selected')
-    data = tablib.Dataset(*new_result, headers=headers)
-
-    # 实例化一个Workbook()对象(即excel文件)
-    resp = make_response(data.xlsx)
-    return responseFile(resp, "selected_variable." + type)
-
-
 def generate_response(var_name, df, iv):
     # data = {var_name: []}
     data = collections.OrderedDict()
@@ -925,13 +841,6 @@ def sort_iv(out):
     return out_sorted_iv
 
 
-def float_nan_to_str_nan(x):
-    if type(x) == float:
-        return str(x)
-    else:
-        return x
-
-
 def sort_variable(variables, result):
     v = {}
     for index, name in enumerate(variables):
@@ -943,5 +852,3 @@ def sort_variable(variables, result):
         new_result[i] = variable
 
     return new_result
-
-

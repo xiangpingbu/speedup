@@ -15,14 +15,3 @@ def get_res(key):
     # print(response)
     return responseto(data=json.loads(response.text))
 
-
-# # 根据name获取资源中的某一个
-# @app.route('/language/<string:name>')
-# def getOne(name):
-#     result = [data for data in datas if data['name'] == name]
-#     if len(result) == 0:
-#         return statusResponse(R404_NOTFOUND)
-#     return fullResponse(R200_OK, result[0])
-
-
-# print requests.get("http://www.baidu.com").text

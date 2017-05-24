@@ -17,11 +17,6 @@ def load_branch(name, branch):
     result = util.query(sql, (name, branch))
     return result
 
-
-
-
-
-
 def update_branch(name, branch, target, remove_list=None, selected_list=None):
     '''更新对应分支的配置'''
     # json_remove_list = None if remove_list is None else json.dumps(remove_list, ensure_ascii=False)
