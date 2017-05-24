@@ -35,21 +35,17 @@ export default {
                 $(".backup-body").each(function() {
                     all_list.push($(this).find(".backup-body-checks").attr("name"))
                 });
-                console.warn(38);
                 data.selected_list = selected_variable.join(",");
                 data.all_list = all_list.join(",");
                 data.with_intercept = $("#withIntercept").val();
                 data.ks_group_num = $("#ksGroupNum").val();
 
             } else {
-                console.warn(46);
-                console.warn($(".variable_apply.checked"));
-                $(".variable_apply.checked").each(function() {
-                    selected_variable.push($(this).find(".apply-checks").attr("name"));
-                    console.warn($(this).find(".apply-checks"));
-                    console.warn(selected_variable);
-                    data.var_list = selected_variable.join(",");
-                });
+                // $(".variable_apply.checked").each(function() {
+                //     selected_variable.push($(this).find(".apply-checks").attr("name"));
+                //     data.var_list = selected_variable.join(",");
+                // });
+                data.var_list = localStorage.getItem("var_list")
                 url = host + "/tool/variable_select";
                 data.ks_group_num = $("#ksGroupNum").val();
                 data.with_intercept = $("#withIntercept").val();

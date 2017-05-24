@@ -151,6 +151,7 @@ export default {
                         .on('ifUnchecked', function(event) {
                             $(".icheckbox_square-green").iCheck('uncheck');
                         });
+                    // TODO: 控制下一步流程，把不可点按钮置灰
                     finishInit = true;
                 },
                 error: function() {

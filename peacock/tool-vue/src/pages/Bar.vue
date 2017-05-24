@@ -90,38 +90,6 @@ function getHead(name) {
     }
 }
 
-function commitBranch() {
-    if (finishInit) {
-        var selected_list = {};
-        var target = $('#target').val();
-        var branch = $('#branch').val();
-        var model_name = $("#model").val();
-        var file_path = $("#filePath").val();
-        /**
-         * 将被选中的variable添加到removeList中
-         */
-        $("#dataframe").find("tbody .checked").each(function (i, n) {
-            selected_list[$(n).parents("tr").children().eq(1).html()] = i;
-        });
-        $.ajax({
-            url: host + "/tool/db/branch/commit-branch",
-            type: 'post',
-            data: {
-                selected_list: JSON.stringify(selected_list),
-                target: target,
-                branch: branch,
-                model_name: model_name,
-            },
-            async: true,
-            success: function (result) {
-            },
-            error: function () {
-
-            }
-        });
-    }
-}
-
 export default {
     data() {
         return {
@@ -477,7 +445,8 @@ export default {
                 num++;
             }
             //记录行数
-            $("#rowNum").val(num);
+            // $("#rowNum").val(num);
+            localStorage.setItem('rowNum', num);
             //设置table内的标签可以点击
 
             // changeTd();
@@ -490,7 +459,7 @@ export default {
             $(".spinner").css('display', 'none');
         })
         // initHead();
-        commitBranch();
+        // commitBranch();
     }
 }
 </script>

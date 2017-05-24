@@ -1,9 +1,9 @@
 <template lang="html">
     <div class="side-bar">
         <!-- <a id="getBar" class="bar">getBar</a> -->
-        <router-link to="/bar">getBar</router-link>
+        <a @click="getBar">getBar</a>
         <a id="history">history</a>
-        <a id="output">apply</a>
+        <a @click="output">apply</a>
         <a href="#bar" id="columnConfig" class="bar">column</a>
         <router-link to="/uploaded">prevInit</router-link>
         <a @click="goSelect">select</a>
@@ -12,9 +12,23 @@
 
 <script>
 var host = 'http://localhost:8091'
+var controlMap = {};
+
+var maxIndex = 2;
+var minIndex = 1;
+var minBoundIndex = 3;
+var maxBoundIndex = 4;
+var woeIndex = 10;
+var binNumIndex = 0;
+var cateIndex = 11;
+var categoricalIndex = 1;
+var branches = null;
+var originalBranch = null;
+var finishInit = false;
+
 
 function exportData(exportSelected) {
-    var row = $("#rowNum").val();
+    var row = localStorage.getItem('rowNum')
     var data = {};
     for (var i = 0; i < row; i++) {
         var name = $('#merge_' + i).attr("name");
@@ -56,26 +70,52 @@ function exportData(exportSelected) {
     return data
 }
 
+function getVarList() {
+    const tempList = [];
+    $(".variable_apply.checked").each(function() {
+        tempList.push($(this).find(".apply-checks").attr("name"));
+    });
+    return tempList.join(",");
+}
+
 export default {
     methods: {
-        goSelect() {
+        getBar() {
             const self = this;
+            // TODO 变量共享：1.引入同一个config 2.vuex
+            // if (finishInit) {
+            var selected_list = {};
+            var target = $('#target').val();
+            var branch = $('#branch').val();
+            var model_name = $("#model").val();
+            var file_path = $("#filePath").val();
+            /**
+             * 将被选中的variable添加到removeList中
+             */
+            $("#dataframe").find("tbody .checked").each(function(i, n) {
+                selected_list[$(n).parents("tr").children().eq(1).html()] = i;
+            });
             $.ajax({
-                url: host + "/tool/if_applyed",
+                url: host + "/tool/db/branch/commit-branch",
                 type: 'post',
-                async: false,
+                data: {
+                    selected_list: JSON.stringify(selected_list),
+                    target: target,
+                    branch: branch,
+                    model_name: model_name,
+                },
+                async: true,
                 success: function(result) {
-                    if (!result.success) {
-                        alert("you have not applyed yet");
-                    } else {
-                        self.$router.push('/select')
-                    }
+                    self.$router.push('/bar')
+                },
+                error: function() {
+
                 }
             });
-        }
-    },
-    mounted() {
-        $("#output").click(function() {
+        },
+        output() {
+            // 保存checkbox状态
+            localStorage.setItem("var_list", getVarList());
             $("#downloadform").remove();
             var form = $("<form>"); //定义一个form表单
             form.attr("id", "downloadform");
@@ -112,7 +152,26 @@ export default {
             //
             //     }
             // });
-        });
+        },
+        goSelect() {
+            const self = this;
+            $.ajax({
+                url: host + "/tool/if_applyed",
+                type: 'post',
+                async: false,
+                success: function(result) {
+                    if (!result.success) {
+                        alert("you have not applyed yet");
+                    } else if (localStorage.getItem("var_list") !== getVarList()) {
+                        alert("checkbox changed, you need reapply");
+                    } else {
+                        self.$router.push('/select')
+                    }
+                }
+            });
+        }
+    },
+    mounted() {
 
         $("#columnConfig").bind("click", function() {
             var params = [];
