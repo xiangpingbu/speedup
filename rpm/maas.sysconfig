@@ -4,5 +4,8 @@ CONFIG="-Dconfig.dir=/opt/maas/conf"
 
 JMX_OPTS=
 #JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+
 JAVA_HOME=/usr/lib/jvm/java
+
+# Ansible will modify JAVA_OPTS !!
 JAVA_OPTS="-Xms2048m -Xmx2048m"

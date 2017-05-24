@@ -1,6 +1,9 @@
 [aliyun-prod-vpc]
-121.196.192.146
-120.27.208.73
+120.27.208.73   aliyun_instance_id=i-bp1bi5umkd8txhygo9mm   aliyun_lb_weight=100
+121.196.192.146 aliyun_instance_id=i-bp1bi5umkd8txhygo9ml   aliyun_lb_weight=100
+
+[canary]
+116.62.71.55    aliyun_instance_id=i-bp1g1mzgwsm7qh2xc0cj   aliyun_lb_weight=10
 
 [production]
 118.178.135.229
@@ -8,14 +11,73 @@
 [staging]
 114.55.176.130
 
+[local-10-10-10]
+10.10.10.100
+10.10.10.101
+10.10.10.102
+10.10.10.103
+10.10.10.104
+10.10.10.105
+10.10.10.107
+10.10.10.200
+10.10.10.201
+
+## aliyun prod vpc
 [aliyun-prod-vpc:vars]
 ansible_user=sre
 ansible_port=1022
 
+src_prop_file=aliyun-prod-vpc.properties
+dst_prop_file=production.properties
+ecreditpal_env=production
+
+influx_cluster_name=aliyun-cn-east-1e
+influx_inputs_proc_ecreditpal=enabled
+influx_inputs_proc_populous=enabled
+influx_inputs_proc_maas=enabled
+
+## canary
+[canary:vars]
+ansible_user=sre
+ansible_port=1022
+
+src_prop_file=aliyun-prod-vpc.properties
+dst_prop_file=production.properties
+ecreditpal_env=production
+
+influx_cluster_name=aliyun-cn-east-1e
+influx_inputs_proc_ecreditpal=enabled
+influx_inputs_proc_populous=enabled
+influx_inputs_proc_maas=enabled
+influx_inputs_redis=enabled
+influx_inputs_mysql=enabled
+
+redis_host=tcp://:Pailie2017@r-bp13eb859950f0b4.redis.rds.aliyuncs.com:6379
+mysql_host=ecreditpal_prod:Litbp4u2w@tcp(rm-bp1tcet0e10mj36qx.mysql.rds.aliyuncs.com:3306)/?tls=false
+
+## production
 [production:vars]
 ansible_user=sre
 ansible_port=22
 
+ecreditpal_env=production
+
+influx_cluster_name=panda
+influx_inputs_proc_ecreditpal=enabled
+
+## staging
 [staging:vars]
 ansible_user=sre
 ansible_port=22
+
+ecreditpal_env=staging
+
+influx_cluster_name=dolphin
+influx_inputs_proc_ecreditpal=enabled
+
+## ecreditpal local
+[local-10-10-10:vars]
+ansible_user=sre
+ansible_port=22
+
+influx_cluster_name=local-10-10-10

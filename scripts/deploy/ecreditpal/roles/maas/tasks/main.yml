@@ -11,10 +11,18 @@
   become: yes
   yum: name={{ rpm_name }} state=present
 
-- name: restart service
+# FIXME
+- name: change canary JAVA_OPTS
+  when: hosts == "canary"
   become: yes
-  shell: systemctl restart maas
+  replace:
+      dest: "{{ sysconfig }}"
+      regexp: '^JAVA_OPTS=.*$'
+      replace: 'JAVA_OPTS="-Xmx1024m"'
 
 - name: save {{ rpm_name }}
   shell: cp "{{ rpm_name }}" "{{ rpm_base }}"
 
+- name: restart service
+  become: yes
+  shell: systemctl restart maas
