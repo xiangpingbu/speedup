@@ -135,7 +135,7 @@ public class AKDModel extends ModelNew {
 
         double prob = scores.get(0);
 
-        return scoreAlign(scoreToLogit(prob));
+        return Math.min(Math.max(Math.round(scoreAlign(scoreToLogit(prob))), 350), 900);
     }
 
     public String toString() {
