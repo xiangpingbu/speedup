@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.common.excel;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,14 +9,14 @@ import java.util.Map;
  * @version 1.0 on 2017/3/17.
  */
 public class ExcelContent {
-    private Map<String, Integer> head;
+    private LinkedHashMap<String, Integer> head;
     private List<List<String>> content;
 
-    public Map<String, Integer> getHead() {
+    public LinkedHashMap<String, Integer> getHead() {
         return head;
     }
 
-    public void setHead(Map<String, Integer> head) {
+    public void setHead(LinkedHashMap<String, Integer> head) {
         this.head = head;
     }
 
