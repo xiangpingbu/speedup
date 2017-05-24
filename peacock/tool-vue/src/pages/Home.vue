@@ -11,7 +11,10 @@
 </template>
 
 <script>
-const Dropzone = require('@/../static/js/dropzone')
+import Dropzone from '@/../static/js/dropzone'
+// const Dropzone = require('@/../static/js/dropzone')
+const host = 'http://localhost:8091'
+
 export default {
     name: 'home',
     data() {
@@ -19,37 +22,37 @@ export default {
     },
     methods: {
         initDropzone() {
-            // var host = 'http://localhost:8091'
-            const host = 'http://101.71.245.166:8091'
             const self = this
             Dropzone.options.myAwesomeDropzone = {
-                url: host + '/tool/upload',
-                paramName: 'file',
+                url: host + "/tool/upload",
+                paramName: "file",
                 autoProcessQueue: false,
                 uploadMultiple: true,
                 parallelUploads: 100,
                 maxFiles: 100,
-                method: 'post',
+                method: "post",
+
                 // Dropzone settings
                 init: function() {
-                    const myDropzone = this
+                    var myDropzone = this;
 
-                    this.element.querySelector('button[type=submit]').addEventListener('click', function(e) {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        myDropzone.processQueue()
-                    })
-                    this.on('sendingmultiple', function() {
-                    })
-                    this.on('successmultiple', function(files, response) {
-                        console.log(response.success)
-                        if (response.data) {
+                    this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        myDropzone.processQueue();
+                    });
+                    this.on("sendingmultiple", function() {});
+                    this.on("successmultiple", function(files, response) {
+                        if (response.success) {
+                            $("#modelName").val(response.data);
                             self.$router.push('/uploaded')
+                        } else {
+                            alert(response.data)
                         }
-                    })
-                    this.on('errormultiple', function(files, response) {})
+                    });
+                    this.on("errormultiple", function(files, response) {});
                 }
-            }
+            };
         }
     },
     created() {

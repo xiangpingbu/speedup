@@ -9,7 +9,7 @@ import os
 class Config(object):
     DEBUG = False
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
-    ROOT_PATH="/Users/lifeng/Desktop/111"
+    ROOT_PATH="/Users/admin/Desktop/maas_demo"
 
 
 class Development(Config):  # inherit from Config
