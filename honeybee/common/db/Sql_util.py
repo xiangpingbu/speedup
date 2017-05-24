@@ -10,8 +10,9 @@ def query(sql,args= None):
             cur.execute(sql,args)
             return db.cursor.fetchall()
         except Exception, e:
-            print e
+
             db.conn.rollback()
+            raise Exception(e)
 
 
 def execute(sql, args=None):

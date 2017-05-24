@@ -7,6 +7,7 @@ from rest import py_test
 import rest.endpoint_tool
 import rest.endpoint_es
 import rest.endpoint_tool_db
+import rest.endpoint_tool_parse
 from rest.app_base import *
 
 
