@@ -45,13 +45,12 @@ public class ScoreCardService  {
     @ModelApi(apiCode = "M112")
     public Object akdService(Map<String, String> map, GenericRecord record) {
         AKDModel akdModel = new AKDModel();
-        Double score = (Double) akdModel.run(map);
-
+        Long score = (Long) akdModel.run(map);
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = akdModel.ParseVariables(akdModel.getVariableList(), score.toString(), AKDModel.AKDModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
-        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(String.valueOf(Math.round(score))).build());
+        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score.toString()).build());
 
-        return Math.round(score);
+        return score;
     }
 }
