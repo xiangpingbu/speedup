@@ -2,6 +2,8 @@ from flask import Flask, request, send_from_directory
 from flask_restful import Api
 from util.restful_tools import *
 from flask_environments import Environments
+from common import global_value
+
 
 
 app = Flask(__name__)
