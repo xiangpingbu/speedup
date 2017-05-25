@@ -5,6 +5,7 @@ import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.google.gson.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -12,11 +13,13 @@ import java.util.*;
  * @version 1.0 on 2017/5/24.
  */
 public class ToolApply {
-    public static void main(String[] args) throws Exception {
+    public static ExcelContent getApplyed(String filePath) throws Exception {
         ExcelRowReader rowReader = new ExcelRowReader();
-        ExcelReaderUtil.readExcel(rowReader, "/Users/lifeng/Desktop/111/model_data.xlsx");
+        ExcelReaderUtil.readExcel(rowReader, filePath);
         ExcelContent content = rowReader.getRows();
         LinkedHashMap<String,Integer> head = content.getHead();
+        LinkedHashMap<String,Integer> newHead = new LinkedHashMap<>();
+
         List<List<String>> rows =  content.getContent();
         Map<String,List<ApplyVariable>> variables = new HashMap<>();
 
@@ -44,14 +47,44 @@ public class ToolApply {
                 list.add(v);
             }
             variables.put(s.getKey(), list);
-            head.put(s.getKey()+"_woe",head.size());
+            int headSize = head.size();
+            head.put(s.getKey()+"_woe",headSize);
         }
 
-        rows.forEach(row -> applyGetWoeValue(row,variables,head));
-        System.out.println();
+        rows.forEach(row -> applyGetWoeValue(row,newHead,variables,head));
+        content.setHead(newHead);
+        return content;
     }
 
-    private static void applyGetWoeValue(List<String> columns,Map<String,List<ApplyVariable>> keys,Map<String,Integer> head) {
+    public static void compare(String applyedFile,String originFile) throws Exception {
+        ExcelRowReader readerA = new ExcelRowReader();
+        ExcelReaderUtil.readExcel(readerA, applyedFile);
+        Map<String,Integer> head = readerA.getRows().getHead();
+
+
+        ExcelContent excelContent = getApplyed(originFile);
+        Map<String,Integer> newHead = excelContent.getHead();
+        List<List<String>> newContents = excelContent.getContent();
+
+        for (int i = 0; i < readerA.getRows().getContent().size(); i++) {
+            List<String> applyed = readerA.getRows().getContent().get(i);
+            List<String> newContent = newContents.get(i);
+
+            for (String s : newHead.keySet()) {
+                int i1 = head.get(s);
+                int i2 = newHead.get(s);
+                String s1 = applyed.get(i1);
+                String s2 = newContent.get(i2);
+                BigDecimal b1 = new BigDecimal(s1).setScale(4,BigDecimal.ROUND_HALF_UP);
+                BigDecimal b2 = new BigDecimal(s2).setScale(4,BigDecimal.ROUND_HALF_UP);
+                if (b1.compareTo(b2) != 0){
+                    System.out.println(s +"  "+ i1 +"  不匹配");
+                }
+            }
+        }
+    }
+
+    private static void applyGetWoeValue(List<String> columns,Map<String,Integer> newHead,Map<String,List<ApplyVariable>> keys,Map<String,Integer> head) {
         for (String s : keys.keySet()) {
             String value = columns.get(head.get(s));
             int i= 0;
@@ -67,7 +100,15 @@ public class ToolApply {
                 }
                 i++;
             }
+            newHead.put(s+"_woe",columns.size()-1);
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        String applyed = "/Users/lifeng/Downloads/df_iv_1.xlsx";
+        String origin = "/Users/lifeng/Desktop/111/model_data.xlsx";
+        compare(applyed,origin);
+
     }
 
 

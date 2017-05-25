@@ -3,6 +3,7 @@ package com.ecreditpal.maas.common.offline;
 import com.ecreditpal.maas.common.utils.CommonUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -48,6 +49,9 @@ public class ApplyVariable {
                 return woe;
             }
         } else {
+            if (StringUtils.isEmpty(value)){
+                value = "nan";
+            }
             if (categoricalValue.contains(value)){
                 return woe;
             }
