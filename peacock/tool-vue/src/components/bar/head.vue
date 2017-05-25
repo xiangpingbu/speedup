@@ -15,9 +15,17 @@
 
 <script>
 const host = 'http://localhost:8091'
+let maxIndex = 2;
+let minIndex = 1;
+let minBoundIndex = 3;
+let maxBoundIndex = 4;
+let woeIndex = 10;
+let binNumIndex = 0;
+let cateIndex = 11;
+let categoricalIndex = 1;
 
 function exportData(exportSelected) {
-    var row = $("#rowNum").val();
+    var row = localStorage.getItem('rowNum');
     var data = {};
     for (var i = 0; i < row; i++) {
         var name = $('#merge_' + i).attr("name");
@@ -64,7 +72,7 @@ function exportData(exportSelected) {
 
 // exportDataWithIV
 function exportDataWithIV() {
-    var row = $("#rowNum").val();
+    var row = localStorage.getItem('rowNum');
     var data = {};
     for (var i = 0; i < row; i++) {
         var name = $('#merge_' + i).attr("name");
@@ -113,6 +121,11 @@ function exportDataWithIV() {
 
 
 export default {
+    data() {
+        return {
+            checkAllFlag: false
+        }
+    },
     computed: {
         branch() {
             console.warn();
@@ -192,14 +205,12 @@ export default {
             });
         },
         selectAll() {
-            var v = $(this).attr("value");
-            if (v == "0") {
+            if (!this.checkAllFlag) {
                 $(".apply-checks").iCheck("check");
-                $("#selectAll").attr("value", "1");
             } else {
                 $(".apply-checks").iCheck("uncheck");
-                $("#selectAll").attr("value", "0");
             }
+            this.checkAllFlag = !this.checkAllFlag;
         },
         rank() {
             var data = exportDataWithIV();

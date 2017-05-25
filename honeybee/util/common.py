@@ -60,7 +60,7 @@ def is_valid_correlation(df, corr_cap=1):
     var_corr = df.corr()
     for col in var_corr.columns:
         for row in var_corr.index:
-            if col != row and var_corr[col][row] > corr_cap:
+            if col != row and var_corr[col][row] >= corr_cap:
                 return False
 
     return True

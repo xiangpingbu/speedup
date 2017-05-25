@@ -61,6 +61,8 @@ export default {
         this.$root.$on('initBar', (result) => {
             var num = 0;
             var initList = [];
+            var barItemList = [];
+            this.barItemList = [];
             //通过变量名获取数据
             for (var valName in result.data) {
                 var varData = result.data[valName]["var_table"];
@@ -72,7 +74,7 @@ export default {
                 } else {
                     table_head = getHead(varData[0][valName]);
                 }
-                this.barItemList.push({valName, iv, num, table_head, varData})
+                barItemList.push({valName, iv, num, table_head, varData})
                 initList.push(num);
 
                 var isSelected = result.data[valName]["is_selected"];
@@ -81,6 +83,9 @@ export default {
                 }
                 num++;
             }
+            this.$nextTick(() => {
+                this.barItemList = barItemList;
+            })
             //记录行数
             // $("#rowNum").val(num);
             localStorage.setItem('rowNum', num);

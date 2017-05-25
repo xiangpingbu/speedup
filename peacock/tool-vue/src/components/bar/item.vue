@@ -419,7 +419,6 @@ export default {
         $(".apply-checks").iCheck({
             checkboxClass: 'icheckbox_square-green variable_apply'
         });
-
         this.$nextTick(() => {
             this.buttonInit([num]);
         })

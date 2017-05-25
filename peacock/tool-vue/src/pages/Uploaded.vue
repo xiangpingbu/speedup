@@ -5,9 +5,8 @@
           <select class="table-ele" :id="name" name="">
           </select>
       </div>
-      <div class="">
-          <button class="btn btn-primary" @click="submit" name="button">commit</button>
-      </div>
+      <button class="btn btn-primary" @click="submit" name="button">commit</button>
+      
   </div>
 </template>
 
@@ -284,6 +283,18 @@ export default {
 
 <style lang="css">
 .upload {
+    position: relative;
     padding-top: 20px;
+}
+.upload .table-label {
+    display: inline-block;
+    width: 50px;
+    text-align: left;
+    margin-right: 10px;
+}
+.upload .btn {
+    position: absolute;
+    left: 250px;
+    top: 113px;
 }
 </style>
