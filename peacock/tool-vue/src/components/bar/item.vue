@@ -24,8 +24,9 @@ import * as d3 from 'd3'
 
 // var xScale, yScale;
 
-
-var host = "http://localhost:8091";
+import {
+    host
+} from '@/config';
 
 var controlMap = {};
 

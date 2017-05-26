@@ -14,7 +14,10 @@
 </template>
 
 <script>
-const host = 'http://localhost:8091'
+import {
+    host
+} from '@/config';
+
 let maxIndex = 2;
 let minIndex = 1;
 let minBoundIndex = 3;

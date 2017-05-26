@@ -14,7 +14,9 @@
 import '@/../static/js/icheck.min'
 import '@/../static/js/select2.min'
 
-var host = 'http://localhost:8091'
+import {
+    host
+} from '@/config';
 // import tool_button from '@/assets/js/tool_button'
 let branches = null;
 let originalBranch = null;
