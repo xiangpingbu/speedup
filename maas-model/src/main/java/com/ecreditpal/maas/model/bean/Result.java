@@ -22,6 +22,14 @@ public class Result<D> implements Serializable {
         return result;
     }
 
+    public static <D> Result<D> wrapSuccessfulResult(String message,D data) {
+        Result<D> result = new Result<D>();
+        result.data = data;
+        result.success = true;
+        result.message = message;
+        return result;
+    }
+
 
     public static <D> Result<D> wrapErrorResult(String errorCode, String message) {
         Result<D> result = new Result<D>();

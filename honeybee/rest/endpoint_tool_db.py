@@ -1,6 +1,5 @@
 # coding=utf-8
 from rest.app_base import *
-from service import db_service as vs
 import requests
 import json
 from collections import OrderedDict
@@ -32,7 +31,7 @@ def commit_branch():
     target = request.form.get("target")
 
 
-    return responseto(data=vs.update_branch(model_name, branch, target, selected_list=selected_list))
+    return responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list))
 
 
 '''
@@ -42,7 +41,7 @@ def commit_branch():
 def checkout():
     model_name = request.values.get("model_name")
     branch = request.values.get("branch")
-    result = vs.load_branch(model_name, branch)
+    result = tool_model_service.load_model(model_name=model_name, model_branch = branch)
 
     return responseto(data=result[0])
 
@@ -54,14 +53,14 @@ def save():
     data = request.values.get("data")
     dict = json.loads(data)
 
-    vs.del_binnbing_record(model_name, branch)
+    tool_model_service.del_binning_record(model_name, branch)
 
     list = []
     for key, val in dict.items():
         now = datetime.now()
         obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=False),val["is_selected"]]
         list.append(obj)
-    if vs.save_binning_record(list) is not True:
+    if tool_model_service.save_binning_record(list) is not True:
         return responseto(success=False)
     return responseto()
 

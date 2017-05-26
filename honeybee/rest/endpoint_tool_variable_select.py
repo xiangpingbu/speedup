@@ -1,7 +1,6 @@
 # coding=utf-8
 from rest.app_base import *
 from service.db import tool_model_service
-from service import db_service as vs
 from service import logit_model_service as lmf
 import pandas as pd
 from util import common
@@ -24,12 +23,12 @@ def variable_select():
 
     # 调用接口时发现var_list为空,那么主动从数据库中读取
     if var_list is None or var_list == '':
-        result = vs.get_selected_variable(model_name, branch)[0]
+        result = tool_model_service.get_selected_variable(model_name, branch)[0]
         var_list = result["selected_variable"].decode('utf-8')
     else:
         # 清除旧数据,插入新的数据
-        if (vs.del_selected_variable(model_name, branch)):
-            vs.save_selected_variable(model_name, branch, var_list)
+        if (tool_model_service.del_selected_variable(model_name, branch)):
+            tool_model_service.save_selected_variable(model_name, branch, var_list)
         else:
             return responseto(messege="fail to save selected variable", success=False)
     target = request.form.get("target")
@@ -79,17 +78,22 @@ def variable_verify():
     model_name = request.form.get("modelName")
     branch = request.form.get("branch")
     corr_cap = request.form.get("corrCap")
+    if corr_cap is not None:
+        corr_cap = float(corr_cap)
+    else:
+        corr_cap = 1
     variables = request.form.get("variables")
 
     variable_list = variables.split(",")
+    variable_list = [x+"_woe" for x in variable_list]
     df_map = global_value.get_value(model_name+"_"+branch)
 
-    df_train = df_map["df_train"]
+    df_train_woe = df_map["df_train_woe"]
 
-    df = pd.DataFrame(df_train,
+    df = pd.DataFrame(df_train_woe,
                       columns=variable_list)
 
-    if common.get_iv_tree_binning(df,corr_cap) is False:
+    if common.is_valid_correlation(df,corr_cap) is False:
         result = common.get_correlation(df)
         return responseto(result.to_dict())
     else:

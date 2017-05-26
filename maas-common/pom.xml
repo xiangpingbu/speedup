@@ -104,8 +104,6 @@
             <artifactId>activejdbc-instrumentation</artifactId>
             <version>1.4.13</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -127,9 +125,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
         </plugins>
     </build>
-
 </project>

@@ -11,7 +11,6 @@ from beans.Pmml import *
 from common.constant import const
 from rest.app_base import *
 from service import binning_service as bf
-from service import db_service as vs
 from service import basic_analysis_service as ba
 from service import logit_model_service as lmf
 from util import common as cmm
@@ -205,7 +204,7 @@ def divide_manually():
                    'bad_rate', 'woe',
                    'type']
 
-    target = vs.load_branch(model_name, branch)[0]["model_target"]
+    target = tool_model_service.load_model(model_name=model_name, model_branch =branch)[0]["model_target"]
     result = bf.adjust_bin(df_train, type == "true", variable_name, boundary_list
                            , target=target, expected_column={variable_name})
 

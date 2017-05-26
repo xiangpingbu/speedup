@@ -14,6 +14,7 @@
         <module>maas-service</module>
         <module>maas-common</module>
         <module>maas-schedule</module>
+        <module>maas-offline</module>
     </modules>
 
     <properties>

@@ -1,4 +1,4 @@
-package com.ecreditpal.maas.common.offline;
+package com.ecreditpal.maas.offline.audit.apply;
 
 import com.ecreditpal.maas.common.utils.CommonUtils;
 import lombok.Getter;
