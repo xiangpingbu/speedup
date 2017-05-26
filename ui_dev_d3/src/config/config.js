@@ -1,5 +1,5 @@
 export default {
-  url_prefix: '/monitor/model_xyb_monitor_',
+  url_prefix: '/es/resource/model_xyb_monitor_',
   personal_live_join: {
     '1,': '父母',
     '2,': '配偶及子女',

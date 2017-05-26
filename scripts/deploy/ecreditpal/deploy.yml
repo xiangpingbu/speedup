@@ -1,0 +1,6 @@
+---
+# ansible-playbook deploy.yml -i hosts -e 'group=staging role=telegraf'
+
+- hosts: "{{ group }}"
+  roles:
+      - role: "{{ role }}"

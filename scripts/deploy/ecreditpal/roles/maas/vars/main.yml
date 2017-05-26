@@ -2,3 +2,5 @@
 
 rpm_base: "maas.rpm"
 rpm_name: "{{ rpm|quote|basename }}"
+sysconfig: "/etc/sysconfig/maas"
+aliyun_lb_id: "lb-bp1hm50dn3i8tjcuws6rw"
