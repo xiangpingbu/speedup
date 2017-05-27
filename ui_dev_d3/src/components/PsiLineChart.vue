@@ -47,6 +47,13 @@ export default {
 
         // sort dataSet by date in acsending order
         dataSet.sort(sortDate)
+        // grab the latest data
+        var LatestData = dataSet.length < 5 ? dataSet : dataSet.slice(dataSet.length - 5, dataSet.length)
+        var latestpsiList = []
+        LatestData.forEach((d) => {
+          latestpsiList.push(d.PSI)
+        })
+        var tempmax = Math.max(...latestpsiList)
 
         // create new name maps
         // var newDataNames = []
@@ -116,7 +123,8 @@ export default {
               label: {
                 // text: this.variable,
                 position: 'outer-top'
-              }
+              },
+              max: this.subChartEnabled ? null : tempmax * 1.5
             }
           },
           point: {

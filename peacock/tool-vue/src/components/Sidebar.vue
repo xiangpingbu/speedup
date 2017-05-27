@@ -4,14 +4,16 @@
         <a @click="getBar">getBar</a>
         <a id="history">history</a>
         <a @click="output">apply</a>
-        <a href="#bar" id="columnConfig" class="bar">column</a>
+        <a href="#bar" id="columnConfig">column</a>
         <router-link to="/uploaded">prevInit</router-link>
         <a @click="goSelect">select</a>
     </div>
 </template>
 
 <script>
-var host = 'http://localhost:8091'
+import {
+    host
+} from '@/config';
 var controlMap = {};
 
 var maxIndex = 2;
@@ -225,14 +227,18 @@ export default {
 <style lang="css">  
 .side-bar a {
     color: #333;
+    background: #eee;
     font-size: 15px;
     line-height: 66px;
     text-align: center;
     text-decoration: none;
     padding: 0 !important;
     cursor: pointer;
+    border: 1px solid #ddd;
 }
 .side-bar a:hover {
+    font-weight: bold;
+    border: none;
     color: #fff;
 }
 </style>

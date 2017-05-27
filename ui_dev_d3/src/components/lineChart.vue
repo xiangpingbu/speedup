@@ -50,6 +50,10 @@ export default {
         // sort dataSet by date in acsending order
         dataSet.sort(sortDate)
         // create new name maps
+        var LatestData = dataSet.length < 5 ? dataSet : dataSet.slice(dataSet.length - 5, dataSet.length)
+        // console.log(LatestData)
+        // console.log(dataSet)
+
         var newDataNames = []
         var nameMap = {}
         // TODO: use lodash
@@ -70,7 +74,8 @@ export default {
           data: {
             colors: colorMap,
             type: 'spline',
-            json: dataSet,
+            // json: dataSet,
+            json: this.subChartEnabled ? dataSet : LatestData,
             keys: {
               x: 'date',
               // value: ['p50', 'p80', 'p10', 'p20', 'p30', 'p40', 'p60', 'p70', 'p90', 'p95', 'p99']
