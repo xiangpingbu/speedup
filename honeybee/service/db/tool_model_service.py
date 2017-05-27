@@ -18,10 +18,10 @@ def load_model(**params):
     result = util.query(process_result[0], process_result[1])
     return result
 
-def update_branch(name, branch, target, remove_list=None, selected_list=None):
+def update_branch(name, branch, target, remove_list=None, selected_list=None,file_path=None):
     '''更新对应分支的配置'''
-    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s , modify_date= %s where model_name=%s and model_branch= %s"
-    result = util.execute(sql, (target, remove_list, selected_list, datetime.now(), name, branch))
+    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s ,file_path = %s, modify_date= %s where model_name=%s and model_branch= %s"
+    result = util.execute(sql, (target, remove_list, selected_list,file_path, datetime.now(), name, branch))
     if result > 0:
         return True
     return False

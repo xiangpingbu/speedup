@@ -141,5 +141,5 @@ cmd = 'java -jar %s %s "origin=%s&applied=%s&columnConfig=%s"'
 cmd = cmd %(jar_path,target,origin,applied,columnConfig)
 import subprocess
 # p2 = subprocess.getoutput(cmd)
-p2 =subprocess.check_output(cmd, shell=True)
-print p2
+# p2 =subprocess.check_output(cmd, shell=True)
+# print p2

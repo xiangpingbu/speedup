@@ -105,6 +105,7 @@ export default {
                     target: target,
                     branch: branch,
                     model_name: model_name,
+                    file_path:file_path
                 },
                 async: true,
                 success: function(result) {
@@ -224,7 +225,7 @@ export default {
 }
 </script>
 
-<style lang="css">  
+<style lang="css">
 .side-bar a {
     color: #333;
     background: #eee;

@@ -477,7 +477,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
         }
 
         $("#" + labelName).select2({tags: true});
-        $("#" + labelName).append(new Option("请选择"))
+        $("#" + labelName).append(new Option("请选择",null))
     }
 
 
@@ -621,6 +621,7 @@ define(['jquery', 'd3', 'i-checks', 'select2'], function ($, d3) {
                     target: target,
                     branch: branch,
                     model_name: model_name,
+                    file_path:file_path
                 },
                 async: true,
                 success: function (result) {

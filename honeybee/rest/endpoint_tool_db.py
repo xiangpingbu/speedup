@@ -6,6 +6,7 @@ from collections import OrderedDict
 from datetime import datetime
 from common.constant import const
 from service.db import tool_model_service
+import pandas as pd
 
 
 
@@ -29,9 +30,24 @@ def commit_branch():
     branch = request.form.get("branch")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
+    file_path = request.form.get("file_path")
 
+    root_path = app.config["ROOT_PATH"]
+    path = root_path + "/" + file_path
 
-    return responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list))
+    key = model_name+"_"+branch
+    if global_value.has_key(key) is False:
+        # 重新加载资源
+        df_all = pd.read_excel(path)
+        df_train = df_all[df_all['dev_ind'] == 1]
+        df_test = df_all[df_all['dev_ind'] == 0]
+        df_map = {model_name + "_" + branch:
+                      {"df_all": df_all,
+                       "df_train": df_train,
+                       "df_test": df_test}}
+        global_value.set_value(**df_map)
+
+    return responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list,file_path = file_path))
 
 
 '''

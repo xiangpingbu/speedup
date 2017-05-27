@@ -7,17 +7,9 @@ from service.db import tool_model_service
 
 
 
-base="/es"
+base="/tool"
 es_host="http://10.10.10.107:9200/"
 
-@app.route(base + "/resource/<string:key>")
-def get_res(key):
-    url = es_host + key+"/_search?pretty"
-    d = json.dumps({"size": 5000})
-    # response = requests.get(url)
-    response = requests.post(url, data=d)
-    # print(response)
-    return responseto(data=json.loads(response.text))
 
 @app.route(base + "/export_selected_variable", methods=['POST'])
 def export_selected_variable():
@@ -88,4 +80,3 @@ def export_score_card():
     open('/Users/lifeng/Desktop/111/xxx.xlsx', 'wb').write(data.xlsx)
 
 
-export_score_card()

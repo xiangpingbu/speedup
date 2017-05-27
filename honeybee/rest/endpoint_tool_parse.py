@@ -152,7 +152,8 @@ def get_branch_info():
     #                    "df_train": df_train,
     #                    "df_test": df_test}}
     #     global_value.set_value(**df_map)
-    selected_file = path.replace(app.config["ROOT_PATH"] + "/", "")
+    if path is not None:
+        selected_file = path.replace(app.config["ROOT_PATH"] + "/", "")
 
 
     files = common_util.listFile(app.config["ROOT_PATH"], absolute=False)
