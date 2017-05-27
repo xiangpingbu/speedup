@@ -256,8 +256,6 @@ def decision_tree_bin(df, var, target, var_type, tree_deep=3, min_leaf=200):
 
     if 'bad_hood' not in df_non_null_predict.columns:
         df_non_null_predict['bad_hood'] = 0
-    if 'good_hood' not in df_non_null_predict.columns:
-        df_non_null_predict['good_hood'] = 0
 
     if var_type in ['object', 'str', 'Categorical']:
         # categorical variable should not use _woe in the name
