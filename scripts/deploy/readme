@@ -1,3 +1,0 @@
-- deploy manually
-  mvn clean package -Paliyun-prod-vpc -DskipTests -Dbuild.version=x.x.x -Dbuild.git.commit=<commit id>
-  ansible-playbook ecreditpal/site.yml -i hosts -e "rpm=path/to/file.rpm hosts=dolphin/panda/aliyun-prod-vpc"
