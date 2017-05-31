@@ -2,10 +2,10 @@
   <div>
     <topbar :numIds="numIds" :countIds="countIds"></topbar>
     <div class="chart-card">
-      <LineChart v-if="type==='line'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable" />
-      <BarChart v-if="type==='bar'" :id="id" :dataSet="dataSet" :subChartEnabled="true" :variable="variable" :nameMap="nameMap" />
-      <PsiLineChart v-if="type==='psi'" :id="id" :dataSet="dataSet" :subChartEnabled="true" />
-      <StatChart v-if="type==='stat'" :id="id" :dataSet="dataSet" :subChartEnabled="true" />
+      <LineChart v-if="type==='line'" :id="id" :subChartEnabled="true" />
+      <BarChart v-if="type==='bar'" :id="id" :subChartEnabled="true" :variable="variable" :nameMap="nameMap" />
+      <PsiLineChart v-if="type==='psi'" :id="id" :subChartEnabled="true" />
+      <StatChart v-if="type==='stat'" :id="id" :subChartEnabled="true" />
     </div>
   </div>
 </template>
@@ -35,8 +35,8 @@ export default {
     update() {
       this.type = sessionStorage.getItem(this.id + 'type')
       this.$nextTick(() => {
-        this.dataSet = JSON.parse(sessionStorage.getItem(this.id))
-        this.variable = sessionStorage.getItem(this.id + 'Var')
+        // this.dataSet = JSON.parse(sessionStorage.getItem(this.id))
+        // this.variable = sessionStorage.getItem(this.id + 'Var')
         if (this.type === 'bar') {
           this.nameMap = JSON.parse(sessionStorage.getItem(this.id + 'nameMap'))
         }

@@ -12,11 +12,11 @@ import java.util.List;
  */
 public class ExcelRowReader implements IExcelRowReader {
 
-    private static LinkedHashMap<String, Integer> head = Maps.newLinkedHashMap();
-    private static List<List<String>> excelRow = Lists.newArrayList();
-    private static ExcelContent excelContent;
-    private static int i = 0;
-    private static int a = 0;
+    private  LinkedHashMap<String, Integer> head = Maps.newLinkedHashMap();
+    private  List<List<String>> excelRow = Lists.newArrayList();
+    private  ExcelContent excelContent ;
+    private  int i = 0;
+    private  int a = 0;
 
 
     @Override
@@ -35,13 +35,16 @@ public class ExcelRowReader implements IExcelRowReader {
             }
             a++;
         }
+        if (i==0){
+            i++;
+            return;
+        }
         excelRow.add(content);
         i++;
     }
 
     public ExcelContent getRows() {
-        excelRow.remove(0);
-        ExcelContent excelContent = new ExcelContent();
+        excelContent = new ExcelContent();
         excelContent.setContent(excelRow);
         excelContent.setHead(head);
         return excelContent;

@@ -1,12 +1,12 @@
 # coding=utf-8
 from rest.app_base import *
-from service import db_service as vs
 import requests
 import json
 from collections import OrderedDict
 from datetime import datetime
 from common.constant import const
 from service.db import tool_model_service
+import pandas as pd
 
 
 
@@ -17,7 +17,7 @@ es_host = "http://10.10.10.107:9200/"
 
 @app.route(base + "/<string:name>")
 def es_req(key):
-    url = es_host + key + "/_search?pretty"
+    url = app.config["es_host"] + key + "/_search?pretty"
     response = requests.get(url)
     return responseto(data=json.loads(response.text))
 
@@ -30,8 +30,24 @@ def commit_branch():
     branch = request.form.get("branch")
     selected_list = request.form.get("selected_list")
     target = request.form.get("target")
+    file_path = request.form.get("file_path")
 
-    return responseto(data=vs.update_branch(model_name, branch, target, selected_list=selected_list))
+    root_path = app.config["ROOT_PATH"]
+    path = root_path + "/" + file_path
+
+    key = model_name+"_"+branch
+    if global_value.has_key(key) is False:
+        # 重新加载资源
+        df_all = pd.read_excel(path)
+        df_train = df_all[df_all['dev_ind'] == 1]
+        df_test = df_all[df_all['dev_ind'] == 0]
+        df_map = {model_name + "_" + branch:
+                      {"df_all": df_all,
+                       "df_train": df_train,
+                       "df_test": df_test}}
+        global_value.set_value(**df_map)
+
+    return responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list,file_path = file_path))
 
 
 '''
@@ -41,7 +57,7 @@ def commit_branch():
 def checkout():
     model_name = request.values.get("model_name")
     branch = request.values.get("branch")
-    result = vs.load_branch(model_name, branch)
+    result = tool_model_service.load_model(model_name=model_name, model_branch = branch)
 
     return responseto(data=result[0])
 
@@ -53,14 +69,14 @@ def save():
     data = request.values.get("data")
     dict = json.loads(data)
 
-    vs.del_binnbing_record(model_name, branch)
+    tool_model_service.del_binning_record(model_name, branch)
 
     list = []
     for key, val in dict.items():
         now = datetime.now()
         obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=False),val["is_selected"]]
         list.append(obj)
-    if vs.save_binning_record(list) is not True:
+    if tool_model_service.save_binning_record(list) is not True:
         return responseto(success=False)
     return responseto()
 

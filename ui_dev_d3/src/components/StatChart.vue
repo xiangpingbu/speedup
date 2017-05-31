@@ -2,7 +2,7 @@
   <div >
     <p style="text-align:center; color: #e3e3e3;">{{id}}</p>
     <div :id="id"></div>
-    <Loading v-if="!dataSet"/>
+    <Loading v-if="loading"/>
   </div>
 </template>
 
@@ -10,6 +10,7 @@
 import * as d3 from 'd3'
 import * as c3 from 'c3'
 import ConfigInfo from '@/config/config.js'
+import * as getData from '@/service/data.js'
 
 // sort data by date
 function sortDate(a, b) {
@@ -19,155 +20,166 @@ function sortDate(a, b) {
 export default {
   name: 'StatChart',
   props: ['id', 'dataSet', 'subChartEnabled', 'variable', 'nameMap'],
-  watch: {
-    'dataSet' (data) {
-      this.draw()
+  data () {
+    return {
+      loading: true
     }
+  },
+  created () {
+    // 'dataSet' (data) {
+    //   this.draw()
+    // }
+    this.draw()
   },
   methods: {
     draw() {
-      if (!this.dataSet) return
-      const dataSet = JSON.parse(JSON.stringify(this.dataSet))
+      // if (!this.dataSet) return
+      // const dataSet = JSON.parse(JSON.stringify(this.dataSet))
       // newDataFields.splice(newDataFields.indexOf('date'), 1)
-      dataSet.sort(sortDate)
-      var newDataFields = d3.keys(dataSet[0])
-      newDataFields.splice(newDataFields.indexOf('date'), 1)
-      const colorMap = {}
-      newDataFields.forEach(function(d, i) {
-        colorMap[d] = ConfigInfo.data_colors[i]
-      })
+      var urlStr = ConfigInfo.url_prefix + 'stat_api'
+      var self = this
 
-      var keyField = 'date'
-      // var valueField = 'hits'
-      var jsonData = []
-      var newMap = {}
-      dataSet.forEach((d) => {
-        var date = d[keyField]
-        var newObj = newMap[date]
-        // input unique date as keys
-        if (!newObj) {
-          newObj = {
-            date: date,
-            hits: 0,
-            count: 0
+      getData.getResponse(urlStr).then((response) => {
+        var res = getData.parseStatData(response.data)
+        var dataSet = res.newJsonData
+
+        dataSet.sort(sortDate)
+        var newDataFields = d3.keys(dataSet[0])
+        newDataFields.splice(newDataFields.indexOf('date'), 1)
+        const colorMap = {}
+        newDataFields.forEach(function(d, i) {
+          colorMap[d] = ConfigInfo.data_colors[i]
+        })
+
+        // format data for chart
+        var keyField = 'date'
+        // var valueField = 'hits'
+        var jsonData = []
+        var newMap = {}
+        dataSet.forEach((d) => {
+          var date = d[keyField]
+          var newObj = newMap[date]
+          // input unique date as keys
+          if (!newObj) {
+            newObj = {
+              date: date,
+              hits: 0,
+              count: 0
+            }
+            newMap[date] = newObj
           }
-          newMap[date] = newObj
-        }
 
-        // sum up the counts
-        if (d3.keys(newMap).includes(d.date)) {
-          newMap[date]['hits'] += d.count
-          newMap[date]['count'] += d.count
-        }
+          // sum up the counts
+          if (d3.keys(newMap).includes(d.date)) {
+            newMap[date]['hits'] += d.count
+            newMap[date]['count'] += d.count
+          }
 
-        // json input to c3 chart
-        jsonData = d3.values(newMap)
-      })
-      // console.log(this.dataSet)
+          // json input to c3 chart
+          jsonData = d3.values(newMap)
+        })
 
-      var chart = c3.generate({
-        bindto: '#' + this.id,
-        padding: {
-          left: 80,
-          right: 50
-        },
-        data: {
-          colors: colorMap,
-          type: 'spline',
-          // json: this.dataSet,
-          json: jsonData,
-          types: {
-            count: 'bar'
+        // generate c3 chart
+        var chart = c3.generate({
+          bindto: '#' + this.id,
+          padding: {
+            left: 80,
+            right: 50
           },
-          keys: {
-            x: 'date',
-            value: ['hits', 'count']
-            // value: newDataFields
+          data: {
+            colors: colorMap,
+            type: 'spline',
+            // json: this.dataSet,
+            json: jsonData,
+            types: {
+              count: 'bar'
+            },
+            keys: {
+              x: 'date',
+              value: ['hits', 'count']
+              // value: newDataFields
+            },
+            // names: this.nameMap,
+            // order: 'desc',
+            // labels: {
+            //   format: (v, id, i, j) => {
+            //     var tv = d3.values(this.dataSet[i])
+            //     tv.forEach((d, index) => {
+            //       if (typeof (d) !== 'number') {
+            //         tv.splice(index, 1)
+            //       }
+            //     })
+            //     if (v === Math.max(...tv)) {
+            //       return sums[i]
+            //     }
+            //   }
+            // },
+            // groups: [names],
+            order: 'desc'
           },
-          // names: this.nameMap,
-          // order: 'desc',
-          // labels: {
-          //   format: (v, id, i, j) => {
-          //     var tv = d3.values(this.dataSet[i])
-          //     tv.forEach((d, index) => {
-          //       if (typeof (d) !== 'number') {
-          //         tv.splice(index, 1)
-          //       }
-          //     })
-          //     if (v === Math.max(...tv)) {
-          //       return sums[i]
-          //     }
+          // tooltip: {
+          //   grouped: false
+          // },
+          // bar: {
+          //   width: {
+          //     ratio: 0.8
           //   }
           // },
-          // groups: [names],
-          order: 'desc'
-        },
-        // tooltip: {
-        //   grouped: false
-        // },
-        // bar: {
-        //   width: {
-        //     ratio: 0.8
-        //   }
-        // },
-        grid: {
-          x: {
-            show: true
-          },
-          y: {
-            show: true
-          }
-        },
-        axis: {
-          x: {
-            type: 'timeseries',
-            extent: jsonData.length < 5 ? [jsonData[0].date, jsonData[jsonData.length - 1].date] : [jsonData[jsonData.length - 5].date, jsonData[jsonData.length - 1].date],
-            tick: {
-              format: '%Y-%m-%d'
-              // culling: {
-              //   max: 5
-              // }
+          grid: {
+            x: {
+              show: true
             },
-            label: {
-              text: 'Date',
-              position: 'outer-right'
+            y: {
+              show: true
             }
           },
-          y: {
-            label: {
-              text: 'count',
-              position: 'outer-top'
+          axis: {
+            x: {
+              type: 'timeseries',
+              extent: jsonData.length < 5 ? [jsonData[0].date, jsonData[jsonData.length - 1].date] : [jsonData[jsonData.length - 5].date, jsonData[jsonData.length - 1].date],
+              tick: {
+                format: '%Y-%m-%d'
+                // culling: {
+                //   max: 5
+                // }
+              },
+              label: {
+                text: 'Date',
+                position: 'outer-right'
+              }
+            },
+            y: {
+              label: {
+                text: 'count',
+                position: 'outer-top'
+              }
             }
-          }
-        },
-        zoom: {
-          enabled: this.subChartEnabled,
-          onzoomstart: function(event) {
-            console.log('onzoomstart', event)
           },
-          onzoomend: function(domain) {
-            console.log('onzoomend', domain)
+          zoom: {
+            enabled: this.subChartEnabled,
+            onzoomstart: function(event) {
+              console.log('onzoomstart', event)
+            },
+            onzoomend: function(domain) {
+              console.log('onzoomend', domain)
+            }
+          },
+          subchart: {
+            show: this.subChartEnabled
+          },
+          legend: {
+            hide: (!this.subChartEnabled)
+          },
+          onrendered: function () {
+            self.loading = false
           }
-        },
-        subchart: {
-          show: this.subChartEnabled
-        },
-        legend: {
-          hide: (!this.subChartEnabled)
+        })
+        if (this.subChartEnabled) {
+          chart.resize({
+            height: 600
+          })
         }
       })
-      if (this.subChartEnabled) {
-        chart.resize({
-          height: 600
-        })
-      }
-
-      // test group
-      // setTimeout(() => {
-      //   var tg = []
-      //   tg.push(newDataFields)
-      //   chart.groups(tg)
-      // }, 2000)
     }
   }
 }

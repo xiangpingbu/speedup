@@ -112,5 +112,20 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>libs-snapshot</id>
+            <name>libs-snapshot</name>
+            <url>http://ci.ecreditpal.local:5080/artifactory/libs-snapshot
+            </url>
+        </snapshotRepository>
+        <repository>
+            <id>libs-release</id>
+            <name>libs-release</name>
+            <url>http://ci.ecreditpal.local:5080/artifactory/libs-release
+            </url>
+        </repository>
+    </distributionManagement>
+
 
 </project>

@@ -7,13 +7,13 @@ import com.ecreditpal.maas.model.bean.Data;
 import com.ecreditpal.maas.pmml.container.obj.ColumnConfig;
 import com.ecreditpal.maas.pmml.processor.ExportModelProcessor;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.dmg.pmml.PMML;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -27,6 +27,8 @@ public class PmmlEndpoint {
 
     @POST
     @Path("/generate")
+    @ApiOperation(value = "pmml generator")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "XYB Model Response", response = PMML.class)})
     @Produces(MediaType.APPLICATION_XML)
     public PMML generatePmml(@ApiParam(name = "column_config", value = "column_config", required = true)
                              @FormParam("column_config") String config,
@@ -40,18 +42,6 @@ public class PmmlEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        Data data = new Data();
-//        data.setNumber(22);
-
-//        data = new Data();
-//        data.setNumber(23);
-//        list.add(data);
-//
-//        data = new Data();
-//        data.setNumber(24);
-//        list.add(data);
-//        return data;
         return null;
     }
-
 }

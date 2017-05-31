@@ -43,7 +43,7 @@ public class ModelLogResponseFilter
 
         builder.setResponseCode(
                 responseContext.getStatusInfo().getStatusCode());
-        if (null != responseContext.getEntity() && !(responseContext.getEntity() instanceof Result)) {
+        if (null != responseContext.getEntity() && responseContext.getEntity() instanceof Result) {
             try {
                 builder.setResponseBody(
                         JsonUtil.toJson(responseContext.getEntity()));

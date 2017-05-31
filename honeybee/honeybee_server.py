@@ -8,6 +8,8 @@ import rest.endpoint_tool
 import rest.endpoint_es
 import rest.endpoint_tool_db
 import rest.endpoint_tool_parse
+import rest.endpoint_tool_variable_select
+import rest.endpoint_tool_excel
 from rest.app_base import *
 
 

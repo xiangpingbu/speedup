@@ -46,15 +46,8 @@ def parse():
         data_map = cmm.df_for_html(df)
 
         result = tool_model_service.load_model(model_name=model_name, model_branch=branch)
-
         branches = []
-
         v = result[0]
-        # selected_list = ""
-        # if v["selected_list"] is not None:
-        #     selected_list = v["selected_list"]
-        # data_map["target"] = v["model_target"]
-
         for n in result:
             branches.append(n["model_branch"])
 
@@ -66,6 +59,18 @@ def parse():
         return responseto(data=data_map)
     else:
         return responseto(message="file not exist", success=False)
+
+
+@app.route(base + "/create_model_name", methods=['GET'])
+def create_model_name():
+    model_name = request.args.get("model_name")
+
+    if tool_model_service.load_model(model_name=model_name,model_branch="master") is None:
+        if tool_model_service.create_branch():
+            return responseto({"model_name":model_name,"model_branch":"master"})
+        else:
+            return responseto("create fail", success=False)
+    return responseto("name exist", success=False)
 
 
 @app.route(base + "/init_model_name", methods=['GET'])
@@ -131,10 +136,29 @@ def get_branch_info():
             return responseto(success=False, data="添加分支失败")
 
     target = result[0]["model_target"]
-    selected_file = result[0]["file_path"].replace(app.config["ROOT_PATH"] + "/", "")
+
+    path = result[0]["file_path"]
+    # df_map = global_value.get_value(model_name+"_"+branch)
+    selected_file = None
+
+    # if path is not None and \
+    #         global_value.has_key(model_name+"_"+branch) is not True\
+    #         and os.path.exists(path):
+    #     df_all = pd.read_excel(path)
+    #     df_train = df_all[df_all['dev_ind'] == 1]
+    #     df_test = df_all[df_all['dev_ind'] == 0]
+    #     df_map = {model_name + "_" + branch:
+    #                   {"df_all": df_all,
+    #                    "df_train": df_train,
+    #                    "df_test": df_test}}
+    #     global_value.set_value(**df_map)
+    if path is not None:
+        selected_file = path.replace(app.config["ROOT_PATH"] + "/", "")
+
+
     files = common_util.listFile(app.config["ROOT_PATH"], absolute=False)
 
-    data = {"target":target,"selected_file": selected_file, "files": files}
+    data = {"target": target, "selected_file": selected_file, "files": files}
 
     return responseto(data)
 

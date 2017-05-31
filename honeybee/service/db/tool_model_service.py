@@ -18,10 +18,10 @@ def load_model(**params):
     result = util.query(process_result[0], process_result[1])
     return result
 
-def update_branch(name, branch, target, remove_list=None, selected_list=None):
+def update_branch(name, branch, target, remove_list=None, selected_list=None,file_path=None):
     '''更新对应分支的配置'''
-    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s , modify_date= %s where model_name=%s and model_branch= %s"
-    result = util.execute(sql, (target, remove_list, selected_list, datetime.now(), name, branch))
+    sql = "update tool_model set model_target= %s , remove_list = %s , selected_list = %s ,file_path = %s, modify_date= %s where model_name=%s and model_branch= %s"
+    result = util.execute(sql, (target, remove_list, selected_list,file_path, datetime.now(), name, branch))
     if result > 0:
         return True
     return False
@@ -81,3 +81,48 @@ def save_binning_record(variable_list):
     if result > 0:
         return True
     return False
+
+def del_binning_record(model_name, model_branch):
+    sql = "update tool_model_content set is_deleted=1 , modify_date = now()  where is_deleted =0 and model_name=%s and model_branch = %s  "
+    result = util.execute(sql, (model_name, model_branch))
+    if result > 0:
+        return True
+    return False
+
+def save_selected_variable(model_name, model_branch, var_list):
+    sql = "insert into tool_model_selected_variable(model_name,model_branch,selected_variable,modify_date,create_date) values(%s,%s,%s,now(),now())"
+    result = util.execute(sql, (model_name, model_branch, var_list))
+    if result > 0:
+        return True
+    else:
+        return False
+
+
+def del_selected_variable(model_name, model_branch):
+    if (len(get_selected_variable(model_name, model_branch)) > 0):
+        sql = "update tool_model_selected_variable " \
+              "set is_deleted=1 ,modify_date=now()" \
+              "where model_name = %s and model_branch=%s"
+        result = util.execute(sql, (model_name, model_branch))
+        if result > 0:
+            return True
+        else:
+            return False
+    else:
+        return True
+
+def update_selected_variable(model_name, model_branch, var_list, modify_date, is_deleted=0):
+    sql = "update tool_model_selected_variable " \
+          "set var_list = %s,modify_date=now(),is_deleted=%s " \
+          "where model_name = %s and model_branch=%s"
+    result = util.execute(sql, {var_list, is_deleted, model_name, model_branch})
+    if result > 0:
+        return True
+    else:
+        return False
+
+def get_selected_variable(model_name, model_branch):
+    sql = "select id,model_name,model_branch,selected_variable,modify_date,create_date from tool_model_selected_variable " \
+          "where model_name=%s and model_branch=%s"
+
+    return util.query(sql, (model_name, model_branch))

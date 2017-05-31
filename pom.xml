@@ -14,6 +14,7 @@
         <module>maas-service</module>
         <module>maas-common</module>
         <module>maas-schedule</module>
+        <module>maas-offline</module>
     </modules>
 
     <properties>
@@ -67,6 +68,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.8.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-xml-provider</artifactId>
+            <version>2.8.8</version>
         </dependency>
 
         <dependency>

@@ -1,18 +1,31 @@
 import axios from 'axios'
 import * as d3 from 'd3'
+import store from '@/store'
+import { mutations } from '@/store/mutations'
 
-// axios.defaults.baseURL = 'http://localhost:3000/'
+axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? process.env.AXIOS_BASE_URL : ''
 // axios.defaults.baseURL = '/api/'
 axios.interceptors.request.use(function (config) {
-  // 将请求直接发送到python，跳过node
-  config.url = `/es/resource/${config.url.split('/monitor/')[1]}`
   return config
 }, function (error) {
   return Promise.reject(error)
 })
 
 export function getResponse (url) {
-  return axios.get(url)
+  // 控制缓存
+  if (store.state.urlCacheData[url]) {
+    return new Promise(resolve => {
+      resolve(store.state.urlCacheData[url])
+    })
+  }
+  return axios.get(url).then(data => {
+    const req = {
+      url,
+      data
+    }
+    mutations.saveUrlCache(store.state, req)
+    return data
+  })
 }
 
 // export function getNumData (url) {
