@@ -42,35 +42,6 @@ public class PmmlEndpoint {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        Data data = new Data();
-//        data.setNumber(22);
-
-//        data = new Data();
-//        data.setNumber(23);
-//        list.add(data);
-//
-//        data = new Data();
-//        data.setNumber(24);
-//        list.add(data);
-//        return data;
         return null;
     }
-
-
-    @POST
-    @Path("/generate2")
-    @Produces(MediaType.APPLICATION_XML)
-    public Data generatePmml() {
-
-        Data data = new Data();
-        data.setNumber("22");
-
-        data = new Data();
-        data.setNumber("23");
-
-        data = new Data();
-        data.setNumber("24");
-        return data;
-    }
-
 }

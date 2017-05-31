@@ -7,6 +7,7 @@ import com.ecreditpal.maas.web.endpoint.filter.ModelLogCommitFilter;
 import com.ecreditpal.maas.web.endpoint.filter.ModelLogFilter;
 import com.ecreditpal.maas.web.endpoint.filter.ModelLogResponseFilter;
 import com.ecreditpal.maas.web.endpoint.interceptor.ExceptionHandler;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.wordnik.swagger.config.ConfigFactory;
 import com.wordnik.swagger.config.ScannerFactory;
@@ -55,6 +56,7 @@ public class SpringWithSwagger extends ResourceConfig {
         register(MultiPartFeature.class);
         register(ExceptionHandler.class);
         register(JacksonJsonProvider.class);
+        register(JacksonJaxbJsonProvider.class);
         register(ModelLogFilter.class);
         register(new AbstractBinder() {
             @Override
