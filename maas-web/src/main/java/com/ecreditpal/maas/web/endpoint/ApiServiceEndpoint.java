@@ -25,7 +25,7 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "apis", description = "Endpoint for api service")
+@Api(value = "maasApis", description = "Endpoint for api service")
 @Path("/api")
 public class ApiServiceEndpoint {
 

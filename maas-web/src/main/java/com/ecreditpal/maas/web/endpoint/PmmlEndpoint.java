@@ -1,20 +1,15 @@
 package com.ecreditpal.maas.web.endpoint;
 
-import com.ecreditpal.maas.common.IPBasedRateLimiter;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
-import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Data;
-import com.ecreditpal.maas.pmml.container.obj.ColumnConfig;
 import com.ecreditpal.maas.pmml.processor.ExportModelProcessor;
-import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.dmg.pmml.PMML;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
+
 
 /**
  * @author lifeng
@@ -43,5 +38,19 @@ public class PmmlEndpoint {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    @POST
+    @Path("/generate2")
+    @ApiOperation(value = "pmml generator")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "XYB Model Response", response = Data.class)})
+    @Produces(MediaType.APPLICATION_XML)
+    public Data generatePmml(){
+
+            Data data = new Data();
+            data.setNumber("22");
+
+        return data;
     }
 }

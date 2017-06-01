@@ -22,7 +22,7 @@ public class WebServer {
         context.setDescriptor(configuration.getString("maas.web","./maas-web/src/main/webapp/WEB-INF/web.xml"));
         String webapp = configuration.getString("maas.webapp","./maas-web/src/main/webapp");
 
-        if (configuration.getBoolean("activejdbc.instrumentation")) {
+        if (configuration.getBoolean("activejdbc.instrumentation",false)) {
             MakeInstrumentationUtil.make(FileUtil.getRootPath());
         }
 
