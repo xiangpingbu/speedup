@@ -18,11 +18,11 @@ public class WebServer {
         Server server = new Server(configuration.getInt("http.port", 9080));
 
         WebAppContext context = new WebAppContext();
-        context.setContextPath("/");
+        context.setContextPath("/maas");
         context.setDescriptor(configuration.getString("maas.web","./maas-web/src/main/webapp/WEB-INF/web.xml"));
         String webapp = configuration.getString("maas.webapp","./maas-web/src/main/webapp");
 
-        if (configuration.getBoolean("activejdbc.instrumentation")) {
+        if (configuration.getBoolean("activejdbc.instrumentation",false)) {
             MakeInstrumentationUtil.make(FileUtil.getRootPath());
         }
 
