@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
-public class ModelNew implements Register{
+public class ModelNew extends PmmlModel implements Register{
     private final static Logger log = LoggerFactory.getLogger(ModelNew.class);
 
     public String configPath;
@@ -173,76 +173,7 @@ public class ModelNew implements Register{
         return conf.getVariables();
     }
 
-    /**
-     * load pmml file and generate evaluator
-     */
-    static void pmmlFileLoad(String pmmlPath, PMML pmml, Evaluator evaluator) {
-        try {
-            pmml = PMMLUtils.loadPMML(pmmlPath);
-            Model m = pmml.getModels().get(0);
-            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
-        } catch (Exception e) {
-            log.error("load pmml file error !", e);
-        }
-    }
 
-    /**
-     * pmml model used only
-     * run after all the variable calculations are done
-     * prepare model variables for model execution
-     * @param evaluator
-     * @param variableMap
-     * @return variable map <name, variable value>
-     */
-    public List<Map<FieldName, FieldValue>> prepareModelInput(Evaluator evaluator, Map<String, Variable> variableMap) {
-        List<FieldName> groupFields = evaluator.getGroupFields();
-        List<Map<FieldName, Object>> stringRows = new ArrayList<Map<FieldName, Object>>();
-        Map<FieldName, Object> stringRow = new LinkedHashMap<FieldName, Object>();
-
-        for (Map.Entry<String, Variable> entry : variableMap.entrySet()) {
-            FieldName name = FieldName.create(entry.getKey());
-            String value = entry.getValue().getValue();
-            if (("").equals(value) || ("NA").equals(value) || ("N/A").equals(value)) {
-                value = null;
-            }
-            stringRow.put(name, value);
-        }
-
-        stringRows.add(stringRow);
-        if (groupFields.size() == 1) {
-            FieldName groupField = groupFields.get(0);
-
-            stringRows = EvaluatorUtil.groupRows(groupField, stringRows);
-        } else if (groupFields.size() > 1) {
-            throw new EvaluationException();
-        }
-
-        List<Map<FieldName, FieldValue>> fieldValueRows = new ArrayList<Map<FieldName, FieldValue>>();
-
-        for (Map<FieldName, Object> sr : stringRows) {
-            Map<FieldName, FieldValue> fieldValueRow = new LinkedHashMap<FieldName, FieldValue>();
-
-            Collection<Map.Entry<FieldName, Object>> entries = sr.entrySet();
-            for (Map.Entry<FieldName, Object> entry : entries) {
-                FieldName name = entry.getKey();
-                // Pre Data process: for numeric variable convert non-double
-                // value to null.
-                if (evaluator.getDataField(name).getDataType() == DataType.DOUBLE) {
-                    try {
-                        Double.parseDouble((String) entry.getValue());
-                    } catch (Exception e) {
-                        entry.setValue(null);
-                    }
-                }
-                FieldValue value = EvaluatorUtil.prepare(evaluator, name, entry.getValue());
-                fieldValueRow.put(name, value);
-            }
-
-            fieldValueRows.add(fieldValueRow);
-        }
-
-        return fieldValueRows;
-    }
 
     /**
      * 将模型计算过程中变量产生的结果,和总的结果加入

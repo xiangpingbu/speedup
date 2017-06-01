@@ -11,10 +11,9 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class HttpParam implements RequestParam {
+public class HttpParam extends RequestParam {
 
     private String url;
-    private Map<String, Object> param;
 
     public HttpParam(String url,Map<String,Object> param) {
         this.url = url;

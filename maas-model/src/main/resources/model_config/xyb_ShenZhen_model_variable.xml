@@ -55,7 +55,7 @@
         </Variable>
 
         <Variable name="p_id_city_same_ind" class="com.ecreditpal.maas.model.variables.SectionVariable">
-            <property name="key" value="liveCase"/>
+            <property name="key" value="pIdCitySameInd"/>
             <property name="paramType" value="numerical"/>
             <property name="description" value=""/>
             <property name="returnType" value="Double"/>
@@ -69,11 +69,12 @@
             <property name="returnType" value="String"/>
         </Variable>
 
-        <Variable name="手机入网时间" class="com.ecreditpal.maas.model.variables.SectionVariable">
-            <property name="key" value="mobileAccessTime"/>
-            <property name="paramType" value="categorical"/>
-            <property name="description" value="return mobile phone access time"/>
+        <Variable name="phone_gray_score" class="com.ecreditpal.maas.model.variables.SectionVariable">
+            <property name="key" value="companyType"/>
+            <property name="paramType" value="numerical"/>
+            <property name="description" value="return company type"/>
             <property name="returnType" value="String"/>
         </Variable>
+
     </Variables>
 </VariableConfiguration>

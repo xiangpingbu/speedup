@@ -1,8 +1,8 @@
-package com.ecreditpal.maas.model.model;
+package com.ecreditpal.maas.model.model.scorecard;
 
 
-import com.ecreditpal.maas.common.utils.PMMLUtils;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
+import com.ecreditpal.maas.model.model.ModelNew;
 import com.ecreditpal.maas.model.variables.Variable;
 import com.ecreditpal.maas.model.variables.VariableConfiguration;
 import com.ecreditpal.maas.model.variables.VariableContentHandler;
@@ -10,13 +10,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.dmg.pmml.FieldName;
-import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.FieldValue;
-import org.jpmml.evaluator.ModelEvaluatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,20 +34,6 @@ public class XYBShenZhenModel extends ModelNew {
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
 
-    public static PMML pmml;
-    public static Evaluator evaluator;
-
-
-
-    /**
-     * static block. load pmml file and init evaluator
-     *
-     *
-     */
-    static {
-        String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_ShenZhen_model_pmml.pmml");
-        pmmlFileLoad(localPmmlPath,pmml,evaluator);
-    }
 
     /**
      * init required data structures
@@ -59,6 +41,11 @@ public class XYBShenZhenModel extends ModelNew {
      * and variable map
      */
     public XYBShenZhenModel(){
+        if (pmml ==null && evaluator ==null) {
+            String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_ShenZhen_model_pmml.pmml");
+            pmmlFileLoad(localPmmlPath);
+        }
+
         setConfigPath(localVariablePath);
         variableList = new ArrayList<Variable>();
         variableMap = new HashMap<String, Variable>();
@@ -101,23 +88,14 @@ public class XYBShenZhenModel extends ModelNew {
      * @return model score as a integer (1-1000)
      */
     public Object executeModel() {
-
-        List<Map<FieldName, FieldValue>> input = prepareModelInput(evaluator, variableMap);
-        ArrayList<Double> scores = new ArrayList<>();
-
-        for (Map<FieldName, FieldValue> maps : input) {
-            Map<FieldName, Double> regressionTerm = (Map<FieldName, Double>) evaluator.evaluate(maps);
-            scores.add(regressionTerm.get(new FieldName(resultFieldName)).doubleValue());
-        }
-
+        List<Double> scores = getScores(variableMap,resultFieldName);
         double prob = scores.get(0);
-        int finalScore = (int)scoreAlign(scoreToLogit(prob));
 
-        return finalScore;
+        return (int)scoreAlign(scoreToLogit(prob));
     }
 
     public String toString() {
-        return "XinYongBao";
+        return "XinYongBaoShenZhen";
     }
 
 }

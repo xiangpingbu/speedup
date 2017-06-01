@@ -149,12 +149,12 @@ public class MyHttpClient {
         return null;
     }
 
-    public String post(String url, Map<String, String> params) {
+    public String post(String url, Map<String, ?> params) {
         HttpResponse response = null;
         HttpPost post = new HttpPost(url);
         List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
         //lamba 表达式构造http请求所需的参数
-        params.forEach((k, v) -> nameValuePair.add(new BasicNameValuePair(k, v)));
+        params.forEach((k, v) -> nameValuePair.add(new BasicNameValuePair(k, v.toString())));
         try {
             post.setEntity(new UrlEncodedFormEntity(nameValuePair,"utf-8"));
 //            post.setHeader("Content-type","utf-8");

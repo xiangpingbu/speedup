@@ -43,9 +43,7 @@ public class ApiServiceEndpoint {
     public Result<Object> getModelResult(
             @ApiParam(name = "apiCode", value = "ecreditpal api code", required = true) @PathParam("apiCode") String apiCode,
             @Context LookupEventMessage lookupEventMessage) {
-//        String ss = request.getParameter("creditLimit");
-//        //得到请求参数
-//        Map<String, String> map = FilterUtil.getRequestForm(request,providers);
+        //得到请求参数
         Map<String,String> map = JsonUtil.json2Map(lookupEventMessage.getRequestInfo().getFormParams().toString());
         //获得apiCode对应的模型
          Object obj = ServiceContainer.execute(apiCode,map,lookupEventMessage);
