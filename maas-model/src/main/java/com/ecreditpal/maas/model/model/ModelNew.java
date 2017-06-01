@@ -5,6 +5,8 @@ import avro.shaded.com.google.common.collect.Lists;
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
+import com.ecreditpal.maas.common.utils.PMMLUtils;
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.model.reload.Register;
 import com.ecreditpal.maas.model.reload.ResReload;
 import com.ecreditpal.maas.model.variables.Variable;
@@ -14,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.dmg.pmml.DataType;
 import org.dmg.pmml.FieldName;
+import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.evaluator.*;
 import org.json.JSONObject;
@@ -168,6 +171,19 @@ public class ModelNew implements Register{
         modelName = conf.getModel();
 
         return conf.getVariables();
+    }
+
+    /**
+     * load pmml file and generate evaluator
+     */
+    static void pmmlFileLoad(String pmmlPath, PMML pmml, Evaluator evaluator) {
+        try {
+            pmml = PMMLUtils.loadPMML(pmmlPath);
+            Model m = pmml.getModels().get(0);
+            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
+        } catch (Exception e) {
+            log.error("load pmml file error !", e);
+        }
     }
 
     /**
