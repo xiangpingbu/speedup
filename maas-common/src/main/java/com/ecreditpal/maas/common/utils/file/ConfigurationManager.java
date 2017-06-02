@@ -115,7 +115,7 @@ public class ConfigurationManager {
      * @param propertiesPath 资源文件的路径
      */
     private static void manuallyLoad(String configFilePath,String propertiesPath) throws IOException {
-        String env = cc.getString("env");
+        String env = cc.getString("maas.env");
         if (env == null) return;
 
         Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
