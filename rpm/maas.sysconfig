@@ -1,11 +1,11 @@
 JAR="/opt/maas/lib/maas-web.jar"
 
-CONFIG="-Dconfig.dir=/opt/maas/conf"
+CONFIG="-Dconfig.dir=/opt/maas/conf -Dmaas.env=local"
 
 JMX_OPTS=
 #JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 
 JAVA_HOME=/usr/lib/jvm/java
 
-# Ansible will modify JAVA_OPTS !!
-JAVA_OPTS="-Xms2048m -Xmx2048m"
+# Ansible will modify JVM_OPTS !!
+JVM_OPTS="-Xms2048m -Xmx2048m"

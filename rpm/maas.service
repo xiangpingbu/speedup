@@ -7,7 +7,7 @@ User=ecreditpal
 Group=ecreditpal
 Type=simple
 EnvironmentFile=/etc/sysconfig/maas
-ExecStart=/usr/bin/java $CONFIG $JAVA_OPTS $JMX_OPTS -jar $JAR
+ExecStart=/usr/bin/java $CONFIG $JVM_OPTS $JMX_OPTS -jar $JAR
 ExecStartPost=/bin/sh -c "echo $MAINPID > /var/ecreditpal/maas.pid"
 
 [Install]
