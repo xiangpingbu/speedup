@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 public class Variable implements Cloneable {
     //protected static String domain = ConfigurationManager.getConfiguration().getString("api.domain");
 //    protected static String domain = "http://panda.mycreditpal.com:8888";
+
     protected static OkHttpUtil httpClient = OkHttpUtil.getInstance();
     /**如果无法得到变量值,默认为missing*/
     static final String MISSING = "missing";

@@ -1,5 +1,6 @@
 package com.ecreditpal.maas.model.handler;
 
+import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.common.utils.http.ApacheHttpClient;
 import com.ecreditpal.maas.common.utils.http.MyHttpClient;
 import com.google.gson.Gson;
@@ -15,23 +16,29 @@ import java.util.Map;
  * @CreateTime 2017/4/14.
  */
 @Slf4j
-public class HttpHandler implements RequestHandler {
+public class HttpHandler extends RequestHandler {
     private static MyHttpClient myHttpClient = MyHttpClient.getInstance();
+    private static String ecreditpalHost = "https://" +
+            ConfigurationManager.getConfiguration().getString("maas.headstream");
 
     @Override
-    public <T> T execute(RequestHandler handler, RequestParam param,Class<T> c) {
-        return c.cast(null);
+    public String execute(RequestHandler handler, Map<String, Object> param) {
+        String host;
+        if (param.get("url") == null)
+            host = ecreditpalHost;
+        else
+            host = param.get("url").toString();
+        try {
+            return myHttpClient.post(host, param);
+        } catch (Exception e) {
+            log.error("error sending http request", e);
+        }
+        return null;
     }
 
     @Override
-    public String execute(RequestHandler handler, RequestParam param) {
-        HttpParam p = (HttpParam) param;
-        try {
-            return myHttpClient.post(p.getUrl(),p.getParam());
-        } catch(Exception e) {
-            log.error("error sending http request",e);
-        }
-        return null;
+    public String execute(Map<String, Object> param) {
+        return execute(null, param);
     }
 
 }
