@@ -60,9 +60,12 @@ public class ConfigurationManager {
                 propertiesPath = productConfigDir;
             }
 
+            manuallyLoad(productConfigDir, propertiesPath);
+
             log.info("loading  property in directory {}.", propertiesPath);
             String applicationProp = propertiesPath + "/application.properties";
             PropertiesConfiguration conf = new PropertiesConfiguration(applicationProp);
+
             /*
                 递归获得配置目录下的所有文件的路径
              */
@@ -82,7 +85,6 @@ public class ConfigurationManager {
 
             String kafkaConfigProp = propertiesPath + "/kafka-config.properties";
 
-            manuallyLoad(propertiesPath,propertiesPath);
 
             PropertiesConfiguration kafkaConf = demarcateKafkaConf(kafkaConfigProp);
 
@@ -111,48 +113,71 @@ public class ConfigurationManager {
      * 用于在服务器上手动更改jar包的环境
      * 在重启服务时指定环境变量env即可替换指定的环境
      *
-     * @param configFilePath 配置文件的路径
+     * @param configDir      配置文件的路径
      * @param propertiesPath 资源文件的路径
      */
-    private static void manuallyLoad(String configFilePath,String propertiesPath) throws IOException {
+    private static void manuallyLoad(String configDir, String propertiesPath) throws IOException {
         String env = cc.getString("maas.env");
-        if (env == null) return;
+        if (env == null) env = "local";
+        configDir = configDir == null ?
+                FileUtil.getRootPath() : configDir;
+
 
         Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
         Properties pro = new Properties();
 
-        String envFile = configFilePath + "/config-" + env + ".properties";
+        String envFile = configDir + "/config-" + env + ".properties";
         try (FileInputStream in = new FileInputStream(envFile)) {
             pro.load(in);
         }
+
+
         File file = new File(propertiesPath);
         File[] files = file.listFiles();
         if (files != null) {
-            for (File subFile : files) {
-                BufferedReader br = new BufferedReader(new FileReader(subFile));
-                StringBuilder sb = new StringBuilder();
-                String line ;
-                while ((line = br.readLine()) != null) {
-                    Matcher m = pattern.matcher(line);
-                    if (m.find()){
-                        String key = m.group().substring(2,m.group().length()-1);
-                        String value = pro.getProperty(key);
-                        if (value != null) {
-                            line = line.replace(m.group(), value);
-                        }
-                    }
-                    sb.append(line);
-                    sb.append(System.getProperty("line.separator"));
+            String bak = propertiesPath + File.separator + "bak";
+            File bakFile = new File(bak);
+            if (!bakFile.exists()) {
+                for (File subFile : files) {
+                    if (subFile.isDirectory()) continue;
+                    FileUtil.copyFile(subFile, bak);
                 }
-                br.close();
+            }
 
-                BufferedWriter bw = new BufferedWriter(new FileWriter(subFile,false));
-                bw.write(sb.toString());
-                bw.flush();
-                bw.close();
+            files = bakFile.listFiles();
+            if (files != null) {
+                for (File subFile : files) {
+                    if (subFile.isDirectory()) continue;
+                    BufferedReader br = new BufferedReader(new FileReader(subFile));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                        Matcher m = pattern.matcher(line);
+                        while (m.find()) {
+                            String hit = m.group();
+                            String key = hit.substring(2, hit.length() - 1);
+                            String value = pro.getProperty(key);
+                            if (value != null) {
+                                line = line.replace(hit, value);
+                            }
+                        }
+                        sb.append(line);
+                        sb.append(System.getProperty("line.separator"));
+                    }
+
+                    br.close();
+                    String fileName = subFile.getParentFile().getParent()+File.separator+subFile.getName();
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, false));
+                    bw.write(sb.toString());
+                    bw.flush();
+                    bw.close();
+                }
             }
         }
-    }
+
+
+}
 
     /**
      * 区分kafka的配置
@@ -180,4 +205,6 @@ public class ConfigurationManager {
             return conf;
         }
     }
+
+
 }
