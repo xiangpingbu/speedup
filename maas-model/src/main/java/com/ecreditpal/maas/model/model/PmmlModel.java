@@ -60,7 +60,7 @@ public abstract class PmmlModel{
 
         for (Map.Entry<String, Variable> entry : variableMap.entrySet()) {
             FieldName name = FieldName.create(entry.getKey());
-            String value = entry.getValue().getValue();
+            String value = entry.getValue().getValue().toString();
             if (("").equals(value) || ("NA").equals(value) || ("N/A").equals(value)) {
                 value = null;
             }

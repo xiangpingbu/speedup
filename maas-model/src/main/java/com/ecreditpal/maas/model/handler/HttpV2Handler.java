@@ -16,24 +16,21 @@ import java.util.Map;
  * @CreateTime 2017/4/14.
  */
 @Slf4j
-public class HttpHandler extends RequestHandler {
+public class HttpV2Handler extends RequestHandler {
     private static MyHttpClient myHttpClient = MyHttpClient.getInstance();
     private static String ecreditpalHost = "https://" +
             ConfigurationManager.getConfiguration().getString("maas.headstream");
+    private static String account =
+            ConfigurationManager.getConfiguration().getString("v2.account");
+    private static String password =
+            ConfigurationManager.getConfiguration().getString("v2.password");
+
 
     @Override
     public String execute(RequestHandler handler, Map<String, Object> param) {
-        String host;
-        if (param.get("url") == null)
-            host = ecreditpalHost;
-        else
-            host = param.get("url").toString();
-        try {
-            return myHttpClient.post(host, param);
-        } catch (Exception e) {
-            log.error("error sending http request", e);
-        }
-        return null;
+            param.put("account",account);
+            param.put("password",password);
+            return myHttpClient.post(ecreditpalHost, param);
     }
 
     @Override

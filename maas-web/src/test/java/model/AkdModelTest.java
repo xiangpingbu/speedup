@@ -72,7 +72,7 @@ public class AkdModelTest {
     public void httpRequestSourceTest() throws IOException, URISyntaxException {
         MyHttpClient client = MyHttpClient.getInstance();
 //        ApacheHttpClient client1 = ApacheHttpClient.getInstance();
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("degree", "本科");
         map.put("cellPhoneAccessTime", "五年以上");
         map.put("gender", "男");

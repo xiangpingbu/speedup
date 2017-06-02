@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VariableConfiguration>
     <Model>XYBModel</Model>
-    <bean id="httpHandler" class="com.ecreditpal.maas.model.handler.HttpHandler" />
+    <bean id="httpHandler" class="com.ecreditpal.maas.model.handler.HttpV2Handler" />
     <Variables>
         <Variable name="TestVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
             <property name="key" value="test"/>

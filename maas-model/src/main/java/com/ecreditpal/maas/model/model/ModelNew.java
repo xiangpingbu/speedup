@@ -183,7 +183,7 @@ public class ModelNew extends PmmlModel implements Register{
      */
     public ModelLog ParseVariables( List<Variable> variables,String result,String name) {
         List<VariableResult> variableResults = Lists.newArrayListWithCapacity(variables.size());
-        variables.forEach(variable -> variableResults.add(new VariableResult(variable.getName(),variable.getValue())));
+        variables.forEach(variable -> variableResults.add(new VariableResult(variable.getName(),variable.getValue().toString())));
 
         ModelLog modelLog = new ModelLog();
         modelLog.setModelResult(result);

@@ -21,6 +21,10 @@ public class Variable implements Cloneable {
 //    protected static String domain = "http://panda.mycreditpal.com:8888";
 
     protected static OkHttpUtil httpClient = OkHttpUtil.getInstance();
+
+    static final String NUMERICAL = "numerical";
+    static final String CATEGORICAL = "categorical";
+
     /**如果无法得到变量值,默认为missing*/
     static final String MISSING = "missing";
     /**如果数值型变量的值非法,默认设置为"-999998"*/
@@ -44,7 +48,7 @@ public class Variable implements Cloneable {
     /**额外参数的其他映射*/
     private String paramMapping;
     /**变量计算完毕后的返回值,默认为9999*/
-    private String value = "-9999";
+    private Object value=9999;
     /**表示variable是由某个通用的类来计算*/
     private String engine;
 

@@ -149,7 +149,7 @@ public class MyHttpClient {
         return null;
     }
 
-    public String post(String url, Map<String, ?> params) {
+    public String post(String url, Map<String, Object> params) {
         HttpResponse response = null;
         HttpPost post = new HttpPost(url);
         List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
