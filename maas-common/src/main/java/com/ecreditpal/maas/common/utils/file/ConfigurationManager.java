@@ -75,12 +75,13 @@ public class ConfigurationManager {
             } else {
                 //从服务器的目录获取配置文件
                 propertiesPath = productConfigDir;
-                loadLogback(productConfigDir);
             }
 
             manuallyLoad(productConfigDir, propertiesPath);
 
-            log.info("loading  property in directory {}.", propertiesPath);
+            if (productConfigDir != null) loadLogback(productConfigDir);
+
+                log.info("loading  property in directory {}.", propertiesPath);
             String applicationProp = propertiesPath + "/application.properties";
             PropertiesConfiguration conf = new PropertiesConfiguration(applicationProp);
 
