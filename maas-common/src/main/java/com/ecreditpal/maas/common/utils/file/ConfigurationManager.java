@@ -1,5 +1,8 @@
 package com.ecreditpal.maas.common.utils.file;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import com.ecreditpal.maas.common.db.activejdbc.MakeInstrumentationUtil;
 import com.ecreditpal.maas.common.kafka.MaasKafkaConfig;
 import com.ecreditpal.maas.common.utils.ConvertUtil;
@@ -72,6 +75,7 @@ public class ConfigurationManager {
             } else {
                 //从服务器的目录获取配置文件
                 propertiesPath = productConfigDir;
+                loadLogback(productConfigDir);
             }
 
             manuallyLoad(productConfigDir, propertiesPath);
@@ -191,8 +195,22 @@ public class ConfigurationManager {
                 }
             }
         }
+}
 
-
+private static void loadLogback(String configDir) {
+    File logbackFile = new File(configDir+"/logback.xml");
+    if (logbackFile.exists()) {
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(lc);
+        lc.reset();
+        try {
+            configurator.doConfigure(logbackFile);
+        }
+        catch (JoranException e) {
+            log.error("fail to load logback.xml",e);
+        }
+    }
 }
 
     /**
