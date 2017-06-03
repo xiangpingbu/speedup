@@ -25,6 +25,7 @@
         <build.version>1.0.0</build.version>
         <build.git.commit>1</build.git.commit>
         <build.config.dir>${user.dir}/target/conf</build.config.dir>
+        <project.config.dir>${user.dir}/config</project.config.dir>
         <app.home>/opt/maas</app.home>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -329,27 +330,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>logback-test.xml</include>
-                    <include>**/*.properties</include>
-                    <include>logback.xml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                    <exclude>logback.xml</exclude>
-                    <exclude>logback-test.xml</exclude>
-                </excludes>
-            </resource>
-        </resources>
     </build>
 
     <!--<profiles>-->
