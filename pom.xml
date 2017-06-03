@@ -25,6 +25,7 @@
         <build.version>1.0.0</build.version>
         <build.git.commit>1</build.git.commit>
         <build.config.dir>${user.dir}/target/conf</build.config.dir>
+        <project.config.dir>${user.dir}/config</project.config.dir>
         <app.home>/opt/maas</app.home>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
