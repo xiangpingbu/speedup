@@ -17,8 +17,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * maas 配置管理
- *
+ *  maas 配置管理类
+ *  通过ConfigurationManager,你可以获得当前环境所有的配置信息
+ *  具体用法:
+ *      String value = ConfigurationManager.getConfiguration().getString("key","defaultValue")
+ *      "key"指的是变量名,如果获取不到这个"key"的对应值,那么将会返回"defaultValue"
+ *  在第一次访问的时候,这个类会初始化
+ *  初始化分为线上和线下两部分,如果指定config.dir参数,即判断是线上环境,那么项目运行所需的参数都在config.dir
+ * 目录中,不然视作在本地环境中启动,会默认读取System.getProperty("user.dir")+/maas-web/target/classes
+ * 下的文件.
+ *  ConfigurationManager读取配置的入口是application.properties文件,将application.properties中的配置信息
+ * 以key,value形式读入内存中.然后依赖其中的maven.submodel获得当前项目的子模块,然后通过递归的形式获得这些模块下所有
+ * 的文件名和文件路径,并加载到内存中.
+ *  因此ConfigurationManager可以帮助获得在config-env.properties中配置的变量,也可以帮助获得项目中所有的资源文件.
+ * 项目的变量配置起初是由maven的profile和filter完成的,但是变量配置只能在项目打包时执行,一旦项目打包完成后就无法改变环境,
+ * 后面新增manuallyLoad方法替换maven的功能,并可以在项目运行时替换环境变量.
  * @author lifeng
  * @version 2017/4/10.
  */
@@ -41,6 +54,7 @@ public class ConfigurationManager {
     public static Configuration getConfiguration() {
         return cc;
     }
+
 
 
     private static void loadConfig() {
@@ -117,8 +131,10 @@ public class ConfigurationManager {
      * @param propertiesPath 资源文件的路径
      */
     private static void manuallyLoad(String configDir, String propertiesPath) throws IOException {
+        //项目运行时指定,如果为空,默认是local环境
         String env = cc.getString("maas.env");
         if (env == null) env = "local";
+        //获得项目
         configDir = configDir == null ?
                 FileUtil.getRootPath() : configDir;
 
@@ -126,7 +142,7 @@ public class ConfigurationManager {
         Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
         Properties pro = new Properties();
 
-        String envFile = configDir + "/config-" + env + ".properties";
+        String envFile = configDir + "/config/config-" + env + ".properties";
         try (FileInputStream in = new FileInputStream(envFile)) {
             pro.load(in);
         }
