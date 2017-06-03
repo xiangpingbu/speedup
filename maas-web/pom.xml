@@ -89,6 +89,11 @@
 
     <build>
         <finalName>maas-web</finalName>
+        <!--<filters>-->
+            <!--<filter>-->
+                <!--../config-${cur.env}.properties-->
+            <!--</filter>-->
+        <!--</filters>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
