@@ -330,26 +330,26 @@
             </plugins>
         </pluginManagement>
 
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>logback-test.xml</include>
-                    <include>**/*.properties</include>
-                    <include>logback.xml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                    <exclude>logback.xml</exclude>
-                    <exclude>logback-test.xml</exclude>
-                </excludes>
-            </resource>
-        </resources>
+        <!--<resources>-->
+            <!--<resource>-->
+                <!--<directory>src/main/resources</directory>-->
+                <!--<filtering>true</filtering>-->
+                <!--<includes>-->
+                    <!--<include>logback-test.xml</include>-->
+                    <!--<include>**/*.properties</include>-->
+                    <!--<include>logback.xml</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
+            <!--<resource>-->
+                <!--<directory>src/main/resources</directory>-->
+                <!--<filtering>false</filtering>-->
+                <!--<excludes>-->
+                    <!--<exclude>**/*.properties</exclude>-->
+                    <!--<exclude>logback.xml</exclude>-->
+                    <!--<exclude>logback-test.xml</exclude>-->
+                <!--</excludes>-->
+            <!--</resource>-->
+        <!--</resources>-->
     </build>
 
     <!--<profiles>-->

@@ -90,7 +90,7 @@ public class AkdModelTest {
         map.put("apiCode", "M112");
 
 
-        String remoteHost = client.post("http://121.196.192.146:9080/rest/api/M112", map);
+        String remoteHost = client.post("http://121.196.192.146:9080/maas/rest/api/M112", map);
         log.debug("remoteHost result:{}", remoteHost);
         String ecreditpal = client.post("https://api.ecreditpal.cn/ecreditpal/rest/api/v2", map);
         log.debug("ecreditpal result:{}", ecreditpal);

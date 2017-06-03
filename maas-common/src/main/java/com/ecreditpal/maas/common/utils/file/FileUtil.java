@@ -54,11 +54,4 @@ public class FileUtil {
         inStream.close();
     }
 
-    public static void main(String[] args) {
-        File file = new File("/Users/lifeng/Work/Code/maas-fork/maas/config-dev.properties");
-        String p = file.getAbsolutePath();
-        String f = file.getParent()+File.separator+file.getName();
-    }
-
-
 }
