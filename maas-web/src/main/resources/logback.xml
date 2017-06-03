@@ -51,20 +51,20 @@
     </appender>
 
     <!--<appender name="kafkaAppender" class="com.ecreditpal.maas.common.log.KafkaAppender">-->
-        <!--<encoder class="com.ecreditpal.maas.common.log.encoder.KafkaEncoder">-->
-            <!--&lt;!&ndash;格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 &ndash;&gt;-->
-            <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
-                <!--<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>-->
-            <!--</layout>-->
-        <!--</encoder>-->
-        <!--<bootstrapSevers>${log.kafka.bootstrap.severs}</bootstrapSevers>-->
-        <!--<topic>${log.kafka.topic}</topic>-->
-        <!--&lt;!&ndash;用来指示一组consumer所在的组&ndash;&gt;-->
-        <!--<groupId>${log.kafka.groupId}</groupId>-->
-        <!--<retries>${log.kafka.retries}</retries>-->
-        <!--<batchSize>${log.kafka.batchSize}</batchSize>-->
-        <!--<lingerMs>${log.kafka.lingerMs}</lingerMs>-->
-        <!--<bufferMemory>${log.kafka.bufferMemory}</bufferMemory>-->
+    <!--<encoder class="com.ecreditpal.maas.common.log.encoder.KafkaEncoder">-->
+    <!--&lt;!&ndash;格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 &ndash;&gt;-->
+    <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
+    <!--<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>-->
+    <!--</layout>-->
+    <!--</encoder>-->
+    <!--<bootstrapSevers>${log.kafka.bootstrap.severs}</bootstrapSevers>-->
+    <!--<topic>${log.kafka.topic}</topic>-->
+    <!--&lt;!&ndash;用来指示一组consumer所在的组&ndash;&gt;-->
+    <!--<groupId>${log.kafka.groupId}</groupId>-->
+    <!--<retries>${log.kafka.retries}</retries>-->
+    <!--<batchSize>${log.kafka.batchSize}</batchSize>-->
+    <!--<lingerMs>${log.kafka.lingerMs}</lingerMs>-->
+    <!--<bufferMemory>${log.kafka.bufferMemory}</bufferMemory>-->
     <!--</appender>-->
 
     <root>
@@ -83,6 +83,3 @@
         <appender-ref ref="fileAppender"/>
     </logger>
 </configuration>
-
-
-
