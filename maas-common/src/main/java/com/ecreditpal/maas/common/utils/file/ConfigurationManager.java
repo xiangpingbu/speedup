@@ -136,13 +136,13 @@ public class ConfigurationManager {
         if (env == null) env = "local";
         //获得项目
         configDir = configDir == null ?
-                FileUtil.getRootPath() : configDir;
+                FileUtil.getRootPath()+"/config" : configDir;
 
 
         Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
         Properties pro = new Properties();
 
-        String envFile = configDir + "/config/config-" + env + ".properties";
+        String envFile = configDir + "/config-" + env + ".properties";
         try (FileInputStream in = new FileInputStream(envFile)) {
             pro.load(in);
         }
