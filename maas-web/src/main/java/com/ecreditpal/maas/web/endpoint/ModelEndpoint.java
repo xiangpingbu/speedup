@@ -4,9 +4,9 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Result;
-import com.ecreditpal.maas.model.model.scorecard.AKDModel;
-import com.ecreditpal.maas.model.model.scorecard.XYBModel;
-import com.ecreditpal.maas.model.model.scorecard.XYBShenZhenModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBShenZhenModel;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.FormParam;

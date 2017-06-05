@@ -2,10 +2,9 @@ package com.ecreditpal.maas.service;
 
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
-import com.ecreditpal.maas.common.avro.LookupEventMessage.ResponseInfo;
-import com.ecreditpal.maas.model.model.scorecard.AKDModel;
-import com.ecreditpal.maas.model.model.scorecard.XYBModel;
-import com.ecreditpal.maas.model.model.scorecard.XYBShenZhenModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBShenZhenModel;
 import com.ecreditpal.maas.service.annotation.Model;
 import com.ecreditpal.maas.service.annotation.ModelApi;
 import org.apache.avro.generic.GenericRecord;

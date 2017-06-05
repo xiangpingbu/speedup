@@ -6,11 +6,8 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.utils.http.OkHttpUtil;
 import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Result;
-import com.ecreditpal.maas.model.bean.XYBModelBean;
-import com.ecreditpal.maas.service.ModelService;
 import com.ecreditpal.maas.service.ServiceContainer;
 import com.ecreditpal.maas.web.bean.User;
-import com.ecreditpal.maas.web.endpoint.filter.FilterUtil;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 

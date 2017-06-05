@@ -3,8 +3,8 @@ package model;
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.excel.ExcelContent;
-import com.ecreditpal.maas.model.model.scorecard.XYBModel;
-import com.ecreditpal.maas.model.variables.Variable;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.variables.Variable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 

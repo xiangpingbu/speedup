@@ -4,19 +4,13 @@ import com.ecreditpal.maas.common.excel.ExcelContent;
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
-import com.ecreditpal.maas.common.utils.http.MyHttpClient;
-import com.ecreditpal.maas.model.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBShenZhenModel;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,33 +27,35 @@ public class XYBShenZhenModelTest {
      *
      * @throws Exception 读取文件时抛出异常
      */
+    @Test
     public void excelHelp() throws Exception {
 
         ExcelRowReader rowReader = new ExcelRowReader();
-        ExcelReaderUtil.readExcel(rowReader, ConfigurationManager.getConfiguration().getString("xyb_ShenZhen_testing.xlsx"));
+        ExcelReaderUtil.readExcel(rowReader, ConfigurationManager.getConfiguration().getString("szxyb_testing.xlsx"));
         ExcelContent content = rowReader.getRows();
 
         Map<String, Integer> head = content.getHead();
-        AKDModel model = new AKDModel();
+        XYBShenZhenModel model = new XYBShenZhenModel();
         double delta = 0.000001d;
         int index = 2;
         for (List<String> list : content.getContent()) {
 
 
             Map<String, Object> map = Maps.newHashMap();
-            map.put("degree",list.get(head.get("")));
-            map.put("gender",list.get(head.get("")));
-            map.put("age",list.get(head.get("")));
-            map.put("cellPhoneAccessTime",list.get(head.get("")));
-            map.put("zhiMaCredit",list.get(head.get("")));
-            map.put("liveCase",list.get(head.get("")));
-            map.put("pIdCitySameInd",list.get(head.get("")));
-            map.put("companyType",list.get(head.get("")));
-            map.put("marriageStatus",list.get(head.get("")));
+            map.put("degree",list.get(head.get("学历")));
+            map.put("gender",list.get(head.get("性别")));
+            map.put("age",list.get(head.get("age")));
+            map.put("cellPhoneAccessTime",list.get(head.get("手机入网时间")));
+            map.put("zhiMaCredit",list.get(head.get("芝麻信用")));
+            map.put("liveCase",list.get(head.get("居住情况")));
+            map.put("pIdCitySameInd",list.get(head.get("p_id_city_same_ind")));
+            map.put("companyType",list.get(head.get("公司性质")));
+            map.put("marriageStatus",list.get(head.get("婚姻状况")));
+            map.put("phoneGrayScore",list.get(head.get("phone_gray_score")));
 
 
             BigDecimal a = new BigDecimal((Double) model.run(map)).setScale(8, BigDecimal.ROUND_HALF_UP);
-            BigDecimal b = new BigDecimal(list.get(head.get("aligned_score"))).setScale(8, BigDecimal.ROUND_HALF_UP);
+            BigDecimal b = new BigDecimal(list.get(head.get("prob_bad_w_gray"))).setScale(8, BigDecimal.ROUND_HALF_UP);
 
             if (Math.abs(a.subtract(b).doubleValue()) > delta) {
                 System.out.println(index + "行匹配不成功,a:" + a.doubleValue() + "b:" + b.doubleValue());

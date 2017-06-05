@@ -5,7 +5,7 @@ import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
 import com.ecreditpal.maas.common.utils.http.MyHttpClient;
-import com.ecreditpal.maas.model.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
