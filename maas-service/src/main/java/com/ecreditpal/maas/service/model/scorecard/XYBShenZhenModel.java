@@ -87,8 +87,8 @@ public class XYBShenZhenModel extends ModelNew {
         List<Double> scores = getScores(variableMap,resultFieldName);
         double prob = scores.get(0);
 
-//        return (int)scoreAlign(scoreToLogit(prob));
-        return prob;
+        return (int)scoreAlign(scoreToLogit(prob));
+//        return prob;
     }
 
     public String toString() {

@@ -33,22 +33,22 @@ public class MiguanPhoneGrayScoreVariable extends Variable {
                         return;
                     }
 
-                    if (!containsKey("cid") &&
-                            !containsKey("name") &&
-                            !containsKey("mobile")) {
+                    if (!containsKey("miguan_cid") &&
+                            !containsKey("miguan_name") &&
+                            !containsKey("miguan_mobile")) {
                         setValue(invalid);
                         return;
                     }
 
-                    HashMap<String, Object> map = new HashMap<>();
+                    HashMap<String, Object> map = new HashMap<>(8);
                     Object value;
-                    if ((value = getString("cid")) != null) {
+                    if ((value = getString("miguan_cid")) != null) {
                         map.put("cid", value);
                     }
-                    if ((value = getString("name")) != null) {
+                    if ((value = getString("miguan_name")) != null) {
                         map.put("name", value);
                     }
-                    if ((value = getString("mobile")) != null) {
+                    if ((value = getString("miguan_mobile")) != null) {
                         map.put("mobile", value);
                     }
                     if (map.size() < 3) {

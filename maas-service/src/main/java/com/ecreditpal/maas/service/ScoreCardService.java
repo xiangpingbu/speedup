@@ -9,6 +9,7 @@ import com.ecreditpal.maas.service.annotation.Model;
 import com.ecreditpal.maas.service.annotation.ModelApi;
 import org.apache.avro.generic.GenericRecord;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,9 +52,9 @@ public class ScoreCardService  {
     }
 
     @ModelApi(apiCode = "M113")
-    public Object xybShenZhenService(Map<String, String> map, GenericRecord record) {
+    public Object xybShenZhenNoGrayService(Map<String, String> map, GenericRecord record) {
         XYBShenZhenModel xybModel = new XYBShenZhenModel();
-        Long score = (Long) xybModel.run(map);
+        Integer score =  (Integer) xybModel.run(map);
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
@@ -62,5 +63,18 @@ public class ScoreCardService  {
         return score;
     }
 
+    @ModelApi(apiCode = "M114")
+    public Object xybShenZhenService(Map<String, String> map, GenericRecord record) {
+        XYBShenZhenModel xybModel = new XYBShenZhenModel();
+        map.put("miguan_cid",map.get("cid"));
+        map.put("miguan_name",map.get("name"));
+        map.put("miguan_mobile",map.get("mobile"));
+        Integer score =  (Integer) xybModel.run(map);
+        LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel());
+        lookupEventMessage.setModelLog(modelLog);
+
+        return score;
+    }
 
 }
