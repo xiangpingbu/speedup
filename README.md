@@ -306,7 +306,7 @@ getString(key:"mgc.txt",default:"/xx/xx/xx/mgc.txt")
 ```xml
 <VariableConfiguration>
     <Model>XYBModel</Model>
-    <Variable name="CreditUtilizationVariable" class="com.ecreditpal.maas.model.variables.SectionVariable">
+    <Variable name="CreditUtilizationVariable" class="com.ecreditpal.maas.service.model.variables.SectionVariable">
             <property name="key" value="creditUtilization"/>
             <property name="paramType" value="numerical"/>
             <property name="paramValue" value="(0-max)"/>
@@ -314,7 +314,7 @@ getString(key:"mgc.txt",default:"/xx/xx/xx/mgc.txt")
             <property name="returnType" value="Double"/>
         </Variable>
 
-        <Variable name="PersonalEducation" class="com.ecreditpal.maas.model.variables.SectionVariable">
+        <Variable name="PersonalEducation" class="com.ecreditpal.maas.service.model.variables.SectionVariable">
             <property name="key" value="personalEducation"/>
             <property name="paramType" value="categorical"/>
             <property name="paramValue" value="1|2|3|4"/>

@@ -4,15 +4,11 @@ import com.ecreditpal.maas.common.excel.ExcelContent;
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
-import com.ecreditpal.maas.common.utils.http.ApacheHttpClient;
 import com.ecreditpal.maas.common.utils.http.MyHttpClient;
-import com.ecreditpal.maas.common.utils.http.OkHttpUtil;
-import com.ecreditpal.maas.model.model.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,7 +72,7 @@ public class AkdModelTest {
     public void httpRequestSourceTest() throws IOException, URISyntaxException {
         MyHttpClient client = MyHttpClient.getInstance();
 //        ApacheHttpClient client1 = ApacheHttpClient.getInstance();
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("degree", "本科");
         map.put("cellPhoneAccessTime", "五年以上");
         map.put("gender", "男");

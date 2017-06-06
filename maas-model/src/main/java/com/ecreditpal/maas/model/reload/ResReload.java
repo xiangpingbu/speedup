@@ -1,6 +1,5 @@
 package com.ecreditpal.maas.model.reload;
 
-import com.ecreditpal.maas.model.model.minganci.MinGanCiFilter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -23,10 +22,6 @@ public class ResReload implements  Subject {
     public ResReload() {
     }
 
-    private static void autoLoad() {
-        MinGanCiFilter minGanCiFilter = new MinGanCiFilter();
-        registers.put(minGanCiFilter.toString(),minGanCiFilter);
-    }
 
     @Override
     public void register(Register register) {

@@ -356,13 +356,18 @@ def column_config():
     list = var_dict['list']
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
+    #p_value值,以逗号隔开
     params = var_dict["params"]
+    #从数据库中得到binning_record,并根据list中variable的顺序排序
     result = sort_variable(list.split(","),
                            tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
+    p_value_list = []
+    param_list = params.split(",")
     data = []
     mem_zip_file = MemoryZipFile()
-    for variable in result:
-        # list = result.copy
+    for index,variable in enumerate(result):
+        variable_name = variable["variable_name"]
+        p_value_list.append({variable_name:param_list[index]})
         records = json.loads(variable["binning_record"], encoding="utf8")
         first_row = records[0]
         # 如果type为true,那么为Numrical
@@ -373,7 +378,6 @@ def column_config():
             del records[0]
         else:
             missing_woe = 0
-        variable_name = variable["variable_name"]
         columnBinning = {"binCountNeg": [],
                          "binCountPos": [],
                          "binWeightedPos": [],
@@ -444,7 +448,7 @@ def column_config():
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
     mem_zip_file.append_content('column_config/model.pmml', xml_str)
-    mem_zip_file.append_content('column_config/lr', params)
+    mem_zip_file.append_content('column_config/lr.json', json.dumps(p_value_list,ensure_ascii=False))
     # return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)
 

@@ -3,8 +3,8 @@ package model;
 import com.ecreditpal.maas.common.excel.ExcelReaderUtil;
 import com.ecreditpal.maas.common.excel.ExcelRowReader;
 import com.ecreditpal.maas.common.excel.ExcelContent;
-import com.ecreditpal.maas.model.model.XYBModel;
-import com.ecreditpal.maas.model.variables.Variable;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.variables.Variable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -16,8 +16,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.util.List;
