@@ -3,6 +3,7 @@ package com.ecreditpal.maas.service.model.variables;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ecreditpal.maas.common.WorkDispatcher;
+import com.ecreditpal.maas.common.constants.MaasConstants;
 import com.ecreditpal.maas.model.bean.IdCardInfoBean;
 import com.ecreditpal.maas.service.IdcardAnalyzeService;
 import com.ecreditpal.maas.service.MobileAnalyzeService;
@@ -30,9 +31,9 @@ public class CidPhoneLocationVariable extends Variable {
                 try {
                     if (getString("pIdCitySameInd") != null) {
                         if ("TRUE".equals(getString("pIdCitySameInd"))){
-                            setValue(1);
+                            setValue(MaasConstants.CID_PHONE_LOCATION_EQUALS);
                         }else{
-                            setValue(0);
+                            setValue(MaasConstants.CID_PHONE_LOCATION_UN_EQUALS);
                         }
                         return;
                     }
@@ -66,9 +67,9 @@ public class CidPhoneLocationVariable extends Variable {
                         String province = result.getJSONObject("result").getString("province");
                         String city = result.getJSONObject("result").getString("city");
                         if (region.contains(province) && region.contains(city)) {
-                            setValue(1); //匹配
+                            setValue(MaasConstants.CID_PHONE_LOCATION_EQUALS); //匹配
                         } else{
-                            setValue(0); //未匹配
+                            setValue(MaasConstants.CID_PHONE_LOCATION_UN_EQUALS); //未匹配
                         }
                     }
                 }catch(Exception e) {

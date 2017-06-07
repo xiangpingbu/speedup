@@ -37,10 +37,8 @@ public class XYBShenZhenModelTest {
         Map<String, Integer> head = content.getHead();
         XYBShenZhenModel model = new XYBShenZhenModel();
         double delta = 0.000001d;
-        int index = 2;
+        int index = 1;
         for (List<String> list : content.getContent()) {
-
-
             Map<String, Object> map = Maps.newHashMap();
             map.put("degree",list.get(head.get("学历")));
             map.put("gender",list.get(head.get("性别")));
@@ -54,9 +52,8 @@ public class XYBShenZhenModelTest {
             map.put("phoneGrayScore",list.get(head.get("phone_gray_score")));
 
 
-            BigDecimal a = new BigDecimal((Double) model.run(map)).setScale(8, BigDecimal.ROUND_HALF_UP);
-            BigDecimal b = new BigDecimal(list.get(head.get("prob_bad_w_gray"))).setScale(8, BigDecimal.ROUND_HALF_UP);
-
+            BigDecimal a = new BigDecimal((Integer) model.run(map));
+            BigDecimal b = new BigDecimal((int)model.scoreAlign(model.scoreToLogit(Double.valueOf(list.get(head.get("prob_bad_w_gray"))))));
             if (Math.abs(a.subtract(b).doubleValue()) > delta) {
                 System.out.println(index + "行匹配不成功,a:" + a.doubleValue() + "b:" + b.doubleValue());
             }

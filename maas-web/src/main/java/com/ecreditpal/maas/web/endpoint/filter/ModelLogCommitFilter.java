@@ -1,9 +1,8 @@
 package com.ecreditpal.maas.web.endpoint.filter;
 
-import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
-import com.ecreditpal.maas.common.constants.KafkaConstants;
+import com.ecreditpal.maas.common.constants.MaasConstants;
 import com.ecreditpal.maas.common.kafka.KafkaProducerException;
 import com.ecreditpal.maas.common.kafka.MaasKafkaProducer;
 import com.ecreditpal.maas.common.utils.file.ConfigurationManager;
@@ -30,7 +29,7 @@ public class ModelLogCommitFilter implements ContainerResponseFilter {
             .getLogger(ModelLogCommitFilter.class);
     private static final String KAFKA_LOOKUP_EVENT_TOPIC = ConfigurationManager
             .getConfiguration().getString("kafka.lookup.event.topic",
-                    KafkaConstants.KAFKA_LOOKUP_EVENT_TOPIC);
+                    MaasConstants.KAFKA_LOOKUP_EVENT_TOPIC);
 
     @Override
     public void filter(ContainerRequestContext requestContext,
