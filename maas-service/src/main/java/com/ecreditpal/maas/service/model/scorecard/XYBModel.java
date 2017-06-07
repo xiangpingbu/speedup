@@ -59,11 +59,14 @@ public class XYBModel extends ModelNew{
         variableList = new ArrayList<Variable>();
         variableMap = new HashMap<String, Variable>();
         inputObjMap = new HashMap<String, Object>();
+        inputMap = new HashMap<String, String>();
         if (XYBModelVariables == null) {
             synchronized (XYBModel.class) {
                 if (XYBModelVariables == null) {
                     try {
+                        evaluator = pmmlFileLoad(ConfigurationManager.getConfiguration().getString("xyb_model_pmml.pmml"));
                         XYBModelVariables = VariableContentHandler.readXML(localVariablePath);
+                        register(this);
                     } catch (Exception e) {
                         logger.error("parse model config error",e);
                     }
@@ -79,7 +82,6 @@ public class XYBModel extends ModelNew{
                 e.printStackTrace();
             }
         }
-        register(this);
     }
 
     /**
@@ -119,19 +121,11 @@ public class XYBModel extends ModelNew{
      * @return model score as a integer (1-1000)
      */
     public Object executeModel() {
-
-        List<Map<FieldName, FieldValue>> input = prepareModelInput(evaluator, variableMap);
-        ArrayList<Double> scores = new ArrayList<>();
-
-        for (Map<FieldName, FieldValue> maps : input) {
-            Map<FieldName, Double> regressionTerm = (Map<FieldName, Double>) evaluator.evaluate(maps);
-            scores.add(regressionTerm.get(new FieldName(resultFieldName)).doubleValue());
-        }
+        ArrayList<Double> scores = getScores(variableMap,resultFieldName,evaluator);
 
         double prob = scores.get(0);
-        int finalScore = (int)scoreAlign(scoreToLogit(prob));
 
-        return finalScore;
+        return (int)scoreAlign(scoreToLogit(prob));
     }
 
     public String toString() {

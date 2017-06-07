@@ -43,15 +43,6 @@ public class AKDModel extends ModelNew {
     public static Evaluator evaluator;
 
     /**
-     * static block. load pmml file and init evaluator
-     *
-     *
-     */
-    static {
-        pmmlFileLoad();
-    }
-
-    /**
      * init required data structures
      * init variables and put variable into variable list
      * and variable map
@@ -61,11 +52,14 @@ public class AKDModel extends ModelNew {
         variableList = new ArrayList<Variable>();
         variableMap = new HashMap<String, Variable>();
         inputObjMap = new HashMap<String, Object>();
+        inputMap = new HashMap<String, String>();
         if (AKDModelVariables == null) {
             synchronized (AKDModel.class) {
                 if (AKDModelVariables == null) {
                     try {
+                        evaluator = pmmlFileLoad(ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml"));
                         AKDModelVariables = VariableContentHandler.readXML(localVariablePath);
+                        register(this);
                     } catch (Exception e) {
                         logger.error("parse model config error", e);
                     }
@@ -81,23 +75,22 @@ public class AKDModel extends ModelNew {
                 e.printStackTrace();
             }
         }
-        register(this);
     }
 
     /**
      * load pmml file and generate evaluator
      */
-    private static void pmmlFileLoad() {
-        try {
-            String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml", "maas-model/src/main/resources/model_config/akd_model_pmml.pmml");
-
-            pmml = PMMLUtils.loadPMML(localPmmlPath);
-            Model m = pmml.getModels().get(0);
-            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
-        } catch (Exception e) {
-            logger.error("load pmml file error !", e);
-        }
-    }
+//    private static void pmmlFileLoad() {
+//        try {
+//            String localPmmlPath = ConfigurationManager.getConfiguration().getString("akd_model_pmml.pmml", "maas-model/src/main/resources/model_config/akd_model_pmml.pmml");
+//
+//            pmml = PMMLUtils.loadPMML(localPmmlPath);
+//            Model m = pmml.getModels().get(0);
+//            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
+//        } catch (Exception e) {
+//            logger.error("load pmml file error !", e);
+//        }
+//    }
 
 
     /**
@@ -107,7 +100,7 @@ public class AKDModel extends ModelNew {
      */
     @Override
     public void work() {
-        pmmlFileLoad();
+
     }
 
     public double scoreToLogit(double prob) {
@@ -125,13 +118,7 @@ public class AKDModel extends ModelNew {
      */
     public Object executeModel() {
 
-        List<Map<FieldName, FieldValue>> input = prepareModelInput(evaluator, variableMap);
-        ArrayList<Double> scores = new ArrayList<>();
-
-        for (Map<FieldName, FieldValue> maps : input) {
-            Map<FieldName, Double> regressionTerm = (Map<FieldName, Double>) evaluator.evaluate(maps);
-            scores.add(regressionTerm.get(new FieldName(resultFieldName)).doubleValue());
-        }
+        ArrayList<Double> scores = getScores(variableMap,resultFieldName,evaluator);
 
         double prob = scores.get(0);
 

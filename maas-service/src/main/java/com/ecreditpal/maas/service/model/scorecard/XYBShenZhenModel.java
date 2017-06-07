@@ -9,6 +9,8 @@ import com.ecreditpal.maas.service.model.variables.VariableContentHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.dmg.pmml.PMML;
+import org.jpmml.evaluator.Evaluator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +30,8 @@ public class XYBShenZhenModel extends ModelNew {
     private static String resultFieldName = "RawResult";
     private static Double alignOffset = 483.9035953;
     private static Double alignFactor = 72.13475204;
+    private static PMML pmml;
+    private static Evaluator evaluator;
 
 
     /**
@@ -36,11 +40,6 @@ public class XYBShenZhenModel extends ModelNew {
      * and variable map
      */
     public XYBShenZhenModel(){
-        if (pmml ==null && evaluator ==null) {
-            String localPmmlPath = ConfigurationManager.getConfiguration().getString("xyb_ShenZhen_model_pmml.pmml");
-            pmmlFileLoad(localPmmlPath);
-        }
-
         setConfigPath(localVariablePath);
         variableList = new ArrayList<Variable>();
         variableMap = new HashMap<String, Variable>();
@@ -50,6 +49,7 @@ public class XYBShenZhenModel extends ModelNew {
             synchronized (XYBShenZhenModel.class) {
                 if (modelVariables == null) {
                     try {
+                        evaluator =pmmlFileLoad(ConfigurationManager.getConfiguration().getString("xyb_ShenZhen_model_pmml.pmml"));
                         modelVariables = VariableContentHandler.readXML(localVariablePath);
                     } catch (Exception e) {
                         log.error("parse model config error",e);
@@ -84,7 +84,7 @@ public class XYBShenZhenModel extends ModelNew {
      * @return model score as a integer (1-1000)
      */
     public Object executeModel() {
-        List<Double> scores = getScores(variableMap,resultFieldName);
+        List<Double> scores = getScores(variableMap,resultFieldName,evaluator);
         double prob = scores.get(0);
 
         return (int)scoreAlign(scoreToLogit(prob));

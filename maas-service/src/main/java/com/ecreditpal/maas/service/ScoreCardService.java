@@ -56,7 +56,7 @@ public class ScoreCardService  {
         XYBShenZhenModel xybModel = new XYBShenZhenModel();
         Integer score =  (Integer) xybModel.run(map);
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
-        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel());
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel()+"_NoGray");
         lookupEventMessage.setModelLog(modelLog);
 //        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score.toString()).build());
 
@@ -71,7 +71,7 @@ public class ScoreCardService  {
         map.put("miguan_mobile",map.get("mobile"));
         Integer score =  (Integer) xybModel.run(map);
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
-        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel());
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel()+"_WithGray");
         lookupEventMessage.setModelLog(modelLog);
 
         return score;

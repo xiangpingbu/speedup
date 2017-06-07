@@ -1,5 +1,5 @@
 <VariableConfiguration>
-    <Model>XYBModel-SHENZHEN</Model>
+    <Model>XYBModel-ShenZhen</Model>
     <Variables>
         <bean id="httpHandler" class="com.ecreditpal.maas.service.model.handler.HttpV2Handler" />
         <!--学历-->

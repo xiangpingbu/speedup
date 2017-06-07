@@ -17,23 +17,24 @@ import java.util.*;
  */
 @Slf4j
 public abstract class PmmlModel{
-    public  PMML pmml;
-    public  Evaluator evaluator;
+//    public  PMML pmml;
+//    public  Evaluator evaluator;
 
     /**
      * load pmml file and generate evaluator
      */
-    public  void pmmlFileLoad(String pmmlPath) {
+    public static Evaluator pmmlFileLoad(String pmmlPath) {
         try {
-            pmml = PMMLUtils.loadPMML(pmmlPath);
+           PMML pmml = PMMLUtils.loadPMML(pmmlPath);
             Model m = pmml.getModels().get(0);
-            evaluator = ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
+            return ModelEvaluatorFactory.getInstance().getModelManager(pmml, m);
         } catch (Exception e) {
             log.error("load pmml file error !", e);
         }
+        return null;
     }
 
-    public ArrayList<Double> getScores(Map<String,Variable> variableMap, String resultFieldName) {
+    public ArrayList<Double> getScores(Map<String,Variable> variableMap, String resultFieldName,Evaluator evaluator) {
         List<Map<FieldName, FieldValue>> input = prepareModelInput(evaluator, variableMap);
         ArrayList<Double> scores = new ArrayList<>();
 
