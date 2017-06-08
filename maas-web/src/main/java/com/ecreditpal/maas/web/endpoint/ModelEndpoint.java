@@ -4,8 +4,9 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Result;
-import com.ecreditpal.maas.model.model.AKDModel;
-import com.ecreditpal.maas.model.model.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBShenZhenModel;
 import com.wordnik.swagger.annotations.*;
 
 import javax.ws.rs.FormParam;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @author lifeng
  * @CreateTime 2017/4/12.
  */
-@Api(value = "xyb", description = "Endpoint for xyb")
+@Api(value = "model", description = "Endpoint for model")
 @Path("/model")
 public class ModelEndpoint {
     @POST
@@ -64,6 +65,89 @@ public class ModelEndpoint {
         String score = xybModel.run(map).toString();
 
         ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
+        lookupEventMessage.setModelLog(modelLog);
+
+        return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
+
+    @POST
+    @Path("/xyb/sz/a")
+    @ApiOperation(value = "XYB ShenZhen Model A")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "XYB Model Response", response = Response.class)})
+    public Response getXybShenZhenModelScoreA(
+            @ApiParam(value = "degree", required = false) @FormParam("degree") String degree,
+            @ApiParam(value = "gender", required = false) @FormParam("gender") String gender,
+            @ApiParam(value = "age", required = false) @FormParam("age") String age,
+            @ApiParam(value = "cellPhoneAccessTime", required = false) @FormParam("cellPhoneAccessTime") String cellPhoneAccessTime,
+            @ApiParam(value = "zhiMaCredit", required = false) @FormParam("zhiMaCredit") String zhiMaCredit,
+            @ApiParam(value = "liveCase", required = false) @FormParam("liveCase") String liveCase,
+            @ApiParam(value = "pIdCitySameInd", required = false) @FormParam("pIdCitySameInd") String pIdCitySameInd,
+            @ApiParam(value = "companyType", required = false) @FormParam("companyType") String companyType,
+            @ApiParam(value = "marriageStatus", required = false) @FormParam("marriageStatus") String marriageStatus,
+            @Context LookupEventMessage lookupEventMessage
+    ) throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(12);
+
+        map.put("degree", degree);
+        map.put("gender", gender);
+        map.put("age", age);
+        map.put("cellPhoneAccessTime", cellPhoneAccessTime);
+        map.put("zhiMaCredit", zhiMaCredit);
+        map.put("liveCase", liveCase);
+        map.put("pIdCitySameInd", pIdCitySameInd);
+        map.put("companyType", companyType);
+        map.put("marriageStatus", marriageStatus);
+
+
+        XYBShenZhenModel model = new XYBShenZhenModel();
+        String score = model.run(map).toString();
+
+        ModelLog modelLog = model.ParseVariables(model.getVariableList(), score, XYBShenZhenModel.modelVariables.getModel());
+        lookupEventMessage.setModelLog(modelLog);
+
+        return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
+    @POST
+    @Path("/xyb/sz/b")
+    @ApiOperation(value = "XYB ShenZhen Model B")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "XYB Model Response", response = Response.class)})
+    public Response getXybShenZhenModelScoreB(
+            @ApiParam(value = "degree", required = false) @FormParam("degree") String degree,
+            @ApiParam(value = "gender", required = false) @FormParam("gender") String gender,
+            @ApiParam(value = "age", required = false) @FormParam("age") String age,
+            @ApiParam(value = "cellPhoneAccessTime", required = false) @FormParam("cellPhoneAccessTime") String cellPhoneAccessTime,
+            @ApiParam(value = "zhiMaCredit", required = false) @FormParam("zhiMaCredit") String zhiMaCredit,
+            @ApiParam(value = "liveCase", required = false) @FormParam("liveCase") String liveCase,
+            @ApiParam(value = "pIdCitySameInd", required = false) @FormParam("pIdCitySameInd") String pIdCitySameInd,
+            @ApiParam(value = "companyType", required = false) @FormParam("companyType") String companyType,
+            @ApiParam(value = "marriageStatus", required = false) @FormParam("marriageStatus") String marriageStatus,
+            @ApiParam(value = "cid", required = false) @FormParam("cid") String cid,
+            @ApiParam(value = "name", required = false) @FormParam("name") String name,
+            @ApiParam(value = "mobile", required = false) @FormParam("mobile") String mobile,
+            @Context LookupEventMessage lookupEventMessage
+    ) throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>(12);
+
+        map.put("degree", degree);
+        map.put("gender", gender);
+        map.put("age", age);
+        map.put("cellPhoneAccessTime", cellPhoneAccessTime);
+        map.put("zhiMaCredit", zhiMaCredit);
+        map.put("liveCase", liveCase);
+        map.put("pIdCitySameInd", pIdCitySameInd);
+        map.put("companyType", companyType);
+        map.put("marriageStatus", marriageStatus);
+        map.put("cid", cid);
+        map.put("name", name);
+        map.put("mobile", mobile);
+
+
+        XYBShenZhenModel model = new XYBShenZhenModel();
+        String score = model.run(map).toString();
+
+        ModelLog modelLog = model.ParseVariables(model.getVariableList(), score, XYBShenZhenModel.modelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
 
         return Response.status(Response.Status.OK).entity(Result.wrapSuccessfulResult(score)).type(MediaType.APPLICATION_JSON_TYPE).build();

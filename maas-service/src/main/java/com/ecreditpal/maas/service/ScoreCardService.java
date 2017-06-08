@@ -2,17 +2,14 @@ package com.ecreditpal.maas.service;
 
 import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
-import com.ecreditpal.maas.common.avro.LookupEventMessage.ResponseInfo;
-import com.ecreditpal.maas.common.utils.ClassUtil;
-import com.ecreditpal.maas.model.model.AKDModel;
-import com.ecreditpal.maas.model.model.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.AKDModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBModel;
+import com.ecreditpal.maas.service.model.scorecard.XYBShenZhenModel;
 import com.ecreditpal.maas.service.annotation.Model;
 import com.ecreditpal.maas.service.annotation.ModelApi;
 import org.apache.avro.generic.GenericRecord;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.ws.Response;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,7 +34,7 @@ public class ScoreCardService  {
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score, XYBModel.XYBModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
-        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score).build());
+//        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score).build());
 
         return score;
     }
@@ -49,8 +46,35 @@ public class ScoreCardService  {
         LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
         ModelLog modelLog = akdModel.ParseVariables(akdModel.getVariableList(), score.toString(), AKDModel.AKDModelVariables.getModel());
         lookupEventMessage.setModelLog(modelLog);
-        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score.toString()).build());
+//        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score.toString()).build());
 
         return score;
     }
+
+    @ModelApi(apiCode = "M113")
+    public Object xybShenZhenNoGrayService(Map<String, String> map, GenericRecord record) {
+        XYBShenZhenModel xybModel = new XYBShenZhenModel();
+        Integer score =  (Integer) xybModel.run(map);
+        LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel()+"_NoGray");
+        lookupEventMessage.setModelLog(modelLog);
+//        lookupEventMessage.setResponseInfo(ResponseInfo.newBuilder().setResponseBody(score.toString()).build());
+
+        return score;
+    }
+
+    @ModelApi(apiCode = "M114")
+    public Object xybShenZhenService(Map<String, String> map, GenericRecord record) {
+        XYBShenZhenModel xybModel = new XYBShenZhenModel();
+        map.put("miguan_cid",map.get("cid"));
+        map.put("miguan_name",map.get("name"));
+        map.put("miguan_mobile",map.get("mobile"));
+        Integer score =  (Integer) xybModel.run(map);
+        LookupEventMessage lookupEventMessage = (LookupEventMessage)record;
+        ModelLog modelLog = xybModel.ParseVariables(xybModel.getVariableList(), score.toString(), XYBShenZhenModel.modelVariables.getModel()+"_WithGray");
+        lookupEventMessage.setModelLog(modelLog);
+
+        return score;
+    }
+
 }

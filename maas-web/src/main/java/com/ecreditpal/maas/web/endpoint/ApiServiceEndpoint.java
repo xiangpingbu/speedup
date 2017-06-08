@@ -6,11 +6,8 @@ import com.ecreditpal.maas.common.avro.LookupEventMessage.LookupEventMessage;
 import com.ecreditpal.maas.common.utils.http.OkHttpUtil;
 import com.ecreditpal.maas.common.utils.json.JsonUtil;
 import com.ecreditpal.maas.model.bean.Result;
-import com.ecreditpal.maas.model.bean.XYBModelBean;
-import com.ecreditpal.maas.service.ModelService;
 import com.ecreditpal.maas.service.ServiceContainer;
 import com.ecreditpal.maas.web.bean.User;
-import com.ecreditpal.maas.web.endpoint.filter.FilterUtil;
 import com.wordnik.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +22,7 @@ import java.util.Map;
  * @author lifeng
  */
 @Slf4j
-@Api(value = "apis", description = "Endpoint for api service")
+@Api(value = "maasApis", description = "Endpoint for api service")
 @Path("/api")
 public class ApiServiceEndpoint {
 
@@ -43,9 +40,7 @@ public class ApiServiceEndpoint {
     public Result<Object> getModelResult(
             @ApiParam(name = "apiCode", value = "ecreditpal api code", required = true) @PathParam("apiCode") String apiCode,
             @Context LookupEventMessage lookupEventMessage) {
-//        String ss = request.getParameter("creditLimit");
-//        //得到请求参数
-//        Map<String, String> map = FilterUtil.getRequestForm(request,providers);
+        //得到请求参数
         Map<String,String> map = JsonUtil.json2Map(lookupEventMessage.getRequestInfo().getFormParams().toString());
         //获得apiCode对应的模型
          Object obj = ServiceContainer.execute(apiCode,map,lookupEventMessage);
