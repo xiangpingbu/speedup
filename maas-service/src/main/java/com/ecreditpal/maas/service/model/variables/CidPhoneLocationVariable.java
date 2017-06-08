@@ -21,18 +21,19 @@ import java.util.concurrent.CountDownLatch;
  */
 @Slf4j
 public class CidPhoneLocationVariable extends Variable {
+    public static final String apiCode = "P314";
 
     @Override
     public void execute(CountDownLatch cdl) {
 
-        Thread t = new Thread(){
+        Thread t = new Thread() {
             @Override
             public void run() {
                 try {
                     if (getString("pIdCitySameInd") != null) {
-                        if ("TRUE".equals(getString("pIdCitySameInd"))){
+                        if ("TRUE".equals(getString("pIdCitySameInd"))) {
                             setValue(MaasConstants.CID_PHONE_LOCATION_EQUALS);
-                        }else{
+                        } else {
                             setValue(MaasConstants.CID_PHONE_LOCATION_UN_EQUALS);
                         }
                         return;
@@ -47,7 +48,7 @@ public class CidPhoneLocationVariable extends Variable {
                     }
                     IdcardAnalyzeService idcardAnalyzeService = IdcardAnalyzeService.getInstance();
                     MobileAnalyzeService mobileAnalyzeService = MobileAnalyzeService.getInstance();
-                    if(!idcardAnalyzeService.check(cid) || !mobileAnalyzeService.isValidMobileNumber(mobile)){
+                    if (!idcardAnalyzeService.check(cid) || !mobileAnalyzeService.isValidMobileNumber(mobile)) {
                         setValue(getInvalid());
                         return;
                     }
@@ -59,6 +60,7 @@ public class CidPhoneLocationVariable extends Variable {
 
                     Map<String, Object> map = new HashMap<>(2);
                     map.put("mobile", mobile);
+                    map.put("apiCode", apiCode);
                     String response = requestHandler.execute(map);
 
                     JSONObject obj = JSON.parseObject(response);
@@ -68,12 +70,12 @@ public class CidPhoneLocationVariable extends Variable {
                         String city = result.getJSONObject("result").getString("city");
                         if (region.contains(province) && region.contains(city)) {
                             setValue(MaasConstants.CID_PHONE_LOCATION_EQUALS); //匹配
-                        } else{
+                        } else {
                             setValue(MaasConstants.CID_PHONE_LOCATION_UN_EQUALS); //未匹配
                         }
                     }
-                }catch(Exception e) {
-                    log.error("error while comparing cid location and phone location",e);
+                } catch (Exception e) {
+                    log.error("error while comparing cid location and phone location", e);
                     setValue(MISSING);
                 } finally {
                     cdl.countDown();
