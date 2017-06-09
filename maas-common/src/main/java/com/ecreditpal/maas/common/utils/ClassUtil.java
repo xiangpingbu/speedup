@@ -120,7 +120,7 @@ public class ClassUtil {
             }
         });
         //循环所有文件
-        for (File file : dirfiles) {
+         for (File file : dirfiles) {
             //如果是目录 则继续扫描
             if (file.isDirectory()) {
                 findAndAddClassesInPackageByFile(packageName + "." + file.getName(),
