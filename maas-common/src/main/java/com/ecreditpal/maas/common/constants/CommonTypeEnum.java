@@ -38,6 +38,6 @@ public enum CommonTypeEnum {
     }
 
     public static boolean isCommonType(Object o) {
-        return set.contains(o.getClass());
+        return o != null && set.contains(o.getClass());
     }
 }
