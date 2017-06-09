@@ -59,6 +59,7 @@
             <property name="key" value="pIdCitySameInd"/>
             <property name="paramType" value="numerical"/>
             <property name="description" value="compare the location of cid and mobile"/>
+            <property name="requestHandler" ref="httpHandler"/>
             <property name="returnType" value="java.lang.Integer"/>
         </Variable>
 
