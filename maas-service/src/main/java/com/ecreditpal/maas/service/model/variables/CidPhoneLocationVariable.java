@@ -29,6 +29,7 @@ public class CidPhoneLocationVariable extends Variable {
         Thread t = new Thread() {
             @Override
             public void run() {
+                String response = null;
                 try {
                     if (getString("pIdCitySameInd") != null) {
                         if ("TRUE".equals(getString("pIdCitySameInd"))) {
@@ -61,7 +62,7 @@ public class CidPhoneLocationVariable extends Variable {
                     Map<String, Object> map = new HashMap<>(2);
                     map.put("mobile", mobile);
                     map.put("apiCode", apiCode);
-                    String response = requestHandler.execute(map);
+                    response = requestHandler.execute(map);
 
                     JSONObject obj = JSON.parseObject(response);
                     JSONObject result = obj.getJSONObject("data").getJSONObject("MOBILE_LOCATION");
@@ -75,7 +76,8 @@ public class CidPhoneLocationVariable extends Variable {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("error while comparing cid location and phone location", e);
+                    log.error("error while comparing cid location and phone location,{}",response,e);
+
                     setValue(MISSING);
                 } finally {
                     cdl.countDown();
