@@ -5,6 +5,7 @@ import avro.shaded.com.google.common.collect.Lists;
 import com.ecreditpal.maas.common.WorkDispatcher;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.ModelLog;
 import com.ecreditpal.maas.common.avro.LookupEventMessage.VariableResult;
+import com.ecreditpal.maas.common.constants.CommonTypeEnum;
 import com.ecreditpal.maas.model.reload.Register;
 import com.ecreditpal.maas.model.reload.ResReload;
 
@@ -89,7 +90,7 @@ public class ModelNew extends PmmlModel implements Register{
     public Object run(Map<String,?> map) {
         for (String s : map.keySet()) {
             Object val = map.get(s);
-            if (val instanceof String) {
+            if (CommonTypeEnum.isCommonType(val)) {
                 inputMap.put(s,val.toString());
             }else {
                 inputObjMap.put(s,val);

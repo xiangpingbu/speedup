@@ -39,7 +39,6 @@ public class XYBModelTest {
         Map<String, Object> map = Maps.newHashMap();
         map.put("creditLimit", 1);  //信用卡过去三个月查询次数
         map.put("creditQueryTimes", 1);
-        System.out.println(System.getProperty("user.dir"));
 
         map.put("creditUtilization", 0); //已经使用的总额度
         map.put("personalEducation", 1);//个人学历,2为本科
@@ -52,7 +51,7 @@ public class XYBModelTest {
 
         int modelTestScore = 624;
         List<Variable> variableList = model.getVariableList();
-//        model.run(map);
+        model.run(map);
 //        model.run(map);
         Assert.assertEquals("模型结果不符合预期",modelTestScore, model.run(map));
 
