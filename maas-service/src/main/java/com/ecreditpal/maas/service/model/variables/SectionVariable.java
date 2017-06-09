@@ -60,6 +60,9 @@ public class SectionVariable extends Variable {
                                 if (result == null) {
                                     setValue(CATEGORICAL_INVALID);
                                     return;
+                                } else if ("".equals(result)){
+                                    setValue(valStr);
+                                    return;
                                 }
                                 setValue(result);
                             } catch (Exception e) {
