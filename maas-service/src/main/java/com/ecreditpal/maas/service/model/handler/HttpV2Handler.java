@@ -14,7 +14,7 @@ import java.util.Map;
 public class HttpV2Handler extends RequestHandler {
     private static MyHttpClient myHttpClient = MyHttpClient.getInstance();
     private static String ecreditpalHost =
-            ConfigurationManager.getConfiguration().getString("maas.headstream");
+            ConfigurationManager.getConfiguration().getString("maas.headStream");
     private static String account =
             ConfigurationManager.getConfiguration().getString("v2.account");
     private static String password =
