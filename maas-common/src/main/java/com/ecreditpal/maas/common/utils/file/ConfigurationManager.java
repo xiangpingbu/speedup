@@ -68,20 +68,22 @@ public class ConfigurationManager {
             String productConfigDir = cc.getString("config.dir");
             String propertiesPath;
             String rootPath = null;
+            String fileName;
             if (productConfigDir == null) {
                 //从本地获取配置文件
                 rootPath = FileUtil.getRootPath();
+                fileName = "logback-test.xml";
                 propertiesPath = rootPath + "/maas-web/target/classes";
             } else {
                 //从服务器的目录获取配置文件
                 propertiesPath = productConfigDir;
+                fileName = "logback.xml";
             }
 
             manuallyLoad(productConfigDir, propertiesPath);
+            loadLogback(propertiesPath,fileName);
 
-            if (productConfigDir != null) loadLogback(productConfigDir);
-
-                log.info("loading  property in directory {}.", propertiesPath);
+            log.info("loading  property in directory {}.", propertiesPath);
             String applicationProp = propertiesPath + "/application.properties";
             PropertiesConfiguration conf = new PropertiesConfiguration(applicationProp);
 
@@ -156,16 +158,16 @@ public class ConfigurationManager {
         File file = new File(propertiesPath);
         File[] files = file.listFiles();
         if (files != null) {
-            String bak = propertiesPath + File.separator + "bak";
-            File bakFile = new File(bak);
-            if (!bakFile.exists()) {
-                for (File subFile : files) {
-                    if (subFile.isDirectory()) continue;
-                    FileUtil.copyFile(subFile, bak);
-                }
-            }
+            String template = propertiesPath + File.separator + "template";
+            File templateFile = new File(template);
+//            if (!templateFile.exists()) {
+//                for (File subFile : files) {
+//                    if (subFile.isDirectory()) continue;
+//                    FileUtil.copyFile(subFile, bak);
+//                }
+//            }
 
-            files = bakFile.listFiles();
+            files = templateFile.listFiles();
             if (files != null) {
                 for (File subFile : files) {
                     if (subFile.isDirectory()) continue;
@@ -196,23 +198,23 @@ public class ConfigurationManager {
                 }
             }
         }
-}
+    }
 
-private static void loadLogback(String configDir) {
-    File logbackFile = new File(configDir+"/logback.xml");
-    if (logbackFile.exists()) {
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        JoranConfigurator configurator = new JoranConfigurator();
-        configurator.setContext(lc);
-        lc.reset();
-        try {
-            configurator.doConfigure(logbackFile);
-        }
-        catch (JoranException e) {
-            log.error("fail to load logback.xml",e);
+    private static void loadLogback(String configDir,String fileName) {
+        File logbackFile = new File(configDir+"/"+fileName);
+        if (logbackFile.exists()) {
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext(lc);
+            lc.reset();
+            try {
+                configurator.doConfigure(logbackFile);
+            }
+            catch (JoranException e) {
+                log.error("fail to load logback.xml",e);
+            }
         }
     }
-}
 
     /**
      * 区分kafka的配置
@@ -240,6 +242,4 @@ private static void loadLogback(String configDir) {
             return conf;
         }
     }
-
-
 }
