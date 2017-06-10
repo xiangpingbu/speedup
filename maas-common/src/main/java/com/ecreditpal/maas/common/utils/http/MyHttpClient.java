@@ -149,15 +149,15 @@ public class MyHttpClient {
         return null;
     }
 
-    public String post(String url, Map<String, Object> params) {
+    public String post(String url, Map<String, String> params) {
         HttpResponse response = null;
         HttpPost post = new HttpPost(url);
         List<NameValuePair> nameValuePair = Lists.newArrayListWithCapacity(params.size());
         //lamba 表达式构造http请求所需的参数
-        params.forEach((k, v) -> nameValuePair.add(new BasicNameValuePair(k, v.toString())));
+        params.forEach((k, v) -> nameValuePair.add(new BasicNameValuePair(k, v)));
+        log.debug("http request url:{} , content:{}",url,nameValuePair.toString());
         try {
             post.setEntity(new UrlEncodedFormEntity(nameValuePair,"utf-8"));
-//            post.setHeader("Content-type","utf-8");
             response = getHttpClient().execute(post);
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 EntityUtils.consume(response.getEntity());
@@ -176,27 +176,6 @@ public class MyHttpClient {
             }
         }
         return null;
-    }
-
-    public static String getContentCharSet(final HttpEntity entity)
-            throws Exception {
-        if (entity == null) {
-            throw new IllegalArgumentException("HTTP entity may not be null");
-        }
-        String charset = null;
-        if (entity.getContentType() != null) {
-            HeaderElement values[] = entity.getContentType().getElements();
-            if (values.length > 0) {
-                NameValuePair param = values[0].getParameterByName("charset");
-                if (param != null) {
-                    charset = param.getValue();
-                }
-            }
-        }
-        if (StringUtils.isEmpty(charset)) {
-            charset = "UTF-8";
-        }
-        return charset;
     }
 
 }

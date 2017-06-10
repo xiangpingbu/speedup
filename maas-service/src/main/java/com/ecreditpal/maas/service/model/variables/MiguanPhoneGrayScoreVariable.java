@@ -28,11 +28,6 @@ public class MiguanPhoneGrayScoreVariable extends Variable {
             public void run() {
                 String invalid = getInvalid();
                 try {
-                    if (getString("phoneGrayScore") != null) {
-                        setValue(getString("phoneGrayScore"));
-                        return;
-                    }
-
                     if (!containsKey("miguan_cid") &&
                             !containsKey("miguan_name") &&
                             !containsKey("miguan_mobile")) {
@@ -40,16 +35,21 @@ public class MiguanPhoneGrayScoreVariable extends Variable {
                         return;
                     }
 
-                    HashMap<String, Object> map = new HashMap<>(8);
-                    Object value;
-                    if ((value = getString("miguan_cid")) != null) {
-                        map.put("cid", value);
+                    String miguanCid = getString("miguan_cid");
+                    String miguanName = getString("miguan_name");
+                    String miguanMobile = getString("miguan_mobile");
+
+                    log.debug("miguanMobile:{},miguanName:{},miguanMobile:{}",miguanCid,miguanName,miguanMobile);
+
+                    HashMap<String, String> map = new HashMap<>(8);
+                    if (miguanCid != null) {
+                        map.put("cid", miguanCid);
                     }
-                    if ((value = getString("miguan_name")) != null) {
-                        map.put("name", value);
+                    if (miguanName  != null) {
+                        map.put("name", miguanName);
                     }
-                    if ((value = getString("miguan_mobile")) != null) {
-                        map.put("mobile", value);
+                    if (miguanMobile != null) {
+                        map.put("mobile", miguanMobile);
                     }
                     if (map.size() < 3) {
                         setValue(MISSING);
@@ -66,7 +66,10 @@ public class MiguanPhoneGrayScoreVariable extends Variable {
                         return;
                     }
                     MiguanVariableBean bean = parseMiguanBean(jsonResult);
-                    setValue(bean.getGrayProfile().getPhoneGrayScore());
+                    Integer score = bean.getGrayProfile().getPhoneGrayScore();
+
+                    setValue(score);
+
                 } catch (Exception e) {
                     log.error("error while parse Miguan api", e);
                     setValue(MISSING);
