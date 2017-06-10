@@ -13,7 +13,7 @@ import java.util.Map;
 @Slf4j
 public class HttpV2Handler extends RequestHandler {
     private static MyHttpClient myHttpClient = MyHttpClient.getInstance();
-    private static String ecreditpalHost = "https://" +
+    private static String ecreditpalHost =
             ConfigurationManager.getConfiguration().getString("maas.headstream");
     private static String account =
             ConfigurationManager.getConfiguration().getString("v2.account");

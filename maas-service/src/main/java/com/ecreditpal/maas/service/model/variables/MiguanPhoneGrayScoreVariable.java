@@ -68,6 +68,8 @@ public class MiguanPhoneGrayScoreVariable extends Variable {
                     MiguanVariableBean bean = parseMiguanBean(jsonResult);
                     Integer score = bean.getGrayProfile().getPhoneGrayScore();
 
+                    setValue(score);
+
                 } catch (Exception e) {
                     log.error("error while parse Miguan api", e);
                     setValue(MISSING);
