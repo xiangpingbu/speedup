@@ -31,17 +31,11 @@ public class CidPhoneLocationVariable extends Variable {
             public void run() {
                 String response = null;
                 try {
-                    if (getString("pIdCitySameInd") != null) {
-                        if ("TRUE".equals(getString("pIdCitySameInd"))) {
-                            setValue(MaasConstants.CID_PHONE_LOCATION_EQUALS);
-                        } else {
-                            setValue(MaasConstants.CID_PHONE_LOCATION_UN_EQUALS);
-                        }
-                        return;
-                    }
 
                     String cid = getString("cid");
                     String mobile = getString("mobile");
+
+                    log.debug("cid:{}, mobile:{}",cid,mobile);
 
                     if (cid == null && mobile == null) {
                         setValue(MISSING);
@@ -59,7 +53,7 @@ public class CidPhoneLocationVariable extends Variable {
 
                     RequestHandler requestHandler = getRequestHandler();
 
-                    Map<String, Object> map = new HashMap<>(2);
+                    Map<String, String> map = new HashMap<>(2);
                     map.put("mobile", mobile);
                     map.put("apiCode", apiCode);
                     response = requestHandler.execute(map);
@@ -76,7 +70,7 @@ public class CidPhoneLocationVariable extends Variable {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("error while comparing cid location and phone location,{}",response,e);
+                    log.error("error while comparing cid location and phone location, response is: {}",response,e);
 
                     setValue(MISSING);
                 } finally {

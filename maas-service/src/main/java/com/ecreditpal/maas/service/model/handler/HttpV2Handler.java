@@ -20,14 +20,14 @@ public class HttpV2Handler extends RequestHandler {
     private static String password =
             ConfigurationManager.getConfiguration().getString("v2.password");
     @Override
-    public String execute(RequestHandler handler, Map<String, Object> param) {
+    public String execute(RequestHandler handler, Map<String, String> param) {
         param.put("account",account);
         param.put("password",password);
         return myHttpClient.post(ecreditpalHost, param);
     }
 
     @Override
-    public String execute(Map<String, Object> param) {
+    public String execute(Map<String, String> param) {
         return execute(null, param);
     }
 

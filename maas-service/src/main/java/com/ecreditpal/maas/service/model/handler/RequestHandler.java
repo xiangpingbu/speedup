@@ -17,11 +17,11 @@ public  class RequestHandler {
      * @param param 请求参数
      * @return String
      */
-    public  String execute(RequestHandler handler,Map<String,Object> param){
+    public  String execute(RequestHandler handler,Map<String,String> param){
         return null;
     };
 
-    public  String execute(Map<String,Object> param){
+    public  String execute(Map<String,String> param){
         return null;
     };
 
