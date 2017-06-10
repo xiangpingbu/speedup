@@ -27,7 +27,6 @@ public class XYBShenZhenModelTest {
      *
      * @throws Exception 读取文件时抛出异常
      */
-    @Test
     public void excelHelp() throws Exception {
 
         ExcelRowReader rowReader = new ExcelRowReader();
