@@ -1,5 +1,0 @@
-#!/bin/sh
-
-getent group ecreditpal &> /dev/null || groupadd -r ecreditpal &> /dev/null
-getent passwd ecreditpal &> /dev/null || useradd -r -g ecreditpal -M -s /sbin/nologin ecreditpal &> /dev/null
-exit 0

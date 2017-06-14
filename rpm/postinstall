@@ -1,5 +1,0 @@
-#!/bin/sh
-
-if [ $1 -eq 1 ]; then
-    systemctl enable maas.service >/dev/null 2>&1 || :
-fi
