@@ -7,6 +7,7 @@ from datetime import datetime
 from common.constant import const
 from service.db import tool_model_service
 import pandas as pd
+from beans.tool_model import *
 
 
 
@@ -73,8 +74,12 @@ def save():
 
     list = []
     for key, val in dict.items():
-        now = datetime.now()
-        obj = [model_name, branch, key, val["iv"], json.dumps(val["var_table"],ensure_ascii=False),val["is_selected"]]
+        obj = ModelContent(model_name=model_name,
+                    model_branch=branch,
+                    variable_name=key,
+                    variable_iv=val["iv"],
+                    binning_record=json.dumps(val["var_table"],ensure_ascii=False),
+                    is_selected=val["is_selected"])
         list.append(obj)
     if tool_model_service.save_binning_record(list) is not True:
         return responseto(success=False)

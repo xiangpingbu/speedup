@@ -5,16 +5,19 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
 
-engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool?charset=utf8", max_overflow=10,
-                       echo=True)
+
 Base = declarative_base()
 
 
 def init_db():
+    engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool?charset=utf8", max_overflow=10,
+                           echo=True)
     Base.metadata.create_all(engine)
 
 
 def drop_db():
+    engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool?charset=utf8", max_overflow=10,
+                           echo=True)
     Base.metadata.drop_all(engine)
 
 
@@ -72,5 +75,5 @@ class ModelSelectedVariable(Base):
 
 init_db()
 
-DB_Session = sessionmaker(bind=engine)
-session = DB_Session()
+# DB_Session = sessionmaker(bind=engine)
+# session = DB_Session()

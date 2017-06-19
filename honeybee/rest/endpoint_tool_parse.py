@@ -7,6 +7,7 @@ from util import common as cmm
 from common import global_value
 from service import basic_analysis_service as ba
 from datetime import datetime
+from beans.tool_model import *
 
 base = '/tool'
 
@@ -121,8 +122,12 @@ def get_branch_info():
             result = tool_model_service.load_binning_record(model_name, original_branch)
             list = []
             for record in result:
-                obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"],
-                       record["is_selected"]]
+                obj = ModelContent(model_name=model_name,
+                            model_branch=branch,
+                            variable_name =record["variable_name"],
+                            variable_iv =record["variable_iv"],
+                            binning_record = record["binning_record"],
+                            is_selected = record["is_selected"])
                 list.append(obj)
             record = tool_model_service.load_model(model_name=model_name, model_branch=original_branch)[0]
             result = [record]
@@ -177,10 +182,13 @@ def new_branch():
     result = tool_model_service.load_binning_record(model_name, original_branch)
 
     list = []
-
     for record in result:
-        obj = [model_name, branch, record["variable_name"], record["variable_iv"], record["binning_record"],
-               record["is_selected"]]
+        obj = ModelContent(model_name=model_name,
+                    model_branch=branch,
+                    variable_name=record["variable_name"],
+                    variable_iv=record["variable_iv"],
+                    binning_record=record["binning_record"],
+                    is_selected=record["is_selected"])
         list.append(obj)
 
     if tool_model_service.copy_branch(model_name, branch, original_branch):
