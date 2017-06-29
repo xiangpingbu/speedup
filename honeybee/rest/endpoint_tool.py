@@ -65,12 +65,12 @@ def init():
 
     result = tool_model_service.load_model(model_name=name, model_branch=branch)
     # selected_list在数据库中是json格式,在python中是一个dict,格式为:select_variable:index(变量的位置)
-    selected_list_json = json.loads(result[0]["selected_list"])
+    selected_list_json = json.loads(result[0].selected_list)
     selected_list = selected_list_json.keys()
 
     min_val = 0
     df = df_map['df_train']
-    init_result = get_init(df, target=result[0]["model_target"], valid=selected_list)
+    init_result = get_init(df, target=result[0].model_target, valid=selected_list)
 
     # 根据init_result获得变量的区间
     out = get_boundary(init_result, min_val)
@@ -264,6 +264,10 @@ def apply():
 
 @app.route(base + "/if_applyed", methods=['POST'])
 def if_applyed():
+    """
+    在挑选变量进入ks计算之前,判断woe是否已经apply到train文件了
+
+    """
     if safely_apply:
         return responseto(success=True)
     else:

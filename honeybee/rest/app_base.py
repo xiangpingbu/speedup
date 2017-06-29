@@ -1,14 +1,28 @@
+# coding=utf-8
 from flask import Flask, request, send_from_directory
 from flask_restful import Api
 from util.restful_tools import *
 from flask_environments import Environments
+from common.exceptions import HoneybeeException
 from common import global_value
 
-
-
 app = Flask(__name__)
-import  os
+
+# FLASK_ENV变量控制honeybee对环境变量的选择,默认为DEVELOPMENT
 # os.environ['FLASK_ENV'] = 'PRODUCTION'
 env = Environments(app)
 env.from_object('conf.config')
 api = Api(app)
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    """
+    全局异常拦截
+    :param e: 被截获的异常
+    :return: 接口抛出异常后直接将这个异常返回
+    """
+    code = 500
+    if isinstance(e, HoneybeeException):
+        code = e.code
+    return responseto(None, message=e.message, code=code,success=False)

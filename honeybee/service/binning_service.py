@@ -213,7 +213,13 @@ def get_categorical_woe(df, var, target, null_value_list=['NaNNaN']):
     agg['goods'] = np.where(pd.isnull(agg.goods), 0, agg.goods)
     agg['total'] = agg.bads + agg.goods
     agg['odds'] = ((agg.bads + delta_1) / (agg.goods + delta_1))
+    print "-------------------"
+    print agg['odds']
+    print float(agg.bads.sum())
+    print float(agg.goods.sum())
+    print "-------------------"
     agg['oddsrt'] = (agg['odds'] / (float(agg.bads.sum()) / float(agg.goods.sum())))
+    agg['oddsrt'].apply(lambda x:  print_it(x))
     agg['woe'] = agg['oddsrt'].apply(lambda x: np.round(np.log(x) * 1.0, 4))
     agg['IV'] = (agg.bads / sum(agg.bads) - agg.goods / sum(agg.goods)) * agg.woe
     agg['bad_rate'] = (agg.bads / agg.total).apply('{0:.2%}'.format)
@@ -619,3 +625,7 @@ def get_manual_bin_categorical(df, var, target, bin_list):
     del df_final['bin_num_woe']
 
     return {'df_woe': df_woe, 'df_result': df_final}
+
+def print_it(x):
+    if x > 0.1:
+        print x

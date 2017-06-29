@@ -1,3 +1,7 @@
+# coding=utf-8
+"""
+实现java的hashcode()方法
+"""
 def convert_n_bytes(n, b):
     bits = b*8
     return (n + 2**(bits-1)) % 2**bits - 2**(bits-1)

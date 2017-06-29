@@ -5,6 +5,7 @@ import copy
 import xml.dom.minidom
 from io import BytesIO
 from common import global_value
+import os
 
 datas = [{'name': 'javascript', 'useto': 'web development'},
          {'name': 'python', 'useto': 'do anything'},
@@ -131,15 +132,16 @@ def ppp():
     return global_value.get_value("")
 
 
-jar_path  = app.config["JAR_PATH"]
-target = 'apply'
-origin = '/Users/lifeng/Desktop/111/model_data.xlsx'
-applied = '/Users/lifeng/Downloads/df_iv_1.xlsx'
-columnConfig = '{"data":{"手机入网时间":[{"手机入网时间":["5年以上","nan"],"woe":"-0.2903","binNum":"0","type":"Categorical"},{"手机入网时间":["3--5年"],"woe":"0.0267","binNum":"1","type":"Categorical"},{"手机入网时间":["1--3年"],"woe":"0.1479","binNum":"2","type":"Categorical"},{"手机入网时间":["6-12个月"],"woe":"0.2521","binNum":"3","type":"Categorical"}],"年龄":[{"max":"22.00000","min":"18.00000","min_boundary":"0","max_boundary":"23.00000","woe":"-0.1085","binNum":"1","type":"Numerical"},{"max":"35.00000","min":"23.00000","min_boundary":"23.00000","max_boundary":"36.00000","woe":"0.0075","binNum":"2","type":"Numerical"},{"max":"42.00000","min":"36.00000","min_boundary":"36.00000","max_boundary":"43.00000","woe":"0.0528","binNum":"3","type":"Numerical"},{"max":"54.00000","min":"43.00000","min_boundary":"43.00000","max_boundary":"inf","woe":"-0.1373","binNum":"4","type":"Numerical"}],"性别":[{"性别":["女"],"woe":"-0.3294","binNum":"0","type":"Categorical"},{"性别":["男"],"woe":"0.1026","binNum":"1","type":"Categorical"}],"工作年限":[{"max":"1.00000","min":"1.00000","min_boundary":"0","max_boundary":"2.00000","woe":"-0.1525","binNum":"1","type":"Numerical"},{"max":"2.00000","min":"2.00000","min_boundary":"2.00000","max_boundary":"3.00000","woe":"-0.1979","binNum":"2","type":"Numerical"},{"max":"8.00000","min":"3.00000","min_boundary":"3.00000","max_boundary":"9.00000","woe":"-0.0889","binNum":"3","type":"Numerical"},{"max":"13.00000","min":"9.00000","min_boundary":"9.00000","max_boundary":"14.00000","woe":"-0.1887","binNum":"4","type":"Numerical"},{"max":"15.00000","min":"14.00000","min_boundary":"14.00000","max_boundary":"inf","woe":"0.4333","binNum":"5","type":"Numerical"}],"公司性质":[{"公司性质":["国有股份","机关及事业单位","社会团体"],"woe":"-0.4807","binNum":"0","type":"Categorical"},{"公司性质":["个体"],"woe":"-0.1612","binNum":"1","type":"Categorical"},{"公司性质":["nan","民营","外资"],"woe":"-0.067","binNum":"2","type":"Categorical"},{"公司性质":["私营","合资"],"woe":"0.6192","binNum":"3","type":"Categorical"}]},"target":"bad_4w","modelName":"model_data","branch":"master"}'
+# jar_path  = app.config["JAR_PATH"]
+# target = 'apply'
+# origin = '/Users/lifeng/Desktop/111/model_data.xlsx'
+# applied = '/Users/lifeng/Downloads/df_iv_1.xlsx'
+# columnConfig = '{"data":{"手机入网时间":[{"手机入网时间":["5年以上","nan"],"woe":"-0.2903","binNum":"0","type":"Categorical"},{"手机入网时间":["3--5年"],"woe":"0.0267","binNum":"1","type":"Categorical"},{"手机入网时间":["1--3年"],"woe":"0.1479","binNum":"2","type":"Categorical"},{"手机入网时间":["6-12个月"],"woe":"0.2521","binNum":"3","type":"Categorical"}],"年龄":[{"max":"22.00000","min":"18.00000","min_boundary":"0","max_boundary":"23.00000","woe":"-0.1085","binNum":"1","type":"Numerical"},{"max":"35.00000","min":"23.00000","min_boundary":"23.00000","max_boundary":"36.00000","woe":"0.0075","binNum":"2","type":"Numerical"},{"max":"42.00000","min":"36.00000","min_boundary":"36.00000","max_boundary":"43.00000","woe":"0.0528","binNum":"3","type":"Numerical"},{"max":"54.00000","min":"43.00000","min_boundary":"43.00000","max_boundary":"inf","woe":"-0.1373","binNum":"4","type":"Numerical"}],"性别":[{"性别":["女"],"woe":"-0.3294","binNum":"0","type":"Categorical"},{"性别":["男"],"woe":"0.1026","binNum":"1","type":"Categorical"}],"工作年限":[{"max":"1.00000","min":"1.00000","min_boundary":"0","max_boundary":"2.00000","woe":"-0.1525","binNum":"1","type":"Numerical"},{"max":"2.00000","min":"2.00000","min_boundary":"2.00000","max_boundary":"3.00000","woe":"-0.1979","binNum":"2","type":"Numerical"},{"max":"8.00000","min":"3.00000","min_boundary":"3.00000","max_boundary":"9.00000","woe":"-0.0889","binNum":"3","type":"Numerical"},{"max":"13.00000","min":"9.00000","min_boundary":"9.00000","max_boundary":"14.00000","woe":"-0.1887","binNum":"4","type":"Numerical"},{"max":"15.00000","min":"14.00000","min_boundary":"14.00000","max_boundary":"inf","woe":"0.4333","binNum":"5","type":"Numerical"}],"公司性质":[{"公司性质":["国有股份","机关及事业单位","社会团体"],"woe":"-0.4807","binNum":"0","type":"Categorical"},{"公司性质":["个体"],"woe":"-0.1612","binNum":"1","type":"Categorical"},{"公司性质":["nan","民营","外资"],"woe":"-0.067","binNum":"2","type":"Categorical"},{"公司性质":["私营","合资"],"woe":"0.6192","binNum":"3","type":"Categorical"}]},"target":"bad_4w","modelName":"model_data","branch":"master"}'
 # s = os.system("java -jar maas-offline.jar )
-cmd = 'java -jar %s %s "origin=%s&applied=%s&columnConfig=%s"'
-cmd = cmd %(jar_path,target,origin,applied,columnConfig)
+# cmd = 'java -jar %s %s "origin=%s&applied=%s&columnConfig=%s"'
+# cmd = cmd %(jar_path,target,origin,applied,columnConfig)
 import subprocess
 # p2 = subprocess.getoutput(cmd)
 # p2 =subprocess.check_output(cmd, shell=True)
 # print p2
+

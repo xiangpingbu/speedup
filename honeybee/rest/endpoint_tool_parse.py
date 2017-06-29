@@ -50,12 +50,12 @@ def parse():
         branches = []
         v = result[0]
         for n in result:
-            branches.append(n["model_branch"])
+            branches.append(n.model_branch)
 
         # data_map["current_model"] = model_name
         data_map["branches"] = branches
-        data_map["selected_list"] = v["selected_list"]
-        data_map["target"] = v["model_target"]
+        data_map["selected_list"] = v.selected_list
+        data_map["target"] = v.model_target
 
         return responseto(data=data_map)
     else:
@@ -83,7 +83,7 @@ def init_model_name():
     result = tool_model_service.load_model(is_deleted=0)
     # only get  model_name form result
 
-    result = list(set(map(lambda x: x["model_name"], result)))
+    result = list(set(map(lambda x: x.model_name, result)))
 
     return responseto(result)
 
@@ -98,7 +98,7 @@ def get_branch_name():
     model_name = request.args.get("modelName")
     result = tool_model_service.load_model(model_name=model_name)
     # get model_branch and file_path from result
-    result = list(map(lambda x: x["model_branch"], result))
+    result = list(map(lambda x: x.model_branch, result))
 
     return responseto(result)
 
@@ -116,7 +116,7 @@ def get_branch_info():
     result = tool_model_service.load_model(model_name=model_name, model_branch=branch)
 
     ##数据库找不到对应当前分支的数据,用户希望创建一个新分支
-    if len(result) == 0:
+    if result.first() == None:
         try:
             # tool_model_service.create_branch(model_name=model_name, model_branch=branch)
             result = tool_model_service.load_binning_record(model_name, original_branch)
@@ -140,9 +140,9 @@ def get_branch_info():
         except Exception:
             return responseto(success=False, data="添加分支失败")
 
-    target = result[0]["model_target"]
+    target = result.first().model_target
 
-    path = result[0]["file_path"]
+    path = result.first().file_path
     # df_map = global_value.get_value(model_name+"_"+branch)
     selected_file = None
 
