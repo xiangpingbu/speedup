@@ -26,7 +26,7 @@ def get_df_summary(df):
     df_name['non_missing_cnt'] = 0
     df_name['missing_cnt'] = 0
     df_name['coverage'] = 0
-    df_name['uniqueVal'] = 0
+    df_name['unique_val'] = 0
 
     for i in range(len(df_name)):
         col = df_name.iloc[i]['variable']
