@@ -1,13 +1,13 @@
 # coding=utf-8
+import logging as log
+
 from flask import Flask, request, send_from_directory
 from flask_restful import Api
-from util.restful_tools import *
 from flask_environments import Environments
 from common.exceptions import HoneybeeException
-from common import global_value
+from util import restful_tools as rest
 
 app = Flask(__name__)
-
 # FLASK_ENV变量控制honeybee对环境变量的选择,默认为DEVELOPMENT
 # os.environ['FLASK_ENV'] = 'PRODUCTION'
 env = Environments(app)
@@ -25,4 +25,5 @@ def handle_error(e):
     code = 500
     if isinstance(e, HoneybeeException):
         code = e.code
-    return responseto(None, message=e.message, code=code,success=False)
+    log.error(e,exc_info=1)
+    return rest.responseto(None, message=e.message, code=code,success=False)

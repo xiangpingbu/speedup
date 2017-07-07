@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 import collections
+import os
 import sys
 from collections import OrderedDict
+from datetime import datetime
 from io import BytesIO
+from xml.dom import minidom
+
 import numpy as np
 import pandas as pd
 import requests
 from flask import send_file
+
 from beans.Pmml import *
 from common.constant import const
 from rest.app_base import *
 from service import binning_service as bf
-from service import basic_analysis_service as ba
-from service import logit_model_service as lmf
-from util import common as cmm
-from util.ZipFile import *
-from xml.dom import minidom
-import os
 from service.db import tool_model_service
-from datetime import datetime
-from common.util import common_util
+from util import common as cmm, simple_util
+from util.ZipFile import *
 
 base = '/tool'
 base_path = "./util/"
@@ -90,6 +89,7 @@ def rank():
     out_sorted_iv = sort_iv(json_obj)
     return responseto(data=out_sorted_iv)
 
+
 @app.route(base + "/divide", methods=['POST'])
 def divide():
     """
@@ -149,7 +149,7 @@ def divide():
         return responseto(data=data)
     else:
         val = data_map["selected"][name].split("|")
-        df[name] = df[name].apply(lambda x: common_util.float_nan_to_str_nan(x))
+        df[name] = df[name].apply(lambda x: simple_util.float_nan_to_str_nan(x))
 
         df = df[df[name].isin(val)]
 
@@ -204,7 +204,7 @@ def divide_manually():
                    'bad_rate', 'woe',
                    'type']
 
-    target = tool_model_service.load_model(model_name=model_name, model_branch =branch)[0]["model_target"]
+    target = tool_model_service.load_model(model_name=model_name, model_branch=branch)[0]["model_target"]
     result = bf.adjust_bin(df_train, type == "true", variable_name, boundary_list
                            , target=target, expected_column={variable_name})
 
@@ -274,14 +274,11 @@ def if_applyed():
         return responseto(success=False)
 
 
-
-
-
 def apply_get_woe_value(var_name, var_value, var_dict):
     var_content = var_dict[var_name]
     var_type = var_content[0]['type']
     if var_type == 'Numerical':
-        if not common_util.is_num(var_value):
+        if not simple_util.is_num(var_value):
             return 0.0
         for row in var_content:
             if row['min_boundary'] == '-inf':
@@ -304,6 +301,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
             if str(var_value) in row[var_name]:
                 return float(row['woe'])
         return 0.0
+
 
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
 def upload():
@@ -329,21 +327,23 @@ def upload():
                                                  file_path=file_path, model_target="")
     return responseto(data="success")
 
+
 @app.route(base + "/load_applyed", methods=['OPTIONS', 'POST'])
 def load_applyed():
     """读取apply后的文件"""
     # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
     if request.method == 'POST':
         # 获取training文件上传的路径
-        model_name =  request.form.get("model_name")
-        branch =  request.form.get("branch")
+        model_name = request.form.get("model_name")
+        branch = request.form.get("branch")
         files = request.files.getlist("file[]")
         for file in files:
-            df_map = global_value.get_value(model_name+"_"+branch)
+            df_map = global_value.get_value(model_name + "_" + branch)
             df = pd.read_excel(file, encoding="utf-8")
             df_map["df_train_woe"] = df[df['dev_ind'] == 1]
             df_map["df_test_woe"] = df[df['dev_ind'] == 0]
     return responseto(data="success")
+
 
 @app.route(base + "/column_config", methods=['POST'])
 def column_config():
@@ -360,18 +360,18 @@ def column_config():
     list = var_dict['list']
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
-    #p_value值,以逗号隔开
+    # p_value值,以逗号隔开
     params = var_dict["params"]
-    #从数据库中得到binning_record,并根据list中variable的顺序排序
+    # 从数据库中得到binning_record,并根据list中variable的顺序排序
     result = sort_variable(list.split(","),
                            tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
     p_value_list = []
     param_list = params.split(",")
     data = []
     mem_zip_file = MemoryZipFile()
-    for index,variable in enumerate(result):
+    for index, variable in enumerate(result):
         variable_name = variable["variable_name"]
-        p_value_list.append({variable_name:param_list[index]})
+        p_value_list.append({variable_name: param_list[index]})
         records = json.loads(variable["binning_record"], encoding="utf8")
         first_row = records[0]
         # 如果type为true,那么为Numrical
@@ -452,7 +452,7 @@ def column_config():
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
     mem_zip_file.append_content('column_config/model.pmml', xml_str)
-    mem_zip_file.append_content('column_config/lr.json', json.dumps(p_value_list,ensure_ascii=False))
+    mem_zip_file.append_content('column_config/lr.json', json.dumps(p_value_list, ensure_ascii=False))
     # return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)
 
@@ -707,6 +707,7 @@ def merge():
     # data = get_merged(var_name, df, min_val)
     return responseto(data=data)
 
+
 '''
 导出变量配置
 '''
@@ -756,6 +757,7 @@ def export_variables():
 导出变量到excel
 '''
 
+
 def generate_response(var_name, df, iv):
     # data = {var_name: []}
     data = collections.OrderedDict()
@@ -788,7 +790,7 @@ def sort_variable(variables, result):
 
     new_result = [{}] * (len(v) - 1)
     for variable in result:
-        i = v[variable["variable_name"].decode('utf-8')]
+        i = v[variable.variable_name.decode('utf-8')]
         new_result[i] = variable
 
     return new_result

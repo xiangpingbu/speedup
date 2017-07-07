@@ -5,6 +5,8 @@ from service import logit_model_service as lmf
 import pandas as pd
 from util import common
 
+from common import global_value
+
 
 
 base = '/tool'
@@ -30,7 +32,7 @@ def variable_select():
         if (tool_model_service.del_selected_variable(model_name, branch)):
             tool_model_service.save_selected_variable(model_name, branch, var_list)
         else:
-            return responseto(messege="fail to save selected variable", success=False)
+            return rest.responseto(messege="fail to save selected variable", success=False)
     target = request.form.get("target")
     withIntercept = request.form.get("with_intercept") == 'true'
     ks_group_num = request.form.get("ks_group_num")
@@ -42,8 +44,8 @@ def variable_select():
     data = lmf.get_logit_backward(df_train_woe, df_test_woe, target, ks_group_num, var_list.split(","),
                                   withIntercept)
     if data is None:
-        return responseto(success=False)
-    return responseto(data=data)
+        return rest.responseto(success=False)
+    return rest.responseto(data=data)
 
 
 
@@ -68,7 +70,7 @@ def variable_select_manual():
 
     data = lmf.get_logit_backward_manually(df_train_woe, df_test_woe, all_list.split(","),
                                            selected_list.split(","), target, ks_group_num, with_intercept)
-    return responseto(data=data)
+    return rest.responseto(data=data)
 
 @app.route(base+"/variable_verify",methods=['POST'])
 def variable_verify():
@@ -95,6 +97,6 @@ def variable_verify():
 
     if common.is_valid_correlation(df,corr_cap) is False:
         result = common.get_correlation(df)
-        return responseto(result.to_dict())
+        return rest.responseto(result.to_dict())
     else:
-        return responseto(None)
+        return rest.responseto(None)

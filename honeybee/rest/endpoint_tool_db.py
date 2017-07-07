@@ -1,13 +1,16 @@
 # coding=utf-8
-from rest.app_base import *
-import requests
-import json
 from collections import OrderedDict
-from datetime import datetime
+
+import requests
+import pandas as pd
+from flask import request
+
+from util import restful_tools as rest
+from rest.app_base import app
 from common.constant import const
 from service.db import tool_model_service
-import pandas as pd
 from beans.tool_model import *
+from common import  global_value
 
 
 
@@ -20,7 +23,7 @@ es_host = "http://10.10.10.107:9200/"
 def es_req(key):
     url = app.config["es_host"] + key + "/_search?pretty"
     response = requests.get(url)
-    return responseto(data=json.loads(response.text))
+    return rest.responseto(data=json.loads(response.text))
 
 '''
 @pre-init步骤提交该分支的信息
@@ -48,7 +51,7 @@ def commit_branch():
                        "df_test": df_test}}
         global_value.set_value(**df_map)
 
-    return responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list,file_path = file_path))
+    return rest.responseto(data=tool_model_service.update_branch(model_name, branch, target, selected_list=selected_list, file_path = file_path))
 
 
 '''
@@ -60,7 +63,7 @@ def checkout():
     branch = request.values.get("branch")
     result = tool_model_service.load_model(model_name=model_name, model_branch = branch)
 
-    return responseto(data=result[0])
+    return rest.responseto(data=result[0])
 
 
 @app.route(base + "/save", methods=['Post'])
@@ -82,8 +85,8 @@ def save():
                     is_selected=val["is_selected"])
         list.append(obj)
     if tool_model_service.save_binning_record(list) is not True:
-        return responseto(success=False)
-    return responseto()
+        return rest.responseto(success=False)
+    return rest.responseto()
 
 
 @app.route(base + "/load_all", methods=['Post'])
@@ -99,7 +102,7 @@ def load_all():
             data[row["variable_name"]] = {"iv": row["variable_iv"],
                                           "var_table": json.loads(row["binning_record"]),
                                           "is_selected":row["is_selected"]==const.SELECTED}
-    return responseto(data = data)
+    return rest.responseto(data = data)
 
 
 def sort_iv(data):
