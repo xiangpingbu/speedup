@@ -38,6 +38,19 @@ def df_for_html(df):
 
     return data_map
 
+def df_for_db(df):
+    head = []
+    for column in df.columns:
+        head.append(str(column))
+
+    for index, row in df.iterrows():
+        body = {}
+        for key in head:
+            body[key] = (str(row[key]))
+        head.append(body)
+    return head
+
+
 
 def get_iv_tree_binning(df, target):
     """
