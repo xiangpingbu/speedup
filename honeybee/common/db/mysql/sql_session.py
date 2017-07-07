@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 class Orm():
-    engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool?charset=utf8", max_overflow=10,
+    engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool_v3?charset=utf8", max_overflow=10,
                            echo=True)
     def __init__(self):
         DB_Session = sessionmaker(bind=self.engine)

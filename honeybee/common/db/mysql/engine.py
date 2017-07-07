@@ -10,3 +10,5 @@ engine = create_engine("mysql+pymysql://root:Cisco123@127.0.0.1:3306/maas_tool",
 result = engine.execute('select * from tool_model')
 res = result.fetchall()
 print(res)
+
+
