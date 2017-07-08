@@ -1,6 +1,10 @@
 # coding=utf-8
+import logging as log
+import json
+
 import pandas as pd
 from flask import request
+
 import util.restful_tools as rest
 from beans import tool_model
 from common.exceptions import Error
@@ -9,10 +13,7 @@ from service import basic_analysis_service as basic_analysis
 from service.db import source_service
 from service.db import variable_service
 from util import common, simple_util
-import logging as log
 from common.constant import DBConstant
-import json
-
 
 
 @app.route("/source/add", methods=['post'])
@@ -81,6 +82,8 @@ def source_parse(source_id):
         for data in data_list:
             variable = tool_model.Variable()
             variable.__dict__ = data
+            variable.variable_name = data['variable']
+            variable.usage = 0
             variables.append(variable)
         variable_service.save_variables(variables)
 
@@ -99,11 +102,10 @@ def source_parse(source_id):
         raise Error.SOURCE_PARSE_FAIL
 
 
-@app.route("/source/update/<string:source_id>",methods=['post'])
+@app.route("/source/update/<string:source_id>", methods=['post'])
 def update_source(source_id):
     set_name = request.form.get("setName")
     if_delete = request.form.get("ifDelete")
-
 
     source = tool_model.Source()
     source.id = source_id
@@ -116,9 +118,11 @@ def update_source(source_id):
     else:
         raise Error.SOURCE_UPDATE_FAIL
 
-@app.route("/source/list/<string:project_id>",methods=['get'])
+
+@app.route("/source/list/<string:project_id>", methods=['get'])
 def list_source(project_id):
     """
+    罗列该工程所有的资源
     :param project_id: 所属工程的id
     :return: 所有资源的相关参数
     """
@@ -126,9 +130,19 @@ def list_source(project_id):
 
     def map_value(source):
         d = {'setName': source.set_name, 'fileName': source.file_name, 'fileSize': source.file_size,
-             'fileScope': source.file_scope, 'addAt': source.create_date.isoformat(sep = " "), 'origin': source.file_origin,
+             'fileScope': source.file_scope, 'addAt': source.create_date.isoformat(sep=" "),
+             'origin': source.file_origin,
              'readable': source.file_readable}
         return d
 
-    list = map(map_value,sources)
+    list = map(map_value, sources)
     return rest.responseto(list)
+
+
+def del_source(source_id):
+    """
+    删除数据集和与之相关的所有变量记录
+    :param source_id:
+    :return:
+    """
+    source_service.delete_source_by_id()

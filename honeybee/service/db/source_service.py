@@ -1,6 +1,9 @@
 # coding=utf-8
+import logging as log
+
 from common.db.mysql import db_util
-from beans.tool_model import Source
+from beans.tool_model import Source,Variable
+from  datetime import datetime
 
 """
 每一个工程依赖的数据源在数据库中的记录的增删改查
@@ -19,6 +22,7 @@ def add_source(source):
 def get_sources(id=None, project_id=None):
     """
     获得用户的所有资源
+    :param id:
     :param owner_id:  用户的id
     :return: list of source
     """
@@ -36,8 +40,19 @@ def delete_source_by_id(source_id):
     :param source_id: 资源相关主键id
     :return: 数据库更新的条目数
     """
-    update = {'is_deleted': 1}
-    return db_util.update_dict(Source, update, id=source_id)
+    session = db_util.get_orm().session
+    try:
+        update = {'is_deleted': 1,'modify_date':datetime.now()}
+        session.query(Source).filter(Source.id == source_id).update(update)
+        session.query(Variable).filter(Variable.source_id == source_id).update(update)
+        session.flush()
+    except Exception,e:
+        session.rollback()
+        log.error(e,exc_info = 1)
+        raise e
+    finally:
+        session.commit()
+        session.close()
 
 
 def update_source(source):
@@ -48,3 +63,6 @@ def update_source(source):
     """
     update = db_util.update_transform(Source, source)
     return db_util.update_dict(Source, update, id=source.id)
+
+
+delete_source_by_id(1)

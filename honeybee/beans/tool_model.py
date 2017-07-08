@@ -1,11 +1,14 @@
 # coding=utf-8
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DATETIME, CHAR,DECIMAL, BINARY, INT, Integer, String, ForeignKey, TEXT, UniqueConstraint, Index
+from sqlalchemy import Column, DATETIME, CHAR, DECIMAL, BINARY, INT, Integer, String, ForeignKey, TEXT, \
+    UniqueConstraint, Index
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm.query import Query
 import datetime
 import json
+
 Base = declarative_base()
 
 
@@ -20,29 +23,60 @@ def drop_db():
                            echo=True)
     Base.metadata.drop_all(engine)
 
+
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj.__class__, DeclarativeMeta):
-            # an SQLAlchemy class
-            fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                data = obj.__getattribute__(field)
-                try:
-                    json.dumps(data)     # this will fail on non-encodable values, like other classes
-                    fields[field] = data
-                except TypeError:    # 添加了对datetime的处理
-                    if isinstance(data, datetime.datetime):
-                        fields[field] = data.isoformat(sep = " ")
-                    elif isinstance(data, datetime.date):
-                        fields[field] = data.isoformat()
-                    elif isinstance(data, datetime.timedelta):
-                        fields[field] = (datetime.datetime.min + data).time().isoformat()
-                    else:
-                        fields[field] = None
-            # a json-encodable dict
-            return fields
+        # if isinstance(obj.__class__, DeclarativeMeta):
+        #     # an SQLAlchemy class
+        #     fields = {}
+        #     for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+        #         data = obj.__getattribute__(field)
+        #         try:
+        #             json.dumps(data)     # this will fail on non-encodable values, like other classes
+        #             fields[field] = data
+        #         except TypeError:    # 添加了对datetime的处理
+        #             if isinstance(data, datetime.datetime):
+        #                 fields[field] = data.isoformat(sep = " ")
+        #             elif isinstance(data, datetime.date):
+        #                 fields[field] = data.isoformat()
+        #             elif isinstance(data, datetime.timedelta):
+        #                 fields[field] = (datetime.datetime.min + data).time().isoformat()
+        #             else:
+        #                 fields[field] = None
+        # a json-encodable dict
+        # return fields
+        if isinstance(obj, Query):
+            # 定义一个字典数组
+            fields = []
+            # 定义一个字典对象
+            record = {}
+            # 检索结果集的行记录
+            for rec in obj.all():
+                # 检索记录中的成员
+                for field in [x for x in dir(rec) if
+                              # 过滤属性
+                              not x.startswith('_')
+                              # 过滤掉方法属性
+                              and hasattr(rec.__getattribute__(x), '__call__') == False
+                              # 过滤掉不需要的属性
+                              and x != 'metadata']:
+                    data = rec.__getattribute__(field)
 
+                    if isinstance(data, datetime.datetime):
+                        record[field] = data.isoformat(sep=" ")
+                    else:
+                        record[field] = data
+                    # elif isinstance(data, datetime.date):
+                    #     record[field] = data.isoformat()
+                    # elif isinstance(data, datetime.timedelta):
+                    #     record[field] = (datetime.datetime.min + data).time().isoformat()
+                    fields.append(record)
+            # 返回字典数组
+            return fields
+            # 其他类型的数据按照默认的方式序列化成JSON
         return json.JSONEncoder.default(self, obj)
+
+        # return json.JSONEncoder.default(self, obj)
 
 
 class TableBase(AlchemyEncoder):
@@ -74,7 +108,7 @@ class Model(TableBase, Base):
     )
 
 
-class ModelContent(TableBase,Base):
+class ModelContent(TableBase, Base):
     __tablename__ = 'tool_model_content'
     model_name = Column(String(100), nullable=True)
     model_branch = Column(String(100), nullable=True)
@@ -88,7 +122,7 @@ class ModelContent(TableBase,Base):
     )
 
 
-class ModelSelectedVariable(TableBase,Base):
+class ModelSelectedVariable(TableBase, Base):
     __tablename__ = 'tool_model_selected_variable'
     model_name = Column(String(100), nullable=True)
     model_branch = Column(String(100), nullable=True)
@@ -124,32 +158,32 @@ class Source(TableBase, Base):
     训练依赖的数据集
     """
     __tablename__ = 'maas_source'
-    project_id = Column(Integer, nullable=True) #所属工程id
+    project_id = Column(Integer, nullable=True)  # 所属工程id
     set_name = Column(String(50), nullable=True)  # 用户指定的数据集名称
-    file_name = Column(String(100), nullable=True) # 已上传的文件的名称
-    file_size = Column(String(10),nullable=True) # 已上传的文件的大小
-    file_path = Column(String(100),nullable=True) # 已上传的文件的路径
-    file_type = Column(CHAR,nullable=True) # 文件存储的形式 0为本地,1为hdfs
-    file_scope = Column(CHAR, nullable=True) # 0 代表public 1代表private
-    file_origin = Column(CHAR, nullable=True) # 0 代表由用户上传
-    file_readable = Column(CHAR, nullable=True) # 0 代表是否可以被解析 1代表解析的时候出错
+    file_name = Column(String(100), nullable=True)  # 已上传的文件的名称
+    file_size = Column(String(10), nullable=True)  # 已上传的文件的大小
+    file_path = Column(String(100), nullable=True)  # 已上传的文件的路径
+    file_type = Column(CHAR, nullable=True)  # 文件存储的形式 0为本地,1为hdfs
+    file_scope = Column(CHAR, nullable=True)  # 0 代表public 1代表private
+    file_origin = Column(CHAR, nullable=True)  # 0 代表由用户上传
+    file_readable = Column(CHAR, nullable=True)  # 0 代表是否可以被解析 1代表解析的时候出错
 
 
-class Variable(TableBase,Base):
+class Variable(TableBase, Base):
     """
     从数据集中获取的变量
     """
     __tablename__ = 'maas_variable'
-    variable_name = Column(String(100),nullable=True) #变量名称
-    source_id = Column(Integer, nullable=True) # 所属数据集id
-    usage = Column(CHAR, nullable=True) # 0代表未被使用 1代表被使用
+    variable_name = Column(String(100), nullable=True)  # 变量名称
+    source_id = Column(Integer, nullable=True)  # 所属数据集id
+    usage = Column(CHAR, nullable=True)  # 0代表未被使用 1代表被使用 2代表作为target使用
     type = Column(String(12), nullable=True)
-    total_count = Column(Integer, nullable=True) # 总记录数
-    non_missing_count = Column(Integer, nullable=True) # 非空值记录数
-    missing_count = Column(Integer, nullable=True) #空值记录数
-    coverage = Column(String(30),nullable=True) #覆盖率
+    total_count = Column(Integer, nullable=True)  # 总记录数
+    non_missing_count = Column(Integer, nullable=True)  # 非空值记录数
+    missing_count = Column(Integer, nullable=True)  # 空值记录数
+    coverage = Column(String(30), nullable=True)  # 覆盖率
     unique_val = Column(Integer, nullable=True)
-    min = Column(String(40),nullable=True)
+    min = Column(String(40), nullable=True)
     max = Column(String(40), nullable=True)
     mean = Column(String(40), nullable=True)
 
