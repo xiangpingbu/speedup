@@ -1,5 +1,7 @@
 # coding=utf-8
-from rest.app_base import *
+from rest.app_base import app
+from util import restful_tools as rest
+
 import requests
 import json
 
@@ -13,5 +15,5 @@ def get_res(key):
     # response = requests.get(url)
     response = requests.post(url, data=d)
     # print(response)
-    return responseto(data=json.loads(response.text))
+    return rest.responseto(data=json.loads(response.text))
 

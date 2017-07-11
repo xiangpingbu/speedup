@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 import collections
+import os
 import sys
+import json
+
 from collections import OrderedDict
+from datetime import datetime
 from io import BytesIO
+from xml.dom import minidom
 import numpy as np
 import pandas as pd
 import requests
 from flask import send_file
+
 from beans.Pmml import *
 from common.constant import const
+from common import global_value
 from rest.app_base import *
 from service import binning_service as bf
-from service import basic_analysis_service as ba
-from service import logit_model_service as lmf
-from util import common as cmm
-from util.ZipFile import *
-from xml.dom import minidom
-import os
 from service.db import tool_model_service
-from datetime import datetime
-from common.util import common_util
+from util import common as cmm, simple_util
+from util.ZipFile import *
+from util import restful_tools as rest
 
 base = '/tool'
 base_path = "./util/"
@@ -76,7 +78,7 @@ def init():
     out = get_boundary(init_result, min_val)
     # 根据iv排序
     out_sorted_iv = sort_iv(out)
-    return responseto(data=out_sorted_iv)
+    return rest.responseto(data=out_sorted_iv)
 
 
 @app.route(base + "/rank", methods=['POST'])
@@ -88,7 +90,8 @@ def rank():
     data = request.form.get("data")
     json_obj = json.loads(data)
     out_sorted_iv = sort_iv(json_obj)
-    return responseto(data=out_sorted_iv)
+    return rest.responseto(data=out_sorted_iv)
+
 
 @app.route(base + "/divide", methods=['POST'])
 def divide():
@@ -146,10 +149,10 @@ def divide():
         data = generate_response(name, df, iv)
         # data = get_merged(name, df, min_val)
 
-        return responseto(data=data)
+        return rest.responseto(data=data)
     else:
         val = data_map["selected"][name].split("|")
-        df[name] = df[name].apply(lambda x: common_util.float_nan_to_str_nan(x))
+        df[name] = df[name].apply(lambda x: simple_util.float_nan_to_str_nan(x))
 
         df = df[df[name].isin(val)]
 
@@ -174,7 +177,7 @@ def divide():
 
         data = generate_response(name, df, iv)
         # data = get_merged(name, df, min_val)
-        return responseto(data=data)
+        return rest.responseto(data=data)
 
 
 @app.route(base + "/divide_manually", methods=['POST'])
@@ -204,7 +207,7 @@ def divide_manually():
                    'bad_rate', 'woe',
                    'type']
 
-    target = tool_model_service.load_model(model_name=model_name, model_branch =branch)[0]["model_target"]
+    target = tool_model_service.load_model(model_name=model_name, model_branch=branch)[0]["model_target"]
     result = bf.adjust_bin(df_train, type == "true", variable_name, boundary_list
                            , target=target, expected_column={variable_name})
 
@@ -212,7 +215,7 @@ def divide_manually():
     df = pd.DataFrame(result,
                       columns=columns)
     data = generate_response(variable_name, df, iv)
-    return responseto(data=data)
+    return rest.responseto(data=data)
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -257,9 +260,9 @@ def apply():
     output.seek(0)
 
     file = send_file(output, as_attachment=True, attachment_filename='df_iv.xlsx')
-    response = make_response(file)
+    response = rest.make_response(file)
 
-    return responsePandas(response)
+    return rest.responsePandas(response)
 
 
 @app.route(base + "/if_applyed", methods=['POST'])
@@ -269,19 +272,16 @@ def if_applyed():
 
     """
     if safely_apply:
-        return responseto(success=True)
+        return rest.responseto(success=True)
     else:
-        return responseto(success=False)
-
-
-
+        return rest.responseto(success=False)
 
 
 def apply_get_woe_value(var_name, var_value, var_dict):
     var_content = var_dict[var_name]
     var_type = var_content[0]['type']
     if var_type == 'Numerical':
-        if not common_util.is_num(var_value):
+        if not simple_util.is_num(var_value):
             return 0.0
         for row in var_content:
             if row['min_boundary'] == '-inf':
@@ -305,6 +305,7 @@ def apply_get_woe_value(var_name, var_value, var_dict):
                 return float(row['woe'])
         return 0.0
 
+
 @app.route(base + "/upload", methods=['OPTIONS', 'POST'])
 def upload():
     """工具依赖的源文件修改"""
@@ -320,14 +321,15 @@ def upload():
             file_path = storage + "/" + filename
             # filename = secure_filename(file.filename.decode('utf-8'))
             if (os.path.exists(file_path)):
-                return responseto(data="file exist", success=False)
+                return rest.responseto(data="file exist", success=False)
             else:
                 file.save(file_path)
                 model_name = filename.split(".")
                 tool_model_service.create_branch(model_name=model_name[0], model_branch="master",
                                                  create_date=datetime.now(), modify_date=datetime.now(),
                                                  file_path=file_path, model_target="")
-    return responseto(data="success")
+    return rest.responseto(data="success")
+
 
 @app.route(base + "/load_applyed", methods=['OPTIONS', 'POST'])
 def load_applyed():
@@ -335,15 +337,16 @@ def load_applyed():
     # 在跨域的情况下,前端会发送OPTIONS请求进行试探,然后再发送POST请求
     if request.method == 'POST':
         # 获取training文件上传的路径
-        model_name =  request.form.get("model_name")
-        branch =  request.form.get("branch")
+        model_name = request.form.get("model_name")
+        branch = request.form.get("branch")
         files = request.files.getlist("file[]")
         for file in files:
-            df_map = global_value.get_value(model_name+"_"+branch)
+            df_map = global_value.get_value(model_name + "_" + branch)
             df = pd.read_excel(file, encoding="utf-8")
             df_map["df_train_woe"] = df[df['dev_ind'] == 1]
             df_map["df_test_woe"] = df[df['dev_ind'] == 0]
-    return responseto(data="success")
+    return rest.responseto(data="success")
+
 
 @app.route(base + "/column_config", methods=['POST'])
 def column_config():
@@ -360,18 +363,18 @@ def column_config():
     list = var_dict['list']
     model_name = var_dict['model_name']
     model_branch = var_dict['model_branch']
-    #p_value值,以逗号隔开
+    # p_value值,以逗号隔开
     params = var_dict["params"]
-    #从数据库中得到binning_record,并根据list中variable的顺序排序
+    # 从数据库中得到binning_record,并根据list中variable的顺序排序
     result = sort_variable(list.split(","),
                            tool_model_service.load_binning_record(model_name, model_branch, list.split(",")))
     p_value_list = []
     param_list = params.split(",")
     data = []
     mem_zip_file = MemoryZipFile()
-    for index,variable in enumerate(result):
+    for index, variable in enumerate(result):
         variable_name = variable["variable_name"]
-        p_value_list.append({variable_name:param_list[index]})
+        p_value_list.append({variable_name: param_list[index]})
         records = json.loads(variable["binning_record"], encoding="utf8")
         first_row = records[0]
         # 如果type为true,那么为Numrical
@@ -452,7 +455,7 @@ def column_config():
 
     mem_zip_file.append_content('column_config/column_config.json', column_config)
     mem_zip_file.append_content('column_config/model.pmml', xml_str)
-    mem_zip_file.append_content('column_config/lr.json', json.dumps(p_value_list,ensure_ascii=False))
+    mem_zip_file.append_content('column_config/lr.json', json.dumps(p_value_list, ensure_ascii=False))
     # return responseFile(make_response(mem_zip_file),"config.zip")
     return send_file(mem_zip_file.read(), attachment_filename='config.zip', as_attachment=True)
 
@@ -469,6 +472,34 @@ def column_config2():
 
 def get_init(df, target=None, invalid=None, valid=None, fineMinLeafRate=0.05):
     data_map = bf.get_init_bin(df, target, invalid, valid, fineMinLeafRate)
+    keys = data_map.keys()
+    out = collections.OrderedDict()
+    for k in keys:
+        row_data = collections.OrderedDict()
+        c = data_map[k]
+        subList = []
+        var_name = c[0]
+        # var_type = c[1]
+        woe_map = c[2]
+        boundary = c[3]
+        iv = c[4]
+        var_content = collections.OrderedDict()
+        var_content['iv'] = iv
+        for index, row in woe_map.iterrows():  # 获取每行的index、row
+            for col_name in woe_map.columns:
+                if isinstance(row[col_name], np.ndarray):
+                    row_data[col_name] = "|".join(str(i).encode('utf-8') for i in row[col_name].tolist())
+                else:
+                    row_data[col_name] = str(row[col_name])
+                    if col_name == 'max':
+                        row_data['min_boundary'] = row["min"]
+                        row_data['max_boundary'] = row["max"]
+
+            subList.append(row_data)
+            row_data = collections.OrderedDict()
+        var_content['var_table'] = subList
+        out[var_name] = var_content
+    return out
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
@@ -705,7 +736,8 @@ def merge():
 
     data = generate_response(var_name, df, iv)
     # data = get_merged(var_name, df, min_val)
-    return responseto(data=data)
+    return rest.responseto(data=data)
+
 
 '''
 导出变量配置
@@ -715,8 +747,8 @@ def merge():
 @app.route(base + "/export", methods=['POST'])
 def export_variables():
     data = request.form.get("data")
-    response = make_response(data)
-    return responseFile(response, "variable_config.json")
+    response = rest.make_response(data)
+    return rest.responseFile(response, "variable_config.json")
 
 
 '''
@@ -756,6 +788,7 @@ def export_variables():
 导出变量到excel
 '''
 
+
 def generate_response(var_name, df, iv):
     # data = {var_name: []}
     data = collections.OrderedDict()
@@ -788,7 +821,7 @@ def sort_variable(variables, result):
 
     new_result = [{}] * (len(v) - 1)
     for variable in result:
-        i = v[variable["variable_name"].decode('utf-8')]
+        i = v[variable.variable_name.decode('utf-8')]
         new_result[i] = variable
 
     return new_result

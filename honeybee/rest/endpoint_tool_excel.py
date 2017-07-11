@@ -34,8 +34,8 @@ def export_selected_variable():
     data = tablib.Dataset(*new_result, headers=headers)
 
     # 实例化一个Workbook()对象(即excel文件)
-    resp = make_response(data.xlsx)
-    return responseFile(resp, "selected_variable." + type)
+    resp = rest.make_response(data.xlsx)
+    return rest.responseto(resp, "selected_variable." + type)
 
 @app.route(base+"/export_score_card",methods=['POST'])
 def export_score_card():

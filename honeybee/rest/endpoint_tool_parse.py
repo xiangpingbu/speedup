@@ -1,13 +1,16 @@
 # coding=utf-8
-from rest.app_base import *
-from service.db import tool_model_service
-from common.util import common_util
+import os
+
 import pandas as pd
-from util import common as cmm
-from common import global_value
-from service import basic_analysis_service as ba
-from datetime import datetime
+from flask import request
+
 from beans.tool_model import *
+from common import global_value
+from rest.app_base import app
+from service import basic_analysis_service as ba
+from service.db import tool_model_service
+from util import common as cmm, simple_util
+from util import restful_tools as rest
 
 base = '/tool'
 
@@ -57,21 +60,21 @@ def parse():
         data_map["selected_list"] = v.selected_list
         data_map["target"] = v.model_target
 
-        return responseto(data=data_map)
+        return rest.responseto(data=data_map)
     else:
-        return responseto(message="file not exist", success=False)
+        return rest.responseto(message="file not exist", success=False)
 
 
 @app.route(base + "/create_model_name", methods=['GET'])
 def create_model_name():
     model_name = request.args.get("model_name")
 
-    if tool_model_service.load_model(model_name=model_name,model_branch="master") is None:
+    if tool_model_service.load_model(model_name=model_name, model_branch="master") is None:
         if tool_model_service.create_branch():
-            return responseto({"model_name":model_name,"model_branch":"master"})
+            return rest.responseto({"model_name": model_name, "model_branch": "master"})
         else:
-            return responseto("create fail", success=False)
-    return responseto("name exist", success=False)
+            return rest.responseto("create fail", success=False)
+    return rest.responseto("name exist", success=False)
 
 
 @app.route(base + "/init_model_name", methods=['GET'])
@@ -85,7 +88,7 @@ def init_model_name():
 
     result = list(set(map(lambda x: x.model_name, result)))
 
-    return responseto(result)
+    return rest.responseto(result)
 
 
 @app.route(base + "/get_branch_name", methods=['GET'])
@@ -100,7 +103,7 @@ def get_branch_name():
     # get model_branch and file_path from result
     result = list(map(lambda x: x.model_branch, result))
 
-    return responseto(result)
+    return rest.responseto(result)
 
 
 @app.route(base + "/get_branch_info", methods=['Get'])
@@ -123,11 +126,11 @@ def get_branch_info():
             list = []
             for record in result:
                 obj = ModelContent(model_name=model_name,
-                            model_branch=branch,
-                            variable_name =record["variable_name"],
-                            variable_iv =record["variable_iv"],
-                            binning_record = record["binning_record"],
-                            is_selected = record["is_selected"])
+                                   model_branch=branch,
+                                   variable_name=record["variable_name"],
+                                   variable_iv=record["variable_iv"],
+                                   binning_record=record["binning_record"],
+                                   is_selected=record["is_selected"])
                 list.append(obj)
             record = tool_model_service.load_model(model_name=model_name, model_branch=original_branch)[0]
             result = [record]
@@ -138,7 +141,7 @@ def get_branch_info():
                                                 selected_list=record["selected_list"]):
                 tool_model_service.save_binning_record(list)
         except Exception:
-            return responseto(success=False, data="添加分支失败")
+            return rest.responseto(success=False, data="添加分支失败")
 
     target = result.first().model_target
 
@@ -160,8 +163,7 @@ def get_branch_info():
     if path is not None:
         selected_file = path.replace(app.config["ROOT_PATH"] + "/", "")
 
-
-    files = common_util.listFile(app.config["ROOT_PATH"], absolute=False)
+    files = simple_util.listFile(app.config["ROOT_PATH"], absolute=False)
 
     data = {"target": target, "selected_file": selected_file, "files": files}
 
@@ -184,14 +186,14 @@ def new_branch():
     list = []
     for record in result:
         obj = ModelContent(model_name=model_name,
-                    model_branch=branch,
-                    variable_name=record["variable_name"],
-                    variable_iv=record["variable_iv"],
-                    binning_record=record["binning_record"],
-                    is_selected=record["is_selected"])
+                           model_branch=branch,
+                           variable_name=record["variable_name"],
+                           variable_iv=record["variable_iv"],
+                           binning_record=record["binning_record"],
+                           is_selected=record["is_selected"])
         list.append(obj)
 
     if tool_model_service.copy_branch(model_name, branch, original_branch):
         tool_model_service.save_binning_record(list)
-        return responseto(data=True)
-    return responseto(data=False)
+        return rest.responseto(data=True)
+    return rest.responseto(data=False)

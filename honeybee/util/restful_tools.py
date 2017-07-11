@@ -44,7 +44,7 @@ def responseto(data=None, message=None, success=True, **kwargs):
     #             data['error'] = False
     # # if not isinstance(data, dict):
     # #     data = {'error':True, 'message':'data 必须是一个 dict！'}
-    resp = make_response(json.dumps(result))
+    resp = make_response(json.dumps(result,cls=result['cls']))
     # 跨域设置
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Content-Type'] = 'application/json'

@@ -1,6 +1,6 @@
 import re
 
-@outputSchema("element:tuple(id:long,customer cid:chararray, total_cnt:long)")
+# @outputSchema("element:tuple(id:long,customer cid:chararray, total_cnt:long)")
 def process(bag):
     return findSubstring
 

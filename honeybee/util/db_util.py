@@ -1,5 +1,5 @@
 # coding=utf-8
-def process_query(sql,params):
+def process_query(sql, params):
     """
     query查询 sql通用化
     :param sql: 根据param中的key拼接sql
@@ -15,24 +15,19 @@ def process_query(sql,params):
             if index != len(params) - 1:
                 sql += " and "
             list.append(value)
-            index +=1
-    return [sql,list]
+            index += 1
+    return [sql, list]
 
-def process_insert(sql,params):
+
+def process_insert(sql, params):
     key_list = []
     value_list = []
-    for key,value in params.items():
+    for key, value in params.items():
         key_list.append(key)
         value_list.append(value)
 
-    sql+=" ( "+",".join(key_list)+") values"
+    sql += " ( " + ",".join(key_list) + ") values"
 
-    sql+= " ("+','.join((map(lambda x: '%s', value_list))) + ")"
+    sql += " (" + ','.join((map(lambda x: '%s', value_list))) + ")"
 
-    return [sql,value_list]
-
-
-
-
-
-
+    return [sql, value_list]

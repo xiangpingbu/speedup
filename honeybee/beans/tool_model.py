@@ -1,9 +1,13 @@
 # coding=utf-8
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DATETIME, CHAR, BINARY, INT, Integer, String, ForeignKey,TEXT,UniqueConstraint, Index
+from sqlalchemy import Column, DATETIME, CHAR, DECIMAL, BINARY, INT, Integer, String, ForeignKey, TEXT, \
+    UniqueConstraint, Index
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
-
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm.query import Query
+import datetime
+import json
 
 Base = declarative_base()
 
@@ -19,6 +23,71 @@ def drop_db():
                            echo=True)
     Base.metadata.drop_all(engine)
 
+
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        # if isinstance(obj.__class__, DeclarativeMeta):
+        #     # an SQLAlchemy class
+        #     fields = {}
+        #     for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+        #         data = obj.__getattribute__(field)
+        #         try:
+        #             json.dumps(data)     # this will fail on non-encodable values, like other classes
+        #             fields[field] = data
+        #         except TypeError:    # 添加了对datetime的处理
+        #             if isinstance(data, datetime.datetime):
+        #                 fields[field] = data.isoformat(sep = " ")
+        #             elif isinstance(data, datetime.date):
+        #                 fields[field] = data.isoformat()
+        #             elif isinstance(data, datetime.timedelta):
+        #                 fields[field] = (datetime.datetime.min + data).time().isoformat()
+        #             else:
+        #                 fields[field] = None
+        # a json-encodable dict
+        # return fields
+        if isinstance(obj, Query):
+            # 定义一个字典数组
+            fields = []
+            # 检索结果集的行记录
+            for rec in obj.all():
+                # 检索记录中的成员
+                record = {}
+                for field in [x for x in dir(rec) if
+                              # 过滤属性
+                              not x.startswith('_')
+                              # 过滤掉方法属性
+                              and hasattr(rec.__getattribute__(x), '__call__') == False
+                              # 过滤掉不需要的属性
+                              and x != 'metadata'
+                              and x != 'key_separator'
+                              and x != 'item_separator']:
+                    # 定义一个字典对象
+                    data = rec.__getattribute__(field)
+
+                    if isinstance(data, datetime.datetime):
+                        record[field] = data.isoformat(sep=" ")
+                    else:
+                        record[field] = data
+                        # elif isinstance(data, datetime.date):
+                        #     record[field] = data.isoformat()
+                        # elif isinstance(data, datetime.timedelta):
+                        #     record[field] = (datetime.datetime.min + data).time().isoformat()
+                fields.append(record)
+            # 返回字典数组
+            return fields
+            # 其他类型的数据按照默认的方式序列化成JSON
+        return json.JSONEncoder.default(self, obj)
+
+        # return json.JSONEncoder.default(self, obj)
+
+
+class TableBase(AlchemyEncoder):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    is_deleted = Column(CHAR, nullable=False, server_default='0')
+    create_date = Column(DATETIME, nullable=True, server_default=func.now())
+    modify_date = Column(DATETIME, nullable=True, server_default=func.now())
+
+
 # class User(Base):
 #     __tablename__='maas_user'
 #     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -26,17 +95,13 @@ def drop_db():
 #     user_password = Column(String(100), nullable=True)
 
 
-class Model(Base):
+class Model(TableBase, Base):
     __tablename__ = 'tool_model'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    model_name = Column(String(100), nullable=True,doc="模型名称")
+    model_name = Column(String(100), nullable=True)
     model_branch = Column(String(100), nullable=True)
     model_target = Column(String(100), nullable=True)
     remove_list = Column(String(5000), nullable=True)
     selected_list = Column(String(5000), nullable=True)
-    create_date = Column(DATETIME, nullable=True, server_default=func.now())
-    modify_date = Column(DATETIME, nullable=True, server_default=func.now())
-    is_deleted = Column(CHAR, nullable=False, server_default='0')
     file_path = Column(String(500), nullable=False)
 
     __table_args__ = (
@@ -45,40 +110,94 @@ class Model(Base):
     )
 
 
-class ModelContent(Base):
+class ModelContent(TableBase, Base):
     __tablename__ = 'tool_model_content'
-    id = Column(Integer, primary_key=True, autoincrement=True)
     model_name = Column(String(100), nullable=True)
     model_branch = Column(String(100), nullable=True)
     variable_name = Column(String(100), nullable=True)
     variable_iv = Column(String(100), nullable=True)
     binning_record = Column(TEXT, nullable=True)
-    is_deleted = Column(CHAR, nullable=False, server_default='0')
     is_selected = Column(CHAR, nullable=False, server_default='0')
-    create_date = Column(DATETIME, nullable=True, server_default=func.now())
-    modify_date = Column(DATETIME, nullable=True, server_default=func.now())
 
     __table_args__ = (
-        UniqueConstraint('model_name', 'model_branch', model_name='c_branch_name'),
+        UniqueConstraint('model_name', 'model_branch', name='c_branch_name'),
     )
 
 
-class ModelSelectedVariable(Base):
+class ModelSelectedVariable(TableBase, Base):
     __tablename__ = 'tool_model_selected_variable'
-    id = Column(Integer, primary_key=True, autoincrement=True)
     model_name = Column(String(100), nullable=True)
     model_branch = Column(String(100), nullable=True)
     selected_variable = Column(String(15000), nullable=True)
-    is_deleted = Column(CHAR, nullable=False, server_default='0')
-    create_date = Column(DATETIME, nullable=True, server_default=func.now())
-    modify_date = Column(DATETIME, nullable=True, server_default=func.now())
-
     __table_args__ = (
-        UniqueConstraint('model_name', 'model_branch', model_name='v_branch_name'),
+        UniqueConstraint('model_name', 'model_branch', name='v_branch_name'),
     )
 
 
-init_db()
+class User(TableBase, Base):
+    """
+    用户信息
+    """
+    __tablename__ = 'maas_user'
+    user_nick = Column(String(50), nullable=True)  # 用户昵称
+    user_email = Column(String(50), unique=True, nullable=True, index=True)  # 邮箱
+    user_password = Column(String(100), nullable=True)  # 密码,使用md5加密
 
-# DB_Session = sessionmaker(bind=engine)
-# session = DB_Session()
+
+class Project(TableBase, Base):
+    """
+    工程信息
+    """
+    __tablename__ = 'maas_project'
+    owner_id = Column(Integer, nullable=True)
+    project_name = Column(String(50), nullable=True)
+    project_task = Column(String(20), nullable=True)
+    project_desc = Column(String(50), nullable=True)
+
+
+class Source(TableBase, Base):
+    """
+    训练依赖的数据集
+    """
+    __tablename__ = 'maas_source'
+    project_id = Column(Integer, nullable=True)  # 所属工程id
+    set_name = Column(String(50), nullable=True)  # 用户指定的数据集名称
+    file_name = Column(String(100), nullable=True)  # 已上传的文件的名称
+    file_size = Column(String(10), nullable=True)  # 已上传的文件的大小
+    file_path = Column(String(100), nullable=True)  # 已上传的文件的路径
+    file_type = Column(CHAR, nullable=True)  # 文件类型 如excel,csv
+    file_storage = Column(CHAR, nullable=False,server_default='0')  # 存储类型 0为local
+    file_scope = Column(CHAR, nullable=True)  # 0 代表public 1代表private
+    file_origin = Column(CHAR, nullable=True)  # 0 代表由用户上传
+    file_readable = Column(CHAR, nullable=True)  # 0 代表是否可以被解析 1代表解析的时候出错
+    available = Column(CHAR, nullable=False, server_default='0')  # 0 代表不可被使用 1代表可被使用
+
+
+class Variable(TableBase, Base):
+    """
+    从数据集中获取的变量
+    """
+    __tablename__ = 'maas_variable'
+    variable_name = Column(String(100), nullable=True)  # 变量名称
+    source_id = Column(Integer, nullable=True)  # 所属数据集id
+    usage = Column(CHAR, nullable=True)  # 0代表未被使用 1代表被使用 2代表作为target使用
+    type = Column(String(12), nullable=True)
+    total_count = Column(Integer, nullable=True)  # 总记录数
+    non_missing_count = Column(Integer, nullable=True)  # 非空值记录数
+    missing_count = Column(Integer, nullable=True)  # 空值记录数
+    coverage = Column(String(30), nullable=True)  # 覆盖率
+    unique_val = Column(Integer, nullable=True)
+    min = Column(String(40), nullable=True)
+    max = Column(String(40), nullable=True)
+    mean = Column(String(40), nullable=True)
+
+
+class Experiment(TableBase, Base):
+    __tablename__ = 'maas_experiment'
+    source_id = Column(Integer, nullable=True)
+    project_id = Column(Integer, nullable=True)
+    title = Column(String(40), nullable=True)
+    algorithm = Column(CHAR, nullable=True)  # 算法类型 0代表LR(Logistic Regression)
+
+
+init_db()

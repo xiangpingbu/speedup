@@ -7,6 +7,7 @@ import copy
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
+import logging as log
 
 
 def get_init_bin(df_train, target, invalid=None,valid= None, min_leaf_rate=0.05):
@@ -39,22 +40,24 @@ def get_init_bin(df_train, target, invalid=None,valid= None, min_leaf_rate=0.05)
     for v in vars:
         a = v  in vars_list
         if a == if_valid:
-            t = str(df[v].dtype)
-            tree_bin = get_tree_bin(df, v, target, t, null_value_list=[], tree_deep=3, min_leaf_rate=min_leaf_rate)
-            # IV
-            var_iv = tree_bin['IV']
-            if t in ['object', 'str']:
-                boundary_list = str(tree_bin['df_map'][v].tolist())
-            else:
-                boundary_list = str(tree_bin['df_map']['min'].tolist())
+            try:
+                t = str(df[v].dtype)
+                tree_bin = get_tree_bin(df, v, target, t, null_value_list=[], tree_deep=3, min_leaf_rate=min_leaf_rate)
+                # IV
+                var_iv = tree_bin['IV']
+                if t in ['object', 'str']:
+                    boundary_list = str(tree_bin['df_map'][v].tolist())
+                else:
+                    boundary_list = str(tree_bin['df_map']['min'].tolist())
 
-            new_bin = pd.DataFrame({"var_name": v, "iv": var_iv, "tree_boundary": boundary_list}, index=["0"])
-            df_iv = df_iv.append(new_bin)
+                new_bin = pd.DataFrame({"var_name": v, "iv": var_iv, "tree_boundary": boundary_list}, index=["0"])
+                df_iv = df_iv.append(new_bin)
 
-            # boundary
-            new_df_map = tree_bin['df_map']
-            iv_rank_map[v] = (v, t, new_df_map, boundary_list, var_iv)
-
+                # boundary
+                new_df_map = tree_bin['df_map']
+                iv_rank_map[v] = (v, t, new_df_map, boundary_list, var_iv)
+            except Exception, e:
+                log.error(e)
     return iv_rank_map
 
 
