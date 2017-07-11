@@ -41,12 +41,11 @@ def add_user(user):
     return result
 
 
-@db_util.error_handler
 def find_user(email):
     """
     通过邮箱查找用户
     :param email: 邮箱
     :return: 用户信息
     """
-    results = db_util.query(User, User.user_email == email)
+    results = db_util.query(User, user_email = email,is_deleted = 0)
     return results.first()

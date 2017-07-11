@@ -48,29 +48,31 @@ class AlchemyEncoder(json.JSONEncoder):
         if isinstance(obj, Query):
             # 定义一个字典数组
             fields = []
-            # 定义一个字典对象
-            record = {}
             # 检索结果集的行记录
             for rec in obj.all():
                 # 检索记录中的成员
+                record = {}
                 for field in [x for x in dir(rec) if
                               # 过滤属性
                               not x.startswith('_')
                               # 过滤掉方法属性
                               and hasattr(rec.__getattribute__(x), '__call__') == False
                               # 过滤掉不需要的属性
-                              and x != 'metadata']:
+                              and x != 'metadata'
+                              and x != 'key_separator'
+                              and x != 'item_separator']:
+                    # 定义一个字典对象
                     data = rec.__getattribute__(field)
 
                     if isinstance(data, datetime.datetime):
                         record[field] = data.isoformat(sep=" ")
                     else:
                         record[field] = data
-                    # elif isinstance(data, datetime.date):
-                    #     record[field] = data.isoformat()
-                    # elif isinstance(data, datetime.timedelta):
-                    #     record[field] = (datetime.datetime.min + data).time().isoformat()
-                    fields.append(record)
+                        # elif isinstance(data, datetime.date):
+                        #     record[field] = data.isoformat()
+                        # elif isinstance(data, datetime.timedelta):
+                        #     record[field] = (datetime.datetime.min + data).time().isoformat()
+                fields.append(record)
             # 返回字典数组
             return fields
             # 其他类型的数据按照默认的方式序列化成JSON
@@ -163,10 +165,12 @@ class Source(TableBase, Base):
     file_name = Column(String(100), nullable=True)  # 已上传的文件的名称
     file_size = Column(String(10), nullable=True)  # 已上传的文件的大小
     file_path = Column(String(100), nullable=True)  # 已上传的文件的路径
-    file_type = Column(CHAR, nullable=True)  # 文件存储的形式 0为本地,1为hdfs
+    file_type = Column(CHAR, nullable=True)  # 文件类型 如excel,csv
+    file_storage = Column(CHAR, nullable=False,server_default='0')  # 存储类型 0为local
     file_scope = Column(CHAR, nullable=True)  # 0 代表public 1代表private
     file_origin = Column(CHAR, nullable=True)  # 0 代表由用户上传
     file_readable = Column(CHAR, nullable=True)  # 0 代表是否可以被解析 1代表解析的时候出错
+    available = Column(CHAR, nullable=False, server_default='0')  # 0 代表不可被使用 1代表可被使用
 
 
 class Variable(TableBase, Base):
@@ -186,6 +190,14 @@ class Variable(TableBase, Base):
     min = Column(String(40), nullable=True)
     max = Column(String(40), nullable=True)
     mean = Column(String(40), nullable=True)
+
+
+class Experiment(TableBase, Base):
+    __tablename__ = 'maas_experiment'
+    source_id = Column(Integer, nullable=True)
+    project_id = Column(Integer, nullable=True)
+    title = Column(String(40), nullable=True)
+    algorithm = Column(CHAR, nullable=True)  # 算法类型 0代表LR(Logistic Regression)
 
 
 init_db()

@@ -119,10 +119,12 @@ def column_config(list, params, result):
 
 
 # binning recordd的内容
-file_path = '/Users/lifeng/Library/Containers/com.tencent.xinWeChat/Data/Library/Application ' \
-            'Support/com.tencent.xinWeChat/2.0b4.0.9/e95dc620ef049ee0f78c04b5aaa20b6e/Message/MessageTemp' \
-            '/bf41c67aaf05640f4129133babc42bf9/File/procident_fund.json '
-params = ["1", "1", "1", "1", "1", "1", "1"]
+# file_path = '/Users/lifeng/Library/Containers/com.tencent.xinWeChat/Data/Library/Application ' \
+#             'Support/com.tencent.xinWeChat/2.0b4.0.9/e95dc620ef049ee0f78c04b5aaa20b6e/Message/MessageTemp' \
+#             '/bf41c67aaf05640f4129133babc42bf9/File/procident_fund.json '
+
+file_path = '/Users/lifeng/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/e95dc620ef049ee0f78c04b5aaa20b6e/Message/MessageTemp/bf41c67aaf05640f4129133babc42bf9/File/social_insurance(2).json'
+# params = ["1", "1", "1", "1", "1", "1", "1"]
 
 fp = open(file_path)
 fund_json = json.load(fp, encoding='utf-8')
@@ -130,7 +132,14 @@ fund_json = json.load(fp, encoding='utf-8')
 key_list = map(lambda x: x, fund_json.keys())
 print ','.join(key_list)
 
-binning_list = map(lambda x: {"variable_name": x, "binning_record": fund_json[x]}, fund_json.keys())
+binning_list = list()
+params = list()
+for key in fund_json.keys():
+    binning_list.append({"variable_name": key, "binning_record": fund_json[key]})
+
+    obj = fund_json[key][0]
+    params.append(str(fund_json[key][0]['coefficient']))
+
 
 result = sort_variable(key_list, binning_list)
 

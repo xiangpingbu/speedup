@@ -2,7 +2,7 @@
 import logging as log
 
 from common.db.mysql import db_util
-from beans.tool_model import Source,Variable
+from beans.tool_model import Source, Variable
 from  datetime import datetime
 
 """
@@ -19,19 +19,22 @@ def add_source(source):
     return db_util.add_one(source)
 
 
-def get_sources(id=None, project_id=None):
+def get_source(id):
+    """
+    根据主键获得source
+    :param id: 主键
+    :return: source
+    """
+    return db_util.query(Source, is_deleted=0, id=id)
+
+
+def get_sources(project_id):
     """
     获得用户的所有资源
-    :param id:
-    :param owner_id:  用户的id
+    :param project_id: 工程id
     :return: list of source
     """
-    params = {}
-    if id != None:
-        params['id'] = id
-    if project_id != None:
-        params['project_id'] = project_id
-    return db_util.query(Source, **params)
+    return db_util.query(Source, is_deleted=0, project_id=project_id)
 
 
 def delete_source_by_id(source_id):
@@ -42,13 +45,13 @@ def delete_source_by_id(source_id):
     """
     session = db_util.get_orm().session
     try:
-        update = {'is_deleted': 1,'modify_date':datetime.now()}
+        update = {'is_deleted': 1, 'modify_date': datetime.now()}
         session.query(Source).filter(Source.id == source_id).update(update)
         session.query(Variable).filter(Variable.source_id == source_id).update(update)
         session.flush()
-    except Exception,e:
+    except Exception, e:
         session.rollback()
-        log.error(e,exc_info = 1)
+        log.error(e, exc_info=1)
         raise e
     finally:
         session.commit()
@@ -65,4 +68,3 @@ def update_source(source):
     return db_util.update_dict(Source, update, id=source.id)
 
 
-delete_source_by_id(1)

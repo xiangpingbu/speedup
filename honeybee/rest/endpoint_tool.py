@@ -2,11 +2,12 @@
 import collections
 import os
 import sys
+import json
+
 from collections import OrderedDict
 from datetime import datetime
 from io import BytesIO
 from xml.dom import minidom
-
 import numpy as np
 import pandas as pd
 import requests
@@ -14,11 +15,13 @@ from flask import send_file
 
 from beans.Pmml import *
 from common.constant import const
+from common import global_value
 from rest.app_base import *
 from service import binning_service as bf
 from service.db import tool_model_service
 from util import common as cmm, simple_util
 from util.ZipFile import *
+from util import restful_tools as rest
 
 base = '/tool'
 base_path = "./util/"
@@ -75,7 +78,7 @@ def init():
     out = get_boundary(init_result, min_val)
     # 根据iv排序
     out_sorted_iv = sort_iv(out)
-    return responseto(data=out_sorted_iv)
+    return rest.responseto(data=out_sorted_iv)
 
 
 @app.route(base + "/rank", methods=['POST'])
@@ -87,7 +90,7 @@ def rank():
     data = request.form.get("data")
     json_obj = json.loads(data)
     out_sorted_iv = sort_iv(json_obj)
-    return responseto(data=out_sorted_iv)
+    return rest.responseto(data=out_sorted_iv)
 
 
 @app.route(base + "/divide", methods=['POST'])
@@ -146,7 +149,7 @@ def divide():
         data = generate_response(name, df, iv)
         # data = get_merged(name, df, min_val)
 
-        return responseto(data=data)
+        return rest.responseto(data=data)
     else:
         val = data_map["selected"][name].split("|")
         df[name] = df[name].apply(lambda x: simple_util.float_nan_to_str_nan(x))
@@ -174,7 +177,7 @@ def divide():
 
         data = generate_response(name, df, iv)
         # data = get_merged(name, df, min_val)
-        return responseto(data=data)
+        return rest.responseto(data=data)
 
 
 @app.route(base + "/divide_manually", methods=['POST'])
@@ -212,7 +215,7 @@ def divide_manually():
     df = pd.DataFrame(result,
                       columns=columns)
     data = generate_response(variable_name, df, iv)
-    return responseto(data=data)
+    return rest.responseto(data=data)
 
 
 @app.route(base + "/apply", methods=['POST'])
@@ -257,9 +260,9 @@ def apply():
     output.seek(0)
 
     file = send_file(output, as_attachment=True, attachment_filename='df_iv.xlsx')
-    response = make_response(file)
+    response = rest.make_response(file)
 
-    return responsePandas(response)
+    return rest.responsePandas(response)
 
 
 @app.route(base + "/if_applyed", methods=['POST'])
@@ -269,9 +272,9 @@ def if_applyed():
 
     """
     if safely_apply:
-        return responseto(success=True)
+        return rest.responseto(success=True)
     else:
-        return responseto(success=False)
+        return rest.responseto(success=False)
 
 
 def apply_get_woe_value(var_name, var_value, var_dict):
@@ -318,14 +321,14 @@ def upload():
             file_path = storage + "/" + filename
             # filename = secure_filename(file.filename.decode('utf-8'))
             if (os.path.exists(file_path)):
-                return responseto(data="file exist", success=False)
+                return rest.responseto(data="file exist", success=False)
             else:
                 file.save(file_path)
                 model_name = filename.split(".")
                 tool_model_service.create_branch(model_name=model_name[0], model_branch="master",
                                                  create_date=datetime.now(), modify_date=datetime.now(),
                                                  file_path=file_path, model_target="")
-    return responseto(data="success")
+    return rest.responseto(data="success")
 
 
 @app.route(base + "/load_applyed", methods=['OPTIONS', 'POST'])
@@ -342,7 +345,7 @@ def load_applyed():
             df = pd.read_excel(file, encoding="utf-8")
             df_map["df_train_woe"] = df[df['dev_ind'] == 1]
             df_map["df_test_woe"] = df[df['dev_ind'] == 0]
-    return responseto(data="success")
+    return rest.responseto(data="success")
 
 
 @app.route(base + "/column_config", methods=['POST'])
@@ -469,6 +472,34 @@ def column_config2():
 
 def get_init(df, target=None, invalid=None, valid=None, fineMinLeafRate=0.05):
     data_map = bf.get_init_bin(df, target, invalid, valid, fineMinLeafRate)
+    keys = data_map.keys()
+    out = collections.OrderedDict()
+    for k in keys:
+        row_data = collections.OrderedDict()
+        c = data_map[k]
+        subList = []
+        var_name = c[0]
+        # var_type = c[1]
+        woe_map = c[2]
+        boundary = c[3]
+        iv = c[4]
+        var_content = collections.OrderedDict()
+        var_content['iv'] = iv
+        for index, row in woe_map.iterrows():  # 获取每行的index、row
+            for col_name in woe_map.columns:
+                if isinstance(row[col_name], np.ndarray):
+                    row_data[col_name] = "|".join(str(i).encode('utf-8') for i in row[col_name].tolist())
+                else:
+                    row_data[col_name] = str(row[col_name])
+                    if col_name == 'max':
+                        row_data['min_boundary'] = row["min"]
+                        row_data['max_boundary'] = row["max"]
+
+            subList.append(row_data)
+            row_data = collections.OrderedDict()
+        var_content['var_table'] = subList
+        out[var_name] = var_content
+    return out
     keys = data_map.keys()
     out = collections.OrderedDict()
     for k in keys:
@@ -705,7 +736,7 @@ def merge():
 
     data = generate_response(var_name, df, iv)
     # data = get_merged(var_name, df, min_val)
-    return responseto(data=data)
+    return rest.responseto(data=data)
 
 
 '''
@@ -716,8 +747,8 @@ def merge():
 @app.route(base + "/export", methods=['POST'])
 def export_variables():
     data = request.form.get("data")
-    response = make_response(data)
-    return responseFile(response, "variable_config.json")
+    response = rest.make_response(data)
+    return rest.responseFile(response, "variable_config.json")
 
 
 '''

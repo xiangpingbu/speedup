@@ -19,7 +19,7 @@ def get_projects(owner_id):
     :param owner_id:  用户的id
     :return: Project
     """
-    return db_util.query(Project, owner_id=owner_id)
+    return db_util.query(Project, owner_id=owner_id,is_deleted = 0)
 
 
 def get_project_by_id(owner_id, project_id):
@@ -29,7 +29,7 @@ def get_project_by_id(owner_id, project_id):
     :param project_id:
     :return:
     """
-    return db_util.query(Project, owner_id=owner_id, project_id=project_id)
+    return db_util.query(Project, owner_id=owner_id, project_id=project_id,is_deleted = 0)
 
 
 def delete_project(project_id):

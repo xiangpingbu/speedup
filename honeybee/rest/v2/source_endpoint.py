@@ -42,13 +42,15 @@ def add_source():
 
     f = files[0]
     from unicodedata import normalize
-    filename = normalize('NFKD', f.filename).encode('utf-8', 'ignore')
-    file_path = app.config['ROOT_PATH'] + "/" + filename
+    file_name = normalize('NFKD', f.filename).encode('utf-8', 'ignore')
+    file_path = app.config['ROOT_PATH'] + "/" + file_name
+    file_type = file_name[file_name.find('.')+1:]
     # 保存文件至本地
     f.save(file_path)
     size = simple_util.get_file_size(file_path)
 
-    source.file_name = filename  # 上传的文件的名称
+    source.file_type = file_type
+    source.file_name = file_name  # 上传的文件的名称
     source.file_path = file_path
     source.file_size = size
 
@@ -63,7 +65,7 @@ def source_parse(source_id):
     :param source_id:
     :return:
     """
-    source = source_service.get_sources(source_id)
+    source = source_service.get_source(source_id)
     file_path = source.file_path
     df = None
     is_success = True
@@ -145,4 +147,9 @@ def del_source(source_id):
     :param source_id:
     :return:
     """
-    source_service.delete_source_by_id()
+    source_service.delete_source_by_id(source_id)
+
+
+file_name = '123.excel'
+type = file_name[file_name.find('.')+1:]
+print type
