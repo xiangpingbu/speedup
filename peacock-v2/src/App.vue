@@ -1,23 +1,29 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <!--<img src="./assets/logo.png">-->
+    <TopBar></TopBar>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import TopBar from '@/components/TopBar.vue'
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    TopBar
+  }
 }
 </script>
 
 <style>
+/*@import "https://unpkg.com/element-ui/lib/theme-default/index.css";*/
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  /*font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 10px;*/
 }
 </style>

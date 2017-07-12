@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <!-- <TopBar></TopBar> -->
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
@@ -21,12 +22,17 @@
 </template>
 
 <script>
+import TopBar from '@/components/TopBar.vue'
+
 export default {
   name: 'hello',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
     }
+  },
+  components: {
+    TopBar
   }
 }
 </script>
