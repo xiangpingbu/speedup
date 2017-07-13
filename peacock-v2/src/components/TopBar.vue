@@ -5,9 +5,8 @@
         <router-link to='/'>
           Home
         </router-link>
-        <router-link to=pathList[1]>
-          <!-- {{Project}} -->
-          {{pathList[1]}}
+        <router-link to='/test/'>
+          {{Project}}
         </router-link>
         <router-link to='/'>
           {{Algorithm}}
@@ -25,7 +24,7 @@
         // console.log(this.$route)
         // console.log(this.$route.fullPath.split('/'))
         this.$nextTick(() => {
-          this.pathList = this.$route.fullPath === '/' ? ['Home'] : this.$route.fullPath.split('/')
+          this.pathList = this.$route.fullPath.split('/')
           this.pathList.shift()
           console.log(this.pathList)
           this.pathList.push('tt')
@@ -33,6 +32,7 @@
       },
       data () {
         return {
+          // id: this.$route.id,
           activeIndex: '1',
           activeIndex2: '1',
           pathList: []
