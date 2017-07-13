@@ -3,6 +3,7 @@
       <logo></logo>
       <div class="line">
         <router-link to='/'>
+          <span><i class="fa fa-home" aria-hidden="true"></i></span>
           Home
         </router-link>
         <router-link to='/test/'>
@@ -59,6 +60,7 @@
 
 <style>
   /*@import "../assets/inspinia/";*/
+  @import '../assets/inspinia/font-awesome/css/font-awesome.min.css';
   body {
     margin: 0;
   }
