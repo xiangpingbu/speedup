@@ -17,6 +17,7 @@
 
 <script>
     import logo from '@/components/Logo.vue'
+    // import {mapMutations} from 'vuex'
     export default {
       name: 'TopBar',
       props: ['Project', 'Algorithm'],
@@ -28,6 +29,7 @@
           this.pathList.shift()
           console.log(this.pathList)
           this.pathList.push('tt')
+          console.log((Array.join(this.pathList)))
         })
       },
       data () {
@@ -35,13 +37,18 @@
           // id: this.$route.id,
           activeIndex: '1',
           activeIndex2: '1',
-          pathList: []
+          pathList: [],
+          ProjectMap: []
         }
       },
       methods: {
+        // ...mapMutations(['saveData', 'saveId']),
         handleSelect (key, keyPath) {
           console.log(key, keyPath)
           // console.log(this.$route)
+        },
+        getProjectDetail (id) {
+          this.ProjectMap = this.$store.state.map.id
         }
       },
       components: {
@@ -51,6 +58,7 @@
 </script>
 
 <style>
+  /*@import "../assets/inspinia/";*/
   body {
     margin: 0;
   }
