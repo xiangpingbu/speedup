@@ -2,8 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
 import Page from '@/pages/Page'
+
 // import SideBar from '@/components/sidebar/Sidebar'
 import source from '@/components/dataSource/SourceBody'
+import modal from '@/components/dataSource/SourceModal'
 
 Vue.use(Router)
 
@@ -27,6 +29,11 @@ export default new Router({
       path: '/source',
       name: 'source',
       component: source
+    },
+    {
+      path: '/modal',
+      name: 'modal',
+      component: modal
     }
   ]
 })

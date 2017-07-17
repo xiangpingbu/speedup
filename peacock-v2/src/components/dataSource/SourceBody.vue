@@ -19,13 +19,12 @@
 
           <div class="pull-right">
             <button tooltip-placement="top" uib-tooltip="Edit data source" tooltip-append-to-body="true"
-                    tooltip-enable="true" class="btn btn-sm btn-info ng-scope" data-ng-if="controller.access.auth"
-                    data-ng-click="controller.editDataset(rd)">
+                    tooltip-enable="true" class="btn btn-sm btn-info ng-scope"
+                    >
               <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
             </button>
             <button tooltip-placement="top" uib-tooltip="Delete data source" tooltip-append-to-body="true"
-                    tooltip-enable="true" class="btn btn-sm btn-danger ng-scope" data-ng-if="controller.access.auth"
-                    data-ng-click="controller.removeDataset(rd, $index)">
+                    tooltip-enable="true" class="btn btn-sm btn-danger ng-scope">
               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
           </div>

@@ -11,12 +11,29 @@
           </li>
           <li>
             <router-link to='/test/'>
+              <span><i class="fa fa-bookmark" aria-hidden="true"></i></span>
               Project
             </router-link>
           </li>
           <li>
-            <router-link to='/'>
+            <router-link to='/source'>
+              <span><i class="fa fa-folder-open" aria-hidden="true"></i></span>
               {{Algorithm}}
+            </router-link>
+          </li>
+        </ul>
+
+      </div>
+      <div class="sign">
+        <ul >
+          <li>
+            <router-link to='/'>
+              Sign in
+            </router-link>
+          </li>
+          <li>
+            <router-link to='/' class="btn-sign">
+              Sign up for maas
             </router-link>
           </li>
         </ul>
@@ -37,8 +54,6 @@
           this.pathList = this.$route.fullPath.split('/')
           this.pathList.shift()
           console.log(this.pathList)
-          this.pathList.push('tt')
-          console.log((Array.join(this.pathList)))
         })
       },
       data () {
@@ -102,5 +117,28 @@
     text-transform: uppercase;
     color: white;
     text-decoration: none;
+  }
+  .sign {
+    float: right;
+    /*padding-left: 10px;*/
+    margin-top: 10px;
+  }
+  .sign li {
+    display: inline-block;
+    padding-left: 5px;
+  }
+  .sign a {
+    font-family: "Roboto Condensed",sans-serif;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+    padding: 5px;
+  }
+  .btn-sign {
+    font-family: "Roboto Condensed",sans-serif;
+    background-color: rgba(255,255,255,.15);
+    color: #fff;
+    border-radius: 4px;
+    transition: all .2s ease;
   }
 </style>
