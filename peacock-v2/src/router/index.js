@@ -6,6 +6,7 @@ import Page from '@/pages/Page'
 // import SideBar from '@/components/sidebar/Sidebar'
 import source from '@/components/dataSource/SourceBody'
 import modal from '@/components/dataSource/SourceModal'
+import side from '@/components/component/body/Body'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router({
       path: '/modal',
       name: 'modal',
       component: modal
+    },
+    {
+      path: '/side',
+      name: 'side',
+      component: side
     }
   ]
 })
