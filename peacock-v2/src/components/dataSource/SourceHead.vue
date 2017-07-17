@@ -8,7 +8,7 @@
       <button data-toggle="modal" data-target="#dataset" class="btn btn-primary">Add new database1</button>
     </span>
   </MainHead>
-    <SourceModal :toggleId=toggleId>
+    <SourceModal :toggleId='modalId'>
     </SourceModal>
   </div>
 </template>
@@ -20,7 +20,7 @@
   export default {
     data () {
       return {
-        toggleId: 'dataset'
+        modalId: 'dataset'
       }
     },
     components: {MainHead, SourceModal}

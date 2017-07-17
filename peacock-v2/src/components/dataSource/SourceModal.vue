@@ -39,11 +39,6 @@
     components: {Modal},
     name: 'SourceModal',
     componentName: 'SourceModal',
-    data () {
-      return {
-        toggleId: this.props
-      }
-    },
     props: ['toggleId']
   }
 
