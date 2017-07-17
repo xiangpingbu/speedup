@@ -2,16 +2,24 @@
     <div class="top">
       <logo></logo>
       <div class="line">
-        <router-link to='/'>
-          <span><i class="fa fa-home" aria-hidden="true"></i></span>
-          Home
-        </router-link>
-        <router-link to='/test/'>
-          {{Project}}
-        </router-link>
-        <router-link to='/'>
-          {{Algorithm}}
-        </router-link>
+        <ul>
+          <li>
+            <router-link to='/'>
+              <span><i class="fa fa-home" aria-hidden="true"></i></span>
+              Home
+            </router-link>
+          </li>
+          <li>
+            <router-link to='/test/'>
+              Project
+            </router-link>
+          </li>
+          <li>
+            <router-link to='/'>
+              {{Algorithm}}
+            </router-link>
+          </li>
+        </ul>
       </div>
     </div>
 </template>
@@ -77,8 +85,19 @@
     display: inline-block;
     /*vertical-align: middle;*/
     /*text-align: center;*/
+    margin-left: -30px;
+    margin-top: 10px;
+  }
+  .line li {
+    display: inline-block;
+    font-family: "Roboto Condensed",sans-serif;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+    padding-left: 5px;
   }
   .line a {
+    /*display: inline-block;*/
     font-family: "Roboto Condensed",sans-serif;
     text-transform: uppercase;
     color: white;
