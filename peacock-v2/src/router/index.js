@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
-<<<<<<< HEAD
 import Page from '@/pages/Page'
-=======
-import SideBar from '@/components/sidebar/Sidebar'
+
+// import SideBar from '@/components/sidebar/Sidebar'
 import source from '@/components/dataSource/SourceBody'
->>>>>>> upstream/dev-lifeng-0711-peacock-v2
+import modal from '@/components/dataSource/SourceModal'
+import side from '@/components/component/body/Body'
 
 Vue.use(Router)
 
@@ -18,20 +18,32 @@ export default new Router({
       component: Hello
     },
     {
-<<<<<<< HEAD
       path: '/test',
       name: 'Page',
       component: Page
-=======
-      path: '/side',
-      name: 'Sidebar',
-      component: SideBar
+      // path: '/side',
+      // name: 'Sidebar',
+      // component: SideBar
     },
     {
-      path: '/source',
+      path: '/test/:id',
       name: 'source',
       component: source
->>>>>>> upstream/dev-lifeng-0711-peacock-v2
+    },
+    // {
+    //   path: '/source',
+    //   name: 'source',
+    //   component: source
+    // },
+    {
+      path: '/modal',
+      name: 'modal',
+      component: modal
+    },
+    {
+      path: '/side',
+      name: 'side',
+      component: side
     }
   ]
 })

@@ -18,19 +18,18 @@
     margin-top: 0;
     margin-bottom: 15px;
     border-bottom: 1px solid rgba(0, 0, 0, .075);
-    padding-top: 15px;
-    padding-bottom: 16px;
+    padding-bottom: 20px;
     padding-left: 40px;
     padding-right: 40px;
     background-color: #fafafa;
     overflow: hidden;
     position: relative;
-    z-index: 1001;
+    /*z-index: 1001;*/
   }
 
   .page-head h1 {
     font-size: 20px;
-    margin-top: 0;
+    margin-top: 20px;
     margin-bottom: 0;
     display: inline-block;
     font-family: "Roboto Condensed",sans-serif;
