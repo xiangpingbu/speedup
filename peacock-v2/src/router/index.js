@@ -20,16 +20,20 @@ export default new Router({
       path: '/test',
       name: 'Page',
       component: Page
-      //
       // path: '/side',
       // name: 'Sidebar',
       // component: SideBar
     },
     {
-      path: '/source',
+      path: '/test/:id',
       name: 'source',
       component: source
     },
+    // {
+    //   path: '/source',
+    //   name: 'source',
+    //   component: source
+    // },
     {
       path: '/modal',
       name: 'modal',

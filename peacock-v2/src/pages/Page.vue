@@ -2,11 +2,12 @@
   <div>
     <!-- <TopBar v-if="loading"></TopBar> -->
     <span>Page</span>
+    <ProjectCard :id="id"></ProjectCard>
   </div>
 </template>
 
 <script>
-  import TopBar from '@/components/TopBar.vue'
+  import ProjectCard from '@/components/ProjectCard'
   export default {
     name: 'Page',
     created () {
@@ -14,11 +15,12 @@
     },
     data () {
       return {
+        id: 'source',
         loading: true
       }
     },
     components: {
-      TopBar
+      ProjectCard
     }
   }
 </script>
