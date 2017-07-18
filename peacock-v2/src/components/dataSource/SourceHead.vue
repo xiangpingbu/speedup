@@ -20,7 +20,7 @@
   export default {
     data () {
       return {
-        toggleId: 'dataset'
+        modalId: 'dataset'
       }
     },
     components: {MainHead, SourceModal}
