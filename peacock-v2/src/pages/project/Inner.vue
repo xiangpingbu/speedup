@@ -25,6 +25,13 @@ export default {
       this.toggleStatus = toggleStatus
     })
   },
+  watch: {
+    '$route.path' () {
+      if (this.$route.path.split('/').length < 4) {
+        this.$router.push(`${this.$route.path}/datasource`)
+      }
+    }
+  },
   components: {
     Sidebar
   }
