@@ -17,8 +17,10 @@ export default {
     }
   },
   created() {
-    // default router, TODO: use router config
-    this.$router.push(`${this.$route.path}/datasource`)
+    // default router
+    if (this.$route.path.split('/').length === 4) {
+      this.$router.push(`${this.$route.path}/datasource`)
+    }
     this.$root.$on('toggleStatus', toggleStatus => {
       this.toggleStatus = toggleStatus
     })

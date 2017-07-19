@@ -80,6 +80,10 @@ export default new Router({
             path: 'predict',
             name: 'project.predict',
             component: AnalyticsPredict
+          },
+          {
+            path: '*',
+            redirect: { name: 'project.source' }
           }
         ]
       }]
