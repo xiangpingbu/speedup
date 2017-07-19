@@ -8,7 +8,9 @@ import ProjectInner from '@/pages/project/Inner'
 import ProjectList from '@/pages/project/List'
 // project data
 import DataPreview from '@/pages/project/data/Preview'
-import DataSource from '@/pages/project/data/Source'
+// import DataSource from '@/pages/project/data/Source'
+import DataSource from '@/pages/project/data/Source/SourceBody'
+
 // project train
 import TrainExperiment from '@/pages/project/train/Experiment'
 import TrainResult from '@/pages/project/train/Result'

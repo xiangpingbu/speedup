@@ -33,10 +33,9 @@ export default {
 <style lang="scss" scoped>
 .main {
   margin-left: 280px;
-  padding: 20px;
+  // padding: 20px;
   &.toggle-hide {
     margin-left: 60px;
   }
 }
 </style>
-
