@@ -10,7 +10,7 @@
             </router-link>
           </li>
           <li>
-            <router-link to='/test'>
+            <router-link to='/app'>
               <span><i class="fa fa-bookmark" aria-hidden="true"></i></span>
               Project
             </router-link>

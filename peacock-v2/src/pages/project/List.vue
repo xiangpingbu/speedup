@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <TopBar v-if="loading"></TopBar> -->
-    <span>Page</span>
+    <ProjectCard :id="id"></ProjectCard>
+    <!-- mock  -->
     <ProjectCard :id="id"></ProjectCard>
   </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
   import ProjectCard from '@/components/ProjectCard'
   export default {
-    name: 'Page',
+    name: 'projectlist',
     created () {
       // console.log(this.$route)
     },
