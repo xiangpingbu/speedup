@@ -34,7 +34,7 @@
 
 
 <script>
-  import Modal from '@/components/component/body/Modal'
+  import Modal from '@/components/Modal'
   export default {
     components: {Modal},
     name: 'SourceModal',

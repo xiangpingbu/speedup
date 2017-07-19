@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <SourceHead></SourceHead>
-    <div class="col-sm-6">
+    <div class="col-sm-6 card">
       <div class="panel panel-primary">
         <div class="panel-body">
           <b>Dataset:</b> {{Dataset}}<br>
@@ -36,7 +36,7 @@
 
 <script>
   // 引用头部标签
-  import SourceHead from '@/components/datasource/SourceHead.vue'
+  import SourceHead from '@/pages/project/data/Source/SourceHead.vue'
 //  import axios from 'axios'
   export default {
     created: function () {
@@ -57,6 +57,10 @@
 </script>
 
 <style>
+  .card {
+    margin-left: -10px;
+  }
+
   .panel-body {
     padding: 15px;
   }
@@ -86,4 +90,3 @@
     float: right;
   }
 </style>
-

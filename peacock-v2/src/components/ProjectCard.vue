@@ -67,7 +67,7 @@ export default {
   methods: {
     viewDetails (id) {
       this.$router.push({
-        name: 'source',
+        name: 'project',
         params: {
           id
         }

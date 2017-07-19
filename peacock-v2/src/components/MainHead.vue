@@ -24,6 +24,7 @@
     background-color: #fafafa;
     overflow: hidden;
     position: relative;
+    height: 55px;
     /*z-index: 1001;*/
   }
 

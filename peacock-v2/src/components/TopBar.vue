@@ -10,7 +10,7 @@
             </router-link>
           </li>
           <li>
-            <router-link to='/test'>
+            <router-link to='/app'>
               <span><i class="fa fa-bookmark" aria-hidden="true"></i></span>
               Project
             </router-link>
@@ -88,10 +88,14 @@
           this.pathList = this.$route.fullPath.split('/').filter((item) => {
             return item !== ''
           })
-          console.log(this.pathList)
-          if (this.pathList.length > 1) {
-            this.isProject = true
+          // TODO:
+          if (this.$route.path.split('/').length === 4) {
+            this.$router.push(`${this.$route.path}/datasource`)
           }
+          // console.log(this.pathList)
+          // if (this.pathList.length > 1) {
+          //   this.isProject = true
+          // }
         }
       },
       computed: {
