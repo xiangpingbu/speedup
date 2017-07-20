@@ -5,6 +5,15 @@ from beans import tool_model
 import util.restful_tools as rest
 from flask import request
 
+@app.route("/project/list/<string:user_id>", methods=['get'])
+def get_projects(user_id):
+    """
+    获得该用户所有的工程
+    :return:
+    """
+    projects = project_service.get_projects(user_id)
+    return rest.responseto(projects,cls = tool_model.AlchemyEncoder)
+
 
 @app.route("/project/add", methods=['post'])
 def add_project():
