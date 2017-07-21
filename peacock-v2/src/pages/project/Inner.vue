@@ -19,7 +19,8 @@ export default {
   created() {
     // default router
     if (this.$route.path.split('/').length === 4) {
-      this.$router.push(`${this.$route.path}/datasource`)
+      // this.$router.push(`${this.$route.path}/datasource`)
+      this.$router.push(`${this.$route.path}/info`)
     }
     this.$root.$on('toggleStatus', toggleStatus => {
       this.toggleStatus = toggleStatus
@@ -27,9 +28,9 @@ export default {
   },
   watch: {
     '$route.path' () {
-      if (this.$route.path.split('/').length < 4) {
-        this.$router.push(`${this.$route.path}/datasource`)
-      }
+      // if (this.$route.path.split('/').length < 4) {
+      //   this.$router.push(`${this.$route.path}/datasource`)
+      // }
     }
   },
   components: {

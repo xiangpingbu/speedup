@@ -84,13 +84,18 @@
       },
       watch: {
         '$route' () {
-          console.log(this.$route.fullPath)
+          // console.log(this.$route.fullPath)
           this.pathList = this.$route.fullPath.split('/').filter((item) => {
             return item !== ''
           })
           // TODO:
           if (this.$route.path.split('/').length === 4) {
-            this.$router.push(`${this.$route.path}/datasource`)
+            var pArray = this.$route.path.split('/')
+            // back to project app page
+            pArray.splice(2, 2)
+            // console.log(pArray.join('/'))
+            this.$router.push(pArray.join('/'))
+            // this.$router.push(`${this.$route.path}/datasource`)
           }
           // console.log(this.pathList)
           // if (this.pathList.length > 1) {

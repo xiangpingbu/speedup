@@ -6,6 +6,8 @@ import HomePage from '@/pages/HomePage'
 import Project from '@/pages/Project'
 import ProjectInner from '@/pages/project/Inner'
 import ProjectList from '@/pages/project/List'
+// project info
+import Info from '@/pages/project/Info'
 // project data
 import DataPreview from '@/pages/project/data/Preview'
 // import DataSource from '@/pages/project/data/Source'
@@ -49,6 +51,12 @@ export default new Router({
         name: 'project',
         component: ProjectInner,
         children: [
+          // info
+          {
+            path: 'info',
+            name: 'project.info',
+            component: Info
+          },
           // data
           {
             path: 'datapreview',
@@ -85,7 +93,7 @@ export default new Router({
           },
           {
             path: '*',
-            redirect: { name: 'project.source' }
+            redirect: { name: 'project.info' }
           }
         ]
       }]
