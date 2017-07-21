@@ -1,8 +1,11 @@
 <template>
-  <div class="container-full">
-    <div class="container-fluid">
-      <div class="row">
-        <ProjectCard :projects='projects'></ProjectCard>
+  <div>
+    <ProjectHead></ProjectHead>
+    <div class="container-full">
+      <div class="container-fluid">
+        <div class="row">
+          <ProjectCard :projects='projects'></ProjectCard>
+        </div>
       </div>
     </div>
   </div>
@@ -10,6 +13,7 @@
 
 <script>
   import ProjectCard from '@/components/ProjectCard'
+  import ProjectHead from '@/pages/project/ProjectHead'
   import http from '@/constant/honeybeeConfig'
   export default {
     name: 'projectlist',
@@ -26,7 +30,8 @@
       }
     },
     components: {
-      ProjectCard
+      ProjectCard,
+      ProjectHead
     }
   }
 </script>
