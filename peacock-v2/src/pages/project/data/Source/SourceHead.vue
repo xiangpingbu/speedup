@@ -8,14 +8,14 @@
         <button data-toggle="modal" data-target="#dataset" class="btn btn-primary">Add new database1</button>
       </span>
     </MainHead>
-    <SourceModal :toggleId="toggleId">
+    <SourceModal :toggleId="modalId">
     </SourceModal>
   </div>
 </template>
 
 <script>
-  import MainHead from '@/components/component/body/MainHead'
-  import SourceModal from '@/components/dataSource/SourceModal.vue'
+  import MainHead from '@/components/MainHead'
+  import SourceModal from '@/pages/project/data/Source/SourceModal'
 
   export default {
     data () {

@@ -20,7 +20,7 @@ def statusResponse(statu_dic):
     return jsonify({'status': statu_dic})
 
 
-def responseto(data=None, message=None, success=True, **kwargs):
+def responseto(data=None, message=None, success=True,cls=None, **kwargs):
     """ 封装 json 响应"""
     result = kwargs
     result['success'] = success
@@ -44,7 +44,7 @@ def responseto(data=None, message=None, success=True, **kwargs):
     #             data['error'] = False
     # # if not isinstance(data, dict):
     # #     data = {'error':True, 'message':'data 必须是一个 dict！'}
-    resp = make_response(json.dumps(result,cls=result['cls']))
+    resp = make_response(json.dumps(result,cls=cls))
     # 跨域设置
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Content-Type'] = 'application/json'

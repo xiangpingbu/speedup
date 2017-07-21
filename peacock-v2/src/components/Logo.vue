@@ -1,5 +1,6 @@
 <template>
-  <img class="logo" src="https://pailie-img.oss-cn-shanghai.aliyuncs.com/assets/images/logo.png">
+  <!-- <img class="logo" src="https://pailie-img.oss-cn-shanghai.aliyuncs.com/assets/images/logo.png"> -->
+  <img src="http://via.placeholder.com/80x40">
 </template>
 
 <script>

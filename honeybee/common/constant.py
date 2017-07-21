@@ -19,3 +19,5 @@ class DBConstant():
 
     EXPERIMENT_LR = 0  # Logistic Regression
     EXPERIMENT_ALG_NAME = {0: 'Logistic Regression'}
+
+    PROJECT_TASK = {0: 'Regression'}

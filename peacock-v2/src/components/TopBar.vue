@@ -10,15 +10,15 @@
             </router-link>
           </li>
           <li>
-            <router-link to='/test/'>
+            <router-link to='/app'>
               <span><i class="fa fa-bookmark" aria-hidden="true"></i></span>
               Project
             </router-link>
           </li>
-          <li>
-            <router-link to='/source'>
+          <li v-if="id">
+            <router-link :to="id">
               <span><i class="fa fa-folder-open" aria-hidden="true"></i></span>
-              {{Algorithm}}
+              {{id}}
             </router-link>
           </li>
         </ul>
@@ -50,17 +50,21 @@
       created () {
         // console.log(this.$route)
         // console.log(this.$route.fullPath.split('/'))
-        this.$nextTick(() => {
-          this.pathList = this.$route.fullPath.split('/')
-          this.pathList.shift()
-          console.log(this.pathList)
-        })
+        // this.$nextTick(() => {
+        //   this.pathList = this.$route.fullPath.split('/')
+        //   // this.pathList.shift()
+        //   console.log(this.pathList)
+        //
+        //   if (this.pathList.length > 2) {
+        //     this.isProject = true
+        //   }
+        // })
       },
       data () {
         return {
-          // id: this.$route.id,
-          activeIndex: '1',
-          activeIndex2: '1',
+          // id: this.$route.params.id,
+          path: this.$route.fullPath,
+          isProject: false,
           pathList: [],
           ProjectMap: []
         }
@@ -77,6 +81,32 @@
       },
       components: {
         logo
+      },
+      watch: {
+        '$route' () {
+          // console.log(this.$route.fullPath)
+          this.pathList = this.$route.fullPath.split('/').filter((item) => {
+            return item !== ''
+          })
+          // TODO:
+          if (this.$route.path.split('/').length === 4) {
+            var pArray = this.$route.path.split('/')
+            // back to project app page
+            pArray.splice(2, 2)
+            // console.log(pArray.join('/'))
+            this.$router.push(pArray.join('/'))
+            // this.$router.push(`${this.$route.path}/datasource`)
+          }
+          // console.log(this.pathList)
+          // if (this.pathList.length > 1) {
+          //   this.isProject = true
+          // }
+        }
+      },
+      computed: {
+        id () {
+          return this.$route.params.id
+        }
       }
     }
 </script>
