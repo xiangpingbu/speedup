@@ -4,8 +4,8 @@ from sqlalchemy import Column, DATETIME, CHAR, DECIMAL, BINARY, INT, Integer, St
     UniqueConstraint, Index
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.query import Query
+from util import simple_util
 import datetime
 import json
 
@@ -23,44 +23,11 @@ def drop_db():
                            echo=True)
     Base.metadata.drop_all(engine)
 
-
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, Query):
-            # 定义一个字典数组
-            fields = []
-            if len(obj.all()) > 0:
-                example = obj.first()
-                attrs = [x for x in dir(example) if
-                         # 过滤属性
-                         not x.startswith('_')
-                         # 过滤掉方法属性
-                         and hasattr(example.__getattribute__(x), '__call__') == False
-                         # 过滤掉不需要的属性
-                         and x != 'metadata'
-                         and x != 'key_separator'
-                         and x != 'item_separator']
-            # 检索结果集的行记录
-                for rec in obj.all():
-                    # 检索记录中的成员
-                    record = {}
-                    for field in attrs:
-                        # 定义一个字典对象
-                        data = rec.__getattribute__(field)
-
-                        if isinstance(data, datetime.datetime):
-                            record[field] = data.isoformat(sep=" ")
-                        else:
-                            record[field] = data
-                            # elif isinstance(data, datetime.date):
-                            #     record[field] = data.isoformat()
-                            # elif isinstance(data, datetime.timedelta):
-                            #     record[field] = (datetime.datetime.min + data).time().isoformat()
-                    fields.append(record)
-        # 返回字典数组
-            return fields
+        if isinstance(obj,Query):
+            return simple_util.query_to_base(obj)
         # 其他类型的数据按照默认的方式序列化成JSON
-
         return json.JSONEncoder.default(self, obj)
 
     # return json.JSONEncoder.default(self, obj)

@@ -1,8 +1,8 @@
 import '@/constant/global'
 import axios from 'axios'
-export default {
-  instance: axios.create({
-    baseURL: global.host,
-    timeout: 1000
-  })
-}
+const instance = axios.create({
+  baseURL: 'http://localhost:8091',
+  timeout: 1000
+})
+export default instance
+

@@ -5,7 +5,7 @@ import HomePage from '@/pages/HomePage'
 // project
 import Project from '@/pages/Project'
 import ProjectInner from '@/pages/project/Inner'
-import ProjectList from '@/pages/project/List'
+import ProjectList from '@/pages/project/ProjectList'
 // project data
 import DataPreview from '@/pages/project/data/Preview'
 // import DataSource from '@/pages/project/data/Source'
@@ -40,6 +40,7 @@ export default new Router({
       path: '/app',
       name: 'app',
       component: Project,
+      // 当/app匹配成功,ProjectList会被渲染在Project的<router-view>中
       children: [{
         path: '',
         name: 'project.list',

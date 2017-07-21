@@ -2,8 +2,10 @@
 from service.db import project_service
 from rest.app_base import app
 from beans import tool_model
-import util.restful_tools as rest
+from util import restful_tools as rest,simple_util
 from flask import request
+from common.constant import DBConstant
+
 
 @app.route("/project/list/<string:user_id>", methods=['get'])
 def get_projects(user_id):
@@ -11,8 +13,11 @@ def get_projects(user_id):
     获得该用户所有的工程
     :return:
     """
-    projects = project_service.get_projects(user_id)
-    return rest.responseto(projects,cls = tool_model.AlchemyEncoder)
+    query = project_service.get_projects(user_id)
+    projects = simple_util.query_to_base(query)
+    for project in projects:
+        project['project_task'] = DBConstant.PROJECT_TASK[int(project['project_task'])]
+    return rest.responseto(projects)
 
 
 @app.route("/project/add", methods=['post'])
